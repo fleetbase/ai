@@ -23,8 +23,10 @@ This module is in active development. The current version includes:
 Install this extension like any Fleetbase extension package:
 
 ```bash
-fleetbase extension:install fleetbase/ai
+flb install fleetbase/ai --path /path/to/fleetbase
 ```
+
+The `--path` value should point to the Fleetbase instance directory containing both `console/` and `api/`.
 
 For local development inside a Fleetbase workspace, ensure the console workspace includes `@fleetbase/ai-engine`, then rebuild the console assets after frontend changes.
 
