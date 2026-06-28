@@ -1,0 +1,85 @@
+{{#if this.hasCustomRenderer}}
+    <LazyEngineComponent @component={{this.customRenderer}} @params={{this.context}} as |PreviewComponent ctx|>
+        <PreviewComponent
+            @task={{ctx.task}}
+            @preview={{ctx.preview}}
+            @onApply={{ctx.onApply}}
+            @onCancel={{ctx.onCancel}}
+            @onRefresh={{ctx.onRefresh}}
+            @isApplying={{ctx.isApplying}}
+            @isCancelling={{ctx.isCancelling}}
+            @isRefreshing={{ctx.isRefreshing}}
+        />
+    </LazyEngineComponent>
+{{else}}
+    <div class="fleetbase-ai-response-region fleetbase-ai-action-card" {{did-insert this.warnIfMissingRenderer}}>
+        <div class="fleetbase-ai-action-header">
+            <div>
+                <div class="fleetbase-ai-action-title">{{@preview.label}}</div>
+                <div class="fleetbase-ai-action-message">{{@preview.message}}</div>
+            </div>
+            <span class="fleetbase-ai-action-status">{{if @preview.ready "Ready" "Needs info"}}</span>
+        </div>
+
+        {{#if @preview.fields}}
+            <div class="fleetbase-ai-action-fields">
+                {{#each @preview.fields as |field|}}
+                    <div class="fleetbase-ai-action-field">
+                        <span>{{field.label}}</span>
+                        <strong>{{or field.value "Not set"}}</strong>
+                    </div>
+                {{/each}}
+            </div>
+        {{/if}}
+
+        {{#if @preview.missing_fields}}
+            <div class="fleetbase-ai-action-list">
+                <div class="fleetbase-ai-action-list-title">Required before apply</div>
+                <ul>
+                    {{#each @preview.missing_fields as |field|}}
+                        <li>{{field}}</li>
+                    {{/each}}
+                </ul>
+            </div>
+        {{/if}}
+
+        {{#if @preview.risks}}
+            <div class="fleetbase-ai-action-list fleetbase-ai-action-muted-list">
+                <ul>
+                    {{#each @preview.risks as |risk|}}
+                        <li>{{risk}}</li>
+                    {{/each}}
+                </ul>
+            </div>
+        {{/if}}
+
+        {{#if @preview.result}}
+            <div class="fleetbase-ai-action-result">{{@preview.result.message}}</div>
+        {{/if}}
+
+        {{#if @preview.error}}
+            <div class="fleetbase-ai-action-error">{{@preview.error.message}}</div>
+        {{/if}}
+
+        {{#unless (or @preview.result @preview.error)}}
+            <div class="fleetbase-ai-action-controls">
+                <Button
+                    @type="primary"
+                    @size="sm"
+                    @icon="check"
+                    @text={{or @preview.apply_label "Apply"}}
+                    @disabled={{or @preview.isDisabled @isApplying}}
+                    @isLoading={{@isApplying}}
+                    @onClick={{fn @onApply @task @preview}}
+                />
+                <Button
+                    @size="sm"
+                    @icon="xmark"
+                    @text={{or @preview.cancel_label "Cancel"}}
+                    @disabled={{@isCancelling}}
+                    @onClick={{fn @onCancel @task}}
+                />
+            </div>
+        {{/unless}}
+    </div>
+{{/if}}

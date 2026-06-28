@@ -1,0 +1,17 @@
+{{#if this.ai.isEnabled}}
+    <div class="next-user-button fleetbase-ai-header-tray-button" ...attributes>
+        <button
+            type="button"
+            class="fleetbase-ai-header-tray-button-trigger {{if (media 'isMobile') 'is-mobile'}}"
+            aria-label="Open Fleetbase AI"
+            {{on "click" this.togglePrompt}}
+        >
+            <span class="next-org-button-trigger fleetbase-ai-header-tray-button-icon flex-shrink-0">
+                <FaIcon @icon="brain" />
+            </span>
+        </button>
+        <Attach::Tooltip @class="clean" @animation="scale" @placement="bottom">
+            <InputInfo @text="Open Fleetbase AI" />
+        </Attach::Tooltip>
+    </div>
+{{/if}}

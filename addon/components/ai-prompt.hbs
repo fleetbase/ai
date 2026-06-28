@@ -1,0 +1,197 @@
+{{#if this.ai.isOpen}}
+    <div class="fleetbase-ai-backdrop" role="button" aria-label="Close Fleetbase AI" {{on "click" this.close}}></div>
+    <div class="fleetbase-ai-overlay" role="dialog" aria-label="Fleetbase AI" {{on "click" this.close}}>
+        <div class="fleetbase-ai-shell">
+            {{#if this.showHistory}}
+                <div class="fleetbase-ai-history-overlay" {{on "click" this.stopPropagation}}>
+                    <div class="fleetbase-ai-response-region fleetbase-ai-history fleetbase-ai-history-card">
+                        <div class="fleetbase-ai-panel-title">AI Chats</div>
+                        {{#if this.ai.loadSessions.isRunning}}
+                            <div class="fleetbase-ai-muted">Loading chats...</div>
+                        {{else}}
+                            {{#each this.ai.sessions as |session|}}
+                                <div class="fleetbase-ai-history-item" role="button" tabindex="0" {{on "click" (fn this.selectSession session)}} {{on "keydown" (fn this.handleHistoryItemKeydown session)}}>
+                                    <span class="fleetbase-ai-history-copy">
+                                        <span class="fleetbase-ai-history-prompt">{{or session.title "New AI chat"}}</span>
+                                        <span class="fleetbase-ai-history-meta">
+                                            {{session.status}}
+                                            {{#if session.tasks_count}}
+                                                - {{session.tasks_count}} turns
+                                            {{/if}}
+                                        </span>
+                                    </span>
+                                    <Button
+                                        @icon="trash"
+                                        @helpText="Delete chat"
+                                        @wrapperClass="fleetbase-ai-history-delete-wrapper"
+                                        class="fleetbase-ai-history-delete"
+                                        @disabled={{this.ai.deleteSession.isRunning}}
+                                        @onClick={{fn this.deleteSession session}}
+                                    />
+                                </div>
+                            {{else}}
+                                <div class="fleetbase-ai-muted">No AI chats yet.</div>
+                            {{/each}}
+                        {{/if}}
+                    </div>
+                </div>
+            {{/if}}
+
+            {{#if this.shouldShowResponseStack}}
+                <div class="fleetbase-ai-response-stack" {{on "click" this.stopPropagation}}>
+                {{#each this.turns as |task|}}
+                    {{#if task.prompt}}
+                        <div class="fleetbase-ai-user-message">
+                            <div class="fleetbase-ai-user-message-body">
+                                <div>{{task.prompt}}</div>
+                                {{#if task.metadata.attachments}}
+                                    <div class="fleetbase-ai-message-attachments">
+                                        {{#each task.metadata.attachments as |attachment|}}
+                                            <span class="fleetbase-ai-attachment-chip">
+                                                <FaIcon @icon="paperclip" />
+                                                <span class="fleetbase-ai-attachment-name">{{or attachment.original_filename attachment.name "Attachment"}}</span>
+                                            </span>
+                                        {{/each}}
+                                    </div>
+                                {{/if}}
+                            </div>
+                        </div>
+                    {{/if}}
+
+                    {{#if task.isPending}}
+                        <div class="fleetbase-ai-response-region">
+                            <div class="fleetbase-ai-thinking" aria-live="polite">
+                                <span class="fleetbase-ai-thinking-orbs" aria-hidden="true">
+                                    <span></span>
+                                    <span></span>
+                                    <span></span>
+                                </span>
+                                <span>Thinking...</span>
+                            </div>
+                        </div>
+                    {{else}}
+                        {{#if task.response}}
+                            <div class="fleetbase-ai-response-region">
+                                <div class="fleetbase-ai-answer">
+                                    <div class="fleetbase-ai-answer-body">{{task.formattedResponse}}</div>
+                                </div>
+                            </div>
+                        {{/if}}
+                        {{#each task.actionPreviews as |preview|}}
+                            <AiActionPreviewRenderer
+                                @task={{task}}
+                                @preview={{preview}}
+                                @onApply={{this.applyAction}}
+                                @onCancel={{this.cancelAction}}
+                                @onRefresh={{this.refreshAction}}
+                                @isApplying={{this.ai.applyTask.isRunning}}
+                                @isCancelling={{this.ai.cancelTask.isRunning}}
+                                @isRefreshing={{this.ai.refreshTaskPreview.isRunning}}
+                            />
+                        {{/each}}
+                    {{/if}}
+                {{/each}}
+                </div>
+            {{/if}}
+
+            {{#let (file-queue name="fleetbase-ai-attachments" onFileAdded=(perform this.uploadAttachment) accept=this.acceptedAttachmentTypes) as |queue|}}
+                <FileDropzone @queue={{queue}} class="fleetbase-ai-dropzone" as |dropzone|>
+                    <div class="fleetbase-ai-spotlight {{if dropzone.active 'is-dragging'}}" {{on "click" this.stopPropagation}}>
+                    {{#if dropzone.active}}
+                        <div class="fleetbase-ai-drop-indicator">
+                            <FaIcon @icon="paperclip" />
+                            <span>Drop files to attach</span>
+                        </div>
+                    {{/if}}
+
+                    {{#if this.attachments}}
+                        <div class="fleetbase-ai-attachment-list">
+                            {{#each this.attachments as |attachment|}}
+                                <span class="fleetbase-ai-attachment-chip fleetbase-ai-attachment-chip-removable">
+                                    <FaIcon @icon="paperclip" />
+                                    <span class="fleetbase-ai-attachment-name">{{attachment.name}}</span>
+                                    {{#if attachment.displaySize}}
+                                        <small>{{attachment.displaySize}}</small>
+                                    {{/if}}
+                                    <button type="button" aria-label="Remove attachment" {{on "click" (fn this.removeAttachment attachment)}}>
+                                        <FaIcon @icon="xmark" />
+                                    </button>
+                                </span>
+                            {{/each}}
+                        </div>
+                    {{/if}}
+
+                    {{#if this.uploadQueue}}
+                        <div class="fleetbase-ai-attachment-list">
+                            {{#each this.uploadQueue as |file|}}
+                                <span class="fleetbase-ai-attachment-chip is-uploading">
+                                    <Spinner />
+                                    <span class="fleetbase-ai-attachment-name">{{file.name}}</span>
+                                </span>
+                            {{/each}}
+                        </div>
+                    {{/if}}
+
+                    <div class="fleetbase-ai-prompt-row">
+                        <Button @icon="clock-rotate-left" @helpText="AI chats" @wrapperClass="fleetbase-ai-button-wrapper" class="fleetbase-ai-icon-button" @onClick={{this.toggleHistory}} />
+                        <Button
+                            @icon="plus"
+                            @helpText="New chat"
+                            @wrapperClass="fleetbase-ai-button-wrapper"
+                            class="fleetbase-ai-icon-button"
+                            @disabled={{this.ai.startSession.isRunning}}
+                            @onClick={{this.startSession}}
+                        />
+                        <FileUpload
+                            @name="fleetbase-ai-attachment-picker"
+                            @for="fleetbase-ai-attachment-picker"
+                            @accept={{this.acceptedAttachmentTypes}}
+                            @multiple={{true}}
+                            @onFileAdded={{perform this.uploadAttachment}}
+                            @labelClass="fleetbase-ai-attachment-upload-label"
+                            @disabled={{this.isUploadingAttachments}}
+                        >
+                            <span class="fleetbase-ai-icon-button fleetbase-ai-attachment-button" role="button" aria-label="Attach files">
+                                <FaIcon @icon="paperclip" />
+                            </span>
+                            <Attach::Tooltip @class="clean" @animation="scale" @placement="top">
+                                <InputInfo @text="Attach files" />
+                            </Attach::Tooltip>
+                        </FileUpload>
+                        <Textarea
+                            @value={{this.prompt}}
+                            rows="1"
+                            placeholder="Ask Fleetbase AI..."
+                            class="fleetbase-ai-input"
+                            {{on "keydown" this.handlePromptKeydown}}
+                            {{on "input" this.resizePromptTextarea}}
+                            {{did-insert this.focusPromptInput}}
+                        />
+                        {{#if this.hasCurrentSession}}
+                            <Button
+                                @icon="check"
+                                @helpText="End chat"
+                                @wrapperClass="fleetbase-ai-button-wrapper"
+                                class="fleetbase-ai-icon-button"
+                                @disabled={{this.ai.endSession.isRunning}}
+                                @onClick={{this.endSession}}
+                            />
+                        {{/if}}
+                        <Button
+                            @icon="paper-plane"
+                            @type="primary"
+                            @helpText="Send"
+                            @wrapperClass="fleetbase-ai-button-wrapper"
+                            class="fleetbase-ai-icon-button fleetbase-ai-submit"
+                            @disabled={{this.isSubmitDisabled}}
+                            @isLoading={{this.ai.submit.isRunning}}
+                            @onClick={{this.submit}}
+                        />
+                        <Button @icon="xmark" @helpText="Close" @wrapperClass="fleetbase-ai-button-wrapper" class="fleetbase-ai-icon-button" @onClick={{this.close}} />
+                    </div>
+                    </div>
+                </FileDropzone>
+            {{/let}}
+        </div>
+    </div>
+{{/if}}
