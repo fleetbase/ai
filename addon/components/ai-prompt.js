@@ -15,6 +15,11 @@ export default class AiPromptComponent extends Component {
     @tracked showHistory = false;
     @tracked attachments = [];
     @tracked uploadQueue = [];
+    @tracked responseStackElement = null;
+    @tracked isNearResponseBottom = true;
+    @tracked showScrollToLatest = false;
+    @tracked shouldAutoScroll = true;
+    responseScrollFrame = null;
 
     get shouldShowResponseStack() {
         return this.turns.length > 0;
@@ -22,6 +27,16 @@ export default class AiPromptComponent extends Component {
 
     get turns() {
         return (this.ai.sessionTasks ?? []).map((task) => this.normalizeTask(task)).filter(Boolean);
+    }
+
+    get responseScrollSignature() {
+        return this.turns
+            .map((task) => {
+                const previewSignature = (task.actionPreviews ?? []).map((preview) => `${preview.key ?? preview.action}:${preview.ready}:${preview.isDisabled}`).join(',');
+
+                return [task.uuid ?? task.id, task.status, task.isPending, task.response?.length ?? 0, previewSignature].join(':');
+            })
+            .join('|');
     }
 
     get hasCurrentSession() {
@@ -140,11 +155,14 @@ export default class AiPromptComponent extends Component {
             return;
         }
 
+        this.shouldAutoScroll = true;
         const attachments = this.attachments;
         this.prompt = '';
         this.showHistory = false;
+        this.scheduleResponseScroll({ force: true });
         await this.ai.submit.perform(prompt, attachments);
         this.attachments = [];
+        this.scheduleResponseScroll();
     }
 
     @action close() {
@@ -166,6 +184,7 @@ export default class AiPromptComponent extends Component {
     @action async selectSession(session) {
         await this.ai.loadSession.perform(session);
         this.showHistory = false;
+        this.scheduleResponseScroll({ force: true });
     }
 
     @action handleHistoryItemKeydown(session, event) {
@@ -190,6 +209,7 @@ export default class AiPromptComponent extends Component {
     @action async startSession() {
         this.showHistory = false;
         await this.ai.startSession.perform();
+        this.scheduleResponseScroll({ force: true });
     }
 
     @action async endSession() {
@@ -200,11 +220,13 @@ export default class AiPromptComponent extends Component {
     @action async applyAction(task, preview, input = {}) {
         const updatedTask = await this.ai.applyTask.perform(task, preview.key ?? preview.action, input);
         this.replaceResponse(updatedTask);
+        this.scheduleResponseScroll();
     }
 
     @action async refreshAction(task, preview, input = {}) {
         const updatedTask = await this.ai.refreshTaskPreview.perform(task, preview.key ?? preview.action, input);
         this.replaceResponse(updatedTask);
+        this.scheduleResponseScroll();
 
         return this.normalizedActionPreviewsFor(updatedTask).find((updatedPreview) => updatedPreview.key === preview.key || updatedPreview.action === preview.action);
     }
@@ -212,6 +234,78 @@ export default class AiPromptComponent extends Component {
     @action async cancelAction(task) {
         const updatedTask = await this.ai.cancelTask.perform(task);
         this.replaceResponse(updatedTask);
+        this.scheduleResponseScroll();
+    }
+
+    @action registerResponseStack(element) {
+        this.responseStackElement = element;
+        this.isNearResponseBottom = true;
+        this.showScrollToLatest = false;
+        this.scheduleResponseScroll({ force: true });
+    }
+
+    @action unregisterResponseStack() {
+        if (this.responseScrollFrame) {
+            cancelAnimationFrame(this.responseScrollFrame);
+            this.responseScrollFrame = null;
+        }
+
+        this.responseStackElement = null;
+        this.isNearResponseBottom = true;
+        this.showScrollToLatest = false;
+        this.shouldAutoScroll = true;
+    }
+
+    @action handleResponseStackScroll() {
+        const element = this.responseStackElement;
+        if (!element) {
+            return;
+        }
+
+        this.isNearResponseBottom = this.isResponseStackNearBottom(element);
+        this.shouldAutoScroll = this.isNearResponseBottom;
+        this.showScrollToLatest = !this.isNearResponseBottom && element.scrollHeight > element.clientHeight;
+    }
+
+    @action syncResponseScroll() {
+        this.scheduleResponseScroll();
+    }
+
+    @action scrollToLatest(event) {
+        event?.stopPropagation();
+        this.shouldAutoScroll = true;
+        this.scheduleResponseScroll({ force: true });
+    }
+
+    scheduleResponseScroll({ force = false } = {}) {
+        if (this.responseScrollFrame) {
+            cancelAnimationFrame(this.responseScrollFrame);
+        }
+
+        this.responseScrollFrame = requestAnimationFrame(() => {
+            this.responseScrollFrame = null;
+
+            const element = this.responseStackElement;
+            if (!element) {
+                return;
+            }
+
+            const shouldScroll = force || this.shouldAutoScroll || this.isResponseStackNearBottom(element);
+            if (shouldScroll) {
+                element.scrollTo({
+                    top: element.scrollHeight,
+                    behavior: force ? 'smooth' : 'auto',
+                });
+            }
+
+            this.isNearResponseBottom = this.isResponseStackNearBottom(element);
+            this.shouldAutoScroll = this.isNearResponseBottom;
+            this.showScrollToLatest = !this.isNearResponseBottom && element.scrollHeight > element.clientHeight;
+        });
+    }
+
+    isResponseStackNearBottom(element) {
+        return element.scrollHeight - element.scrollTop - element.clientHeight <= 48;
     }
 
     @action removeAttachment(attachment) {

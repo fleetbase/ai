@@ -38,7 +38,14 @@
             {{/if}}
 
             {{#if this.shouldShowResponseStack}}
-                <div class="fleetbase-ai-response-stack" {{on "click" this.stopPropagation}}>
+                <div
+                    class="fleetbase-ai-response-stack"
+                    {{on "click" this.stopPropagation}}
+                    {{on "scroll" this.handleResponseStackScroll}}
+                    {{did-insert this.registerResponseStack}}
+                    {{did-update this.syncResponseScroll this.responseScrollSignature this.ai.submit.isRunning this.ai.applyTask.isRunning this.ai.cancelTask.isRunning this.ai.refreshTaskPreview.isRunning}}
+                    {{will-destroy this.unregisterResponseStack}}
+                >
                 {{#each this.turns as |task|}}
                     {{#if task.prompt}}
                         <div class="fleetbase-ai-user-message">
@@ -92,6 +99,16 @@
                     {{/if}}
                 {{/each}}
                 </div>
+            {{/if}}
+
+            {{#if this.showScrollToLatest}}
+                <Button
+                    @icon="arrow-down"
+                    @helpText="Scroll to latest"
+                    @wrapperClass="fleetbase-ai-scroll-latest-wrapper"
+                    class="fleetbase-ai-scroll-latest"
+                    @onClick={{this.scrollToLatest}}
+                />
             {{/if}}
 
             {{#let (file-queue name="fleetbase-ai-attachments" onFileAdded=(perform this.uploadAttachment) accept=this.acceptedAttachmentTypes) as |queue|}}
