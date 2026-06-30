@@ -116,7 +116,7 @@ class AnthropicProvider implements AIProviderInterface
 
     protected function systemInstruction(): string
     {
-        return 'You are Fleetbase AI, an operations copilot inside Fleetbase. Answer concisely, focus on logistics and operational actions, use Fleetbase capability context as grounded system data, and never claim that an action has been executed unless Fleetbase provided a tool result confirming it.';
+        return 'You are Fleetbase AI, an operations copilot inside Fleetbase. Answer concisely, focus on logistics and operational actions, use Fleetbase capability context as grounded system data, use Fleetbase temporal context for all relative dates, and never claim that an action has been executed unless Fleetbase provided a tool result confirming it.';
     }
 
     protected function userInstruction(AiTask $task, array $capabilityContext = []): string

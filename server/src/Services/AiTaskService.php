@@ -16,7 +16,7 @@ use Illuminate\Support\Str;
 
 class AiTaskService
 {
-    public function __construct(protected AIProviderInterface $provider, protected AiContextResolver $contextResolver, protected AiCapabilityRegistry $registry, protected AiAttachmentResolver $attachmentResolver)
+    public function __construct(protected AIProviderInterface $provider, protected AiContextResolver $contextResolver, protected AiCapabilityRegistry $registry, protected AiAttachmentResolver $attachmentResolver, protected AiTemporalContext $temporalContext)
     {
     }
 
@@ -42,11 +42,23 @@ class AiTaskService
             'started_at'      => now(),
         ]);
 
+        $temporalContext   = $this->temporalContext->context();
         $capabilityContext = $this->contextResolver->resolve($task);
         $actionPreviews    = $this->resolveActionPreviews($task);
         $sessionContext    = $this->sessionContext($task);
         $attachmentContext = $this->attachmentResolver->contextFor($attachments);
-        $providerContext   = array_values(array_filter(array_merge($sessionContext ? [$sessionContext] : [], $attachmentContext ? [$attachmentContext] : [], $capabilityContext)));
+        $providerContext   = array_values(array_filter(array_merge([$temporalContext], $sessionContext ? [$sessionContext] : [], $attachmentContext ? [$attachmentContext] : [], $capabilityContext)));
+
+        $task->update([
+            'metadata' => array_merge((array) $task->metadata, ['temporal_context' => $temporalContext]),
+        ]);
+
+        $this->recordStep($task, [
+            'type'         => 'temporal_context',
+            'status'       => 'completed',
+            'output'       => $temporalContext,
+            'completed_at' => now(),
+        ]);
 
         if (!empty($attachments)) {
             $this->recordStep($task, [
@@ -114,7 +126,7 @@ class AiTaskService
                 'input_tokens'     => Arr::get($usage, 'input_tokens'),
                 'output_tokens'    => Arr::get($usage, 'output_tokens'),
                 'total_tokens'     => Arr::get($usage, 'total_tokens'),
-                'metadata'         => array_merge((array) Arr::get($result, 'metadata', []), ['attachments' => $attachments, 'capability_context' => $capabilityContext, 'action_previews' => $actionPreviews]),
+                'metadata'         => array_merge((array) Arr::get($result, 'metadata', []), ['attachments' => $attachments, 'temporal_context' => $temporalContext, 'capability_context' => $capabilityContext, 'action_previews' => $actionPreviews]),
                 'completed_at'     => now(),
             ]);
 

@@ -5,6 +5,7 @@ namespace Fleetbase\Ai\Providers;
 use Fleetbase\Ai\Contracts\AIProviderInterface;
 use Fleetbase\Ai\Services\AiProviderManager;
 use Fleetbase\Ai\Services\AiQueryExecutor;
+use Fleetbase\Ai\Services\AiTemporalContext;
 use Fleetbase\Ai\Support\AiCapabilityRegistry;
 use Fleetbase\Ai\Support\AiQueryRegistry;
 use Fleetbase\Ai\Support\Capabilities\CurrentPageContextCapability;
@@ -46,6 +47,7 @@ class AiServiceProvider extends CoreServiceProvider
         $this->app->singleton(AiCapabilityRegistry::class);
         $this->app->singleton(AiQueryRegistry::class);
         $this->app->singleton(AiQueryExecutor::class);
+        $this->app->singleton(AiTemporalContext::class);
     }
 
     /**

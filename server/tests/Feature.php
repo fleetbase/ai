@@ -6,7 +6,9 @@ use Fleetbase\Ai\Services\AiProviderManager;
 use Fleetbase\Ai\Services\LocalAIProvider;
 use Fleetbase\Ai\Services\OpenAIProvider;
 use Fleetbase\Ai\Support\AiCapabilityRegistry;
+use Fleetbase\Ai\Support\AiRelativeDateResolver;
 use Fleetbase\Ai\Support\Capabilities\CurrentPageContextCapability;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Http;
 
 test('provider manager exposes backend curated provider and model metadata', function () {
@@ -19,6 +21,33 @@ test('provider manager exposes backend curated provider and model metadata', fun
         ->and(collect($openai['models'])->pluck('value')->all())->toContain('gpt-5.4-mini', 'gpt-5.4', 'gpt-5.5')
         ->and($anthropic['default_model'])->toBe('claude-haiku-4-5')
         ->and(collect($anthropic['models'])->pluck('value')->all())->toContain('claude-haiku-4-5', 'claude-sonnet-4-6', 'claude-opus-4-8', 'claude-fable-5');
+});
+
+test('relative date resolver resolves schedule offsets from current timezone', function () {
+    Carbon::setTestNow(Carbon::parse('2026-06-30 15:00:00', 'Asia/Singapore'));
+
+    try {
+        $resolved = (new AiRelativeDateResolver(null))->resolveDateTime('scheduled for 3 days from now', 'Asia/Singapore');
+
+        expect($resolved->toIso8601String())->toBe('2026-07-03T15:00:00+08:00');
+    } finally {
+        Carbon::setTestNow();
+    }
+});
+
+test('relative date resolver resolves yesterday as a local date window', function () {
+    Carbon::setTestNow(Carbon::parse('2026-06-30 15:00:00', 'Asia/Singapore'));
+
+    try {
+        $window = (new AiRelativeDateResolver(null))->resolveWindow('How many vehicles were online yesterday?', 'Asia/Singapore');
+
+        expect($window['label'])->toBe('yesterday')
+            ->and($window['timezone'])->toBe('Asia/Singapore')
+            ->and($window['start']->toIso8601String())->toBe('2026-06-29T00:00:00+08:00')
+            ->and($window['end']->toIso8601String())->toBe('2026-06-29T23:59:59+08:00');
+    } finally {
+        Carbon::setTestNow();
+    }
 });
 
 test('provider manager falls back to local when ai is disabled or provider is unknown', function () {
