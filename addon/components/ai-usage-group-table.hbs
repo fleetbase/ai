@@ -1,0 +1,31 @@
+<div class="fleetbase-ai-admin-table-wrap">
+    <table class="fleetbase-ai-admin-table">
+        <thead>
+            <tr>
+                <th>{{@label}}</th>
+                <th>Tasks</th>
+                <th>Input</th>
+                <th>Output</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{#each @rows as |row|}}
+                <tr>
+                    <td>
+                        <strong>{{or row.label row.key}}</strong>
+                        <small>{{row.key}}</small>
+                    </td>
+                    <td>{{row.task_count}}</td>
+                    <td>{{row.input_tokens}}</td>
+                    <td>{{row.output_tokens}}</td>
+                    <td>{{row.total_tokens}}</td>
+                </tr>
+            {{else}}
+                <tr>
+                    <td colspan="5" class="fleetbase-ai-admin-empty">No usage found.</td>
+                </tr>
+            {{/each}}
+        </tbody>
+    </table>
+</div>

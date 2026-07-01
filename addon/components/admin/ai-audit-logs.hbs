@@ -1,0 +1,205 @@
+<ContentPanel @title="AI Task & Chat Logs" @open={{true}} @wrapperClass="bordered-classic">
+    <div class="fleetbase-ai-admin-panel">
+        <div class="fleetbase-ai-admin-filters">
+            <InputGroup @name="Search">
+                <Input class="form-input form-input-sm w-full" @value={{this.filters.search}} placeholder="Search title, prompt summary, provider, model..." {{on "input" (fn this.setFilterFromInput "search")}} />
+            </InputGroup>
+            <InputGroup @name="Status">
+                <Select class="w-full" @value={{this.filters.status}} @options={{this.statusOptions}} @optionLabel="label" @optionValue="value" @onSelect={{fn this.setFilter "status"}} />
+            </InputGroup>
+            <InputGroup @name="Provider">
+                <Select class="w-full" @value={{this.filters.provider}} @options={{this.providerOptions}} @optionLabel="label" @optionValue="value" @placeholder="Any provider" @onSelect={{this.setProvider}} />
+            </InputGroup>
+            <InputGroup @name="Model">
+                <Select class="w-full" @value={{this.filters.model}} @options={{this.modelOptions}} @optionLabel="label" @optionValue="value" @placeholder="Any model" @onSelect={{fn this.setFilter "model"}} />
+            </InputGroup>
+            <InputGroup @name="Organization">
+                <ModelSelect
+                    @modelName="company"
+                    @source={{this.companySource}}
+                    @selectedModel={{this.selectedCompany}}
+                    @placeholder="Select organization"
+                    @triggerClass="form-select form-input"
+                    @allowClear={{true}}
+                    @renderInPlace={{true}}
+                    @onChange={{this.setCompany}}
+                    as |company|
+                >
+                    {{or company.name company.public_id company.uuid}}
+                </ModelSelect>
+            </InputGroup>
+            <InputGroup @name="User">
+                <ModelSelect
+                    @modelName="user"
+                    @source={{this.userSource}}
+                    @query={{this.userQuery}}
+                    @selectedModel={{this.selectedUser}}
+                    @placeholder="Select user"
+                    @triggerClass="form-select form-input"
+                    @allowClear={{true}}
+                    @renderInPlace={{true}}
+                    @onChange={{this.setUser}}
+                    as |user|
+                >
+                    {{or user.name user.email user.public_id user.uuid}}
+                </ModelSelect>
+            </InputGroup>
+            <InputGroup @name="Date">
+                <DatePicker @value={{this.dateRange}} @range={{true}} @onSelect={{this.setDateRange}} @autoClose={{true}} @buttons={{array "clear"}} @placeholder="Exact date or range" class="w-full form-input-sm" />
+            </InputGroup>
+        </div>
+
+        <div class="fleetbase-ai-admin-actions">
+            <Button @type="primary" @icon="magnifying-glass" @text="Search logs" @isLoading={{this.loadSessions.isRunning}} @onClick={{perform this.loadSessions}} />
+            <Button @icon="xmark" @text="Clear" @onClick={{this.clearFilters}} />
+        </div>
+
+        <div class="fleetbase-ai-admin-stack">
+            <div class="fleetbase-ai-admin-card">
+                <div class="fleetbase-ai-admin-card-header">
+                    <span>Chat Sessions</span>
+                    <small>{{this.sessions.length}} shown</small>
+                </div>
+
+                <div class="fleetbase-ai-admin-table-wrap fleetbase-ai-admin-scroll-area">
+                    <table class="fleetbase-ai-admin-table">
+                        <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th>Organization</th>
+                                <th>User</th>
+                                <th>Status</th>
+                                <th>Turns</th>
+                                <th>Tokens</th>
+                                <th>Last message</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {{#each this.sessions as |session|}}
+                                <tr role="button" class="fleetbase-ai-admin-row" {{on "click" (fn this.selectSession session)}}>
+                                    <td>
+                                        <strong>{{or session.title "New AI chat"}}</strong>
+                                        <small>{{session.uuid}}</small>
+                                    </td>
+                                    <td>{{or session.company.name session.company_uuid "Unknown"}}</td>
+                                    <td>{{or session.created_by.name session.created_by.email session.created_by_uuid "Unknown"}}</td>
+                                    <td><span class="fleetbase-ai-admin-badge">{{or session.status "unknown"}}</span></td>
+                                    <td>{{session.tasks_count}}</td>
+                                    <td>{{session.total_tokens}}</td>
+                                    <td>{{n-a (format-date-fns session.last_message_at "dd MMM yyyy HH:mm")}}</td>
+                                </tr>
+                            {{else}}
+                                <tr>
+                                    <td colspan="7" class="fleetbase-ai-admin-empty">No AI sessions found.</td>
+                                </tr>
+                            {{/each}}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="fleetbase-ai-admin-card">
+                <div class="fleetbase-ai-admin-card-header">
+                    <span>Session Tasks</span>
+                    {{#if this.selectedSession}}
+                        <small>{{this.selectedSessionTasks.length}} turns</small>
+                    {{/if}}
+                </div>
+
+                {{#if this.selectedSession}}
+                    <div class="fleetbase-ai-admin-task-list">
+                        {{#each this.selectedSessionTasks as |task|}}
+                            <button type="button" class="fleetbase-ai-admin-task-item" {{on "click" (fn this.selectTask task)}}>
+                                <span>
+                                    <strong>{{or task.prompt_excerpt "Untitled prompt"}}</strong>
+                                    <small>{{or task.response_summary "No response summary"}} </small>
+                                </span>
+                                <span class="fleetbase-ai-admin-task-meta">
+                                    {{or task.provider "local"}} / {{or task.model "unknown"}}
+                                    <b>{{task.total_tokens}}</b>
+                                </span>
+                            </button>
+                        {{else}}
+                            <div class="fleetbase-ai-admin-empty">This session has no tasks.</div>
+                        {{/each}}
+                    </div>
+                {{else}}
+                    <div class="fleetbase-ai-admin-empty">Select a chat session to inspect its tasks.</div>
+                {{/if}}
+            </div>
+        </div>
+
+        <div class="fleetbase-ai-admin-card">
+            <div class="fleetbase-ai-admin-card-header">
+                <span>Task Detail</span>
+                {{#if this.selectedTask}}
+                    <small>{{this.selectedTask.uuid}}</small>
+                {{/if}}
+            </div>
+
+            {{#if this.selectedTask}}
+                <div class="fleetbase-ai-admin-detail-grid">
+                    <div><label>Status</label><span>{{or this.selectedTask.status "unknown"}}</span></div>
+                    <div><label>Provider</label><span>{{or this.selectedTask.provider "local"}}</span></div>
+                    <div><label>Model</label><span>{{or this.selectedTask.model "unknown"}}</span></div>
+                    <div><label>Total tokens</label><span>{{this.selectedTask.total_tokens}}</span></div>
+                    <div><label>Created</label><span>{{n-a (format-date-fns this.selectedTask.created_at "dd MMM yyyy HH:mm")}}</span></div>
+                    <div><label>Completed</label><span>{{n-a (format-date-fns this.selectedTask.completed_at "dd MMM yyyy HH:mm")}}</span></div>
+                </div>
+
+                {{#if this.hasSelectedTaskContent}}
+                    <div class="fleetbase-ai-admin-content-grid">
+                        <div>
+                            <h4>Prompt</h4>
+                            <pre>{{this.selectedTask.prompt}}</pre>
+                        </div>
+                        <div>
+                            <h4>Response</h4>
+                            <pre>{{this.selectedTask.response}}</pre>
+                        </div>
+                    </div>
+                {{else}}
+                    <div class="fleetbase-ai-admin-redacted">
+                        <span>Prompt and response content is redacted.</span>
+                        {{#if this.canRevealContent}}
+                            <Button @icon="eye" @text="Reveal content" @size="sm" @isLoading={{this.revealTaskContent.isRunning}} @onClick={{perform this.revealTaskContent}} />
+                        {{/if}}
+                    </div>
+                {{/if}}
+
+                <div class="fleetbase-ai-admin-table-wrap mt-3">
+                    <table class="fleetbase-ai-admin-table">
+                        <thead>
+                            <tr>
+                                <th>Step</th>
+                                <th>Status</th>
+                                <th>Tool</th>
+                                <th>Provider</th>
+                                <th>Tokens</th>
+                                <th>Created</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {{#each this.selectedTaskSteps as |step|}}
+                                <tr>
+                                    <td>{{or step.type "step"}}</td>
+                                    <td>{{or step.status "unknown"}}</td>
+                                    <td>{{n-a step.tool}}</td>
+                                    <td>{{or step.provider this.selectedTask.provider "local"}}</td>
+                                    <td>{{or step.usage.total_tokens "-"}}</td>
+                                    <td>{{n-a (format-date-fns step.created_at "dd MMM HH:mm")}}</td>
+                                </tr>
+                            {{else}}
+                                <tr>
+                                    <td colspan="6" class="fleetbase-ai-admin-empty">No task steps recorded.</td>
+                                </tr>
+                            {{/each}}
+                        </tbody>
+                    </table>
+                </div>
+            {{else}}
+                <div class="fleetbase-ai-admin-empty">Select a task to view its details.</div>
+            {{/if}}
+        </div>
+    </div>
+</ContentPanel>

@@ -23,9 +23,9 @@ class AiTaskController extends Controller
     public function store(Request $request, AiTaskService $tasks)
     {
         $request->validate([
-            'prompt'       => ['required', 'string', 'max:12000'],
-            'session_uuid' => ['nullable', 'string'],
-            'attachments'  => ['nullable', 'array'],
+            'prompt'        => ['required', 'string', 'max:12000'],
+            'session_uuid'  => ['nullable', 'string'],
+            'attachments'   => ['nullable', 'array'],
             'attachments.*' => ['string'],
         ]);
 
@@ -53,12 +53,12 @@ class AiTaskController extends Controller
 
     public function cancel(string $id, AiTaskService $tasks)
     {
-        $task = $this->findTask($id);
-        $metadata = (array) $task->metadata;
-        $previews = collect((array) data_get($metadata, 'action_previews', []));
-        $preview  = $previews->first();
+        $task      = $this->findTask($id);
+        $metadata  = (array) $task->metadata;
+        $previews  = collect((array) data_get($metadata, 'action_previews', []));
+        $preview   = $previews->first();
         $actionKey = is_array($preview) ? ($preview['key'] ?? $preview['action'] ?? null) : null;
-        $error = [
+        $error     = [
             'action'  => $actionKey,
             'type'    => 'cancelled',
             'message' => 'This AI action preview was cancelled.',

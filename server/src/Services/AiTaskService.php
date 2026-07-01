@@ -2,9 +2,8 @@
 
 namespace Fleetbase\Ai\Services;
 
-use Fleetbase\Ai\Contracts\AIProviderInterface;
 use Fleetbase\Ai\Contracts\AIActionCapabilityInterface;
-use Fleetbase\Ai\Services\AiProviderManager;
+use Fleetbase\Ai\Contracts\AIProviderInterface;
 use Fleetbase\Ai\Models\AiSession;
 use Fleetbase\Ai\Models\AiTask;
 use Fleetbase\Ai\Models\AiTaskStep;
@@ -22,24 +21,24 @@ class AiTaskService
 
     public function createFromRequest(Request $request): AiTask
     {
-        $config   = Setting::system('ai', []);
-        $provider = $this->provider instanceof AiProviderManager ? $this->provider->providerNameFor($config) : 'local';
-        $model    = $this->provider instanceof AiProviderManager ? $this->provider->modelFor($config) : 'fleetbase-local-preview';
-        $session  = $this->resolveSessionForRequest($request);
+        $config      = Setting::system('ai', []);
+        $provider    = $this->provider instanceof AiProviderManager ? $this->provider->providerNameFor($config) : 'local';
+        $model       = $this->provider instanceof AiProviderManager ? $this->provider->modelFor($config) : 'fleetbase-local-preview';
+        $session     = $this->resolveSessionForRequest($request);
         $attachments = $this->attachmentResolver->resolveFromRequest($request);
 
         $task = AiTask::create([
             'ai_session_uuid'  => $session->uuid,
-            'company_uuid'    => session('company'),
-            'created_by_uuid' => optional($request->user())->uuid,
-            'task_type'       => $request->input('task_type', 'prompt'),
-            'status'          => 'running',
-            'prompt'          => $request->input('prompt'),
-            'provider'        => $provider,
-            'model'           => $model,
-            'context'         => $request->input('context', []),
-            'metadata'        => ['attachments' => $attachments],
-            'started_at'      => now(),
+            'company_uuid'     => session('company'),
+            'created_by_uuid'  => optional($request->user())->uuid,
+            'task_type'        => $request->input('task_type', 'prompt'),
+            'status'           => 'running',
+            'prompt'           => $request->input('prompt'),
+            'provider'         => $provider,
+            'model'            => $model,
+            'context'          => $request->input('context', []),
+            'metadata'         => ['attachments' => $attachments],
+            'started_at'       => now(),
         ]);
 
         $temporalContext   = $this->temporalContext->context();
@@ -76,9 +75,9 @@ class AiTaskService
             ]);
 
             $providerContext[] = [
-                'capability' => 'fleetbase.ai.action_previews',
-                'type'       => 'action_preview',
-                'data'       => $actionPreviews,
+                'capability'  => 'fleetbase.ai.action_previews',
+                'type'        => 'action_preview',
+                'data'        => $actionPreviews,
                 'instruction' => 'A Fleetbase action preview has already been prepared from the user prompt. Do not ask again for details already present in the preview draft. Do not say the action has been applied until Fleetbase returns an apply result.',
             ];
 
@@ -181,8 +180,8 @@ class AiTaskService
         ]);
 
         try {
-            $result   = $capability->apply($task, (array) $preview, $input);
-            $metadata = (array) $task->metadata;
+            $result                     = $capability->apply($task, (array) $preview, $input);
+            $metadata                   = (array) $task->metadata;
             $metadata['action_results'] = array_values(array_merge((array) data_get($metadata, 'action_results', []), [$result]));
 
             $task->update([
@@ -197,8 +196,8 @@ class AiTaskService
                 'completed_at' => now(),
             ]);
         } catch (\Throwable $e) {
-            $error    = ['message' => $e->getMessage(), 'type' => get_class($e)];
-            $metadata = (array) $task->metadata;
+            $error                     = ['message' => $e->getMessage(), 'type' => get_class($e)];
+            $metadata                  = (array) $task->metadata;
             $metadata['action_errors'] = array_values(array_merge((array) data_get($metadata, 'action_errors', []), [$error]));
 
             $task->update(['status' => 'apply_failed', 'metadata' => $metadata]);
@@ -211,7 +210,7 @@ class AiTaskService
     public function recordStep(AiTask $task, array $attributes): AiTaskStep
     {
         return AiTaskStep::create(array_merge([
-            'ai_task_uuid'   => $task->uuid,
+            'ai_task_uuid'    => $task->uuid,
             'company_uuid'    => $task->company_uuid,
             'created_by_uuid' => $task->created_by_uuid,
         ], $attributes));
@@ -399,5 +398,4 @@ class AiTaskService
             ],
         ];
     }
-
 }

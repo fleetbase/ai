@@ -37,11 +37,11 @@ class AiContextResolver
             }
 
             $context[] = [
-                'key'         => $capability->key(),
-                'label'       => $capability->label(),
-                'module'      => $capability->module(),
-                'type'        => $capability->type(),
-                'mode'        => $capability->mode(),
+                'key'          => $capability->key(),
+                'label'        => $capability->label(),
+                'module'       => $capability->module(),
+                'type'         => $capability->type(),
+                'mode'         => $capability->mode(),
                 'preview_only' => $capability->previewOnly(),
                 'result'       => $result,
             ];

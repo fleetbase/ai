@@ -184,16 +184,6 @@
                             {{on "input" this.resizePromptTextarea}}
                             {{did-insert this.focusPromptInput}}
                         />
-                        {{#if this.hasCurrentSession}}
-                            <Button
-                                @icon="check"
-                                @helpText="End chat"
-                                @wrapperClass="fleetbase-ai-button-wrapper"
-                                class="fleetbase-ai-icon-button"
-                                @disabled={{this.ai.endSession.isRunning}}
-                                @onClick={{this.endSession}}
-                            />
-                        {{/if}}
                         <Button
                             @icon="paper-plane"
                             @type="primary"
