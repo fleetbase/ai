@@ -64,42 +64,45 @@
 
 .fleetbase-ai-scroll-latest-wrapper {
     position: absolute;
-    right: 8px;
-    bottom: 52px;
+    left: 50%;
+    bottom: 58px;
     z-index: 3;
-    width: 30px;
-    height: 30px;
+    width: 28px;
+    height: 28px;
     box-shadow: none;
+    transform: translateX(-50%);
 }
 
 .fleetbase-ai-scroll-latest {
     display: inline-flex;
-    width: 30px;
-    height: 30px;
+    width: 28px;
+    height: 28px;
     align-items: center;
     justify-content: center;
-    border: 1px solid rgb(255 255 255 / 42%);
-    border-radius: 999px;
-    background: rgb(255 255 255 / 82%);
+    border: 1px solid rgb(148 163 184 / 24%);
+    border-radius: 50%;
+    background: rgb(255 255 255 / 58%);
     color: #2563eb;
-    box-shadow: 0 10px 26px rgb(15 23 42 / 18%);
-    backdrop-filter: blur(5px) saturate(150%);
+    box-shadow: 0 8px 20px rgb(15 23 42 / 12%);
+    backdrop-filter: blur(5px) saturate(135%);
 }
 
 .fleetbase-ai-scroll-latest:hover {
-    background: rgb(239 246 255 / 92%);
+    border-color: rgb(37 99 235 / 26%);
+    background: rgb(239 246 255 / 76%);
     color: #1d4ed8;
 }
 
 body[data-theme='dark'] .fleetbase-ai-scroll-latest {
-    border-color: rgb(148 163 184 / 28%);
-    background: rgb(15 23 42 / 82%);
+    border-color: rgb(148 163 184 / 20%);
+    background: rgb(15 23 42 / 58%);
     color: #93c5fd;
-    box-shadow: 0 10px 26px rgb(0 0 0 / 26%);
+    box-shadow: 0 8px 20px rgb(0 0 0 / 18%);
 }
 
 body[data-theme='dark'] .fleetbase-ai-scroll-latest:hover {
-    background: rgb(30 41 59 / 92%);
+    border-color: rgb(96 165 250 / 24%);
+    background: rgb(30 41 59 / 72%);
     color: #bfdbfe;
 }
 

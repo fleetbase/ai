@@ -212,11 +212,6 @@ export default class AiPromptComponent extends Component {
         this.scheduleResponseScroll({ force: true });
     }
 
-    @action async endSession() {
-        this.showHistory = false;
-        await this.ai.endSession.perform();
-    }
-
     @action async applyAction(task, preview, input = {}) {
         const updatedTask = await this.ai.applyTask.perform(task, preview.key ?? preview.action, input);
         this.replaceResponse(updatedTask);
