@@ -42,6 +42,16 @@ Route::prefix(config('ai.api.routing.prefix', 'ai'))->namespace('Fleetbase\Ai\Ht
                         $router->post('tasks/{id}/apply', 'Internal\AiTaskController@apply');
                         $router->post('tasks/{id}/cancel', 'Internal\AiTaskController@cancel');
                         $router->get('tools', 'Internal\AiToolController@index');
+
+                        $router->prefix('admin')->group(function ($router) {
+                            $router->get('companies', 'Internal\AiAdminController@companies');
+                            $router->get('users', 'Internal\AiAdminController@users');
+                            $router->get('sessions', 'Internal\AiAdminController@sessions');
+                            $router->get('sessions/{id}', 'Internal\AiAdminController@session');
+                            $router->get('tasks/{id}', 'Internal\AiAdminController@task');
+                            $router->post('tasks/{id}/reveal-content', 'Internal\AiAdminController@revealTaskContent');
+                            $router->get('usage', 'Internal\AiAdminController@usage');
+                        });
                     }
                 );
             }

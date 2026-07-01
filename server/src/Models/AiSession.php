@@ -3,7 +3,9 @@
 namespace Fleetbase\Ai\Models;
 
 use Fleetbase\Casts\Json;
+use Fleetbase\Models\Company;
 use Fleetbase\Models\Model;
+use Fleetbase\Models\User;
 use Fleetbase\Traits\Filterable;
 use Fleetbase\Traits\HasApiModelBehavior;
 use Fleetbase\Traits\HasUuid;
@@ -41,5 +43,15 @@ class AiSession extends Model
     public function tasks()
     {
         return $this->hasMany(AiTask::class, 'ai_session_uuid', 'uuid');
+    }
+
+    public function company()
+    {
+        return $this->belongsTo(Company::class, 'company_uuid', 'uuid');
+    }
+
+    public function createdBy()
+    {
+        return $this->belongsTo(User::class, 'created_by_uuid', 'uuid');
     }
 }
