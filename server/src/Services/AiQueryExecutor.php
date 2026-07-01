@@ -135,8 +135,8 @@ class AiQueryExecutor
             $column = $resource->columnFor($field);
 
             match ($operator) {
-                'null'     => $query->whereNull($column),
-                'not_null' => $query->whereNotNull($column),
+                'null'          => $query->whereNull($column),
+                'not_null'      => $query->whereNotNull($column),
                 'false_or_null' => $query->where(function (Builder $nested) use ($column) {
                     $nested->where($column, false)->orWhereNull($column);
                 }),

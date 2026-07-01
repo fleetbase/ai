@@ -1,8 +1,8 @@
 <?php
 
 use Fleetbase\Ai\Models\AiTask;
-use Fleetbase\Ai\Services\AnthropicProvider;
 use Fleetbase\Ai\Services\AiProviderManager;
+use Fleetbase\Ai\Services\AnthropicProvider;
 use Fleetbase\Ai\Services\LocalAIProvider;
 use Fleetbase\Ai\Services\OpenAIProvider;
 use Fleetbase\Ai\Support\AiCapabilityRegistry;
