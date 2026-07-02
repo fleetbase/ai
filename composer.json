@@ -1,6 +1,6 @@
 {
     "name": "fleetbase/ai",
-    "version": "0.0.1",
+    "version": "0.0.2",
     "description": "Fleetbase AI operations copilot and task automation module",
     "keywords": [
         "fleetbase",
