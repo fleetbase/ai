@@ -7,9 +7,19 @@ use Fleetbase\Ai\Services\AiProviderManager;
 use Fleetbase\Http\Controllers\Controller;
 use Fleetbase\Http\Requests\AdminRequest;
 use Fleetbase\Models\Setting;
+use Illuminate\Http\Request;
 
 class AiConfigController extends Controller
 {
+    public function status(Request $request, AiProviderManager $providers)
+    {
+        $config = $providers->normalizeConfig(Setting::system('ai', $providers->defaultConfig()));
+
+        return response()->json([
+            'enabled' => (bool) data_get($config, 'enabled', false),
+        ]);
+    }
+
     public function show(AdminRequest $request, AiProviderManager $providers)
     {
         $config = $providers->normalizeConfig(Setting::system('ai', $providers->defaultConfig()));

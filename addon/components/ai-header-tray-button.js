@@ -8,7 +8,7 @@ export default class AiHeaderTrayButtonComponent extends Component {
 
     constructor() {
         super(...arguments);
-        this.ai.loadConfig.perform();
+        this.ai.loadStatus.perform();
     }
 
     @action togglePrompt() {

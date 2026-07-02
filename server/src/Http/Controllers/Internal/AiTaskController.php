@@ -5,6 +5,7 @@ namespace Fleetbase\Ai\Http\Controllers\Internal;
 use Fleetbase\Ai\Models\AiTask;
 use Fleetbase\Ai\Services\AiTaskService;
 use Fleetbase\Http\Controllers\Controller;
+use Fleetbase\Models\Setting;
 use Illuminate\Http\Request;
 
 class AiTaskController extends Controller
@@ -22,6 +23,8 @@ class AiTaskController extends Controller
 
     public function store(Request $request, AiTaskService $tasks)
     {
+        $this->abortIfAiDisabled();
+
         $request->validate([
             'prompt'        => ['required', 'string', 'max:12000'],
             'session_uuid'  => ['nullable', 'string'],
@@ -39,6 +42,8 @@ class AiTaskController extends Controller
 
     public function preview(string $id, Request $request, AiTaskService $tasks)
     {
+        $this->abortIfAiDisabled();
+
         $task = $this->findTask($id);
 
         return response()->json(['task' => $tasks->refreshPreview($task, $request->input('action_key'), $request->input('input', []))->load('session')]);
@@ -46,6 +51,8 @@ class AiTaskController extends Controller
 
     public function apply(string $id, Request $request, AiTaskService $tasks)
     {
+        $this->abortIfAiDisabled();
+
         $task = $this->findTask($id);
 
         return response()->json(['task' => $tasks->apply($task, $request->input('action_key'), $request->input('input', []))->load('session')]);
@@ -86,5 +93,10 @@ class AiTaskController extends Controller
                 $query->where('uuid', $id)->orWhere('id', $id);
             })
             ->firstOrFail();
+    }
+
+    protected function abortIfAiDisabled(): void
+    {
+        abort_unless((bool) data_get(Setting::system('ai', []), 'enabled', false), 403, 'Fleetbase AI is disabled.');
     }
 }

@@ -27,6 +27,7 @@ Route::prefix(config('ai.api.routing.prefix', 'ai'))->namespace('Fleetbase\Ai\Ht
                 $router->group(
                     ['prefix' => 'v1', 'middleware' => ['fleetbase.protected']],
                     function ($router) {
+                        $router->get('status', 'Internal\AiConfigController@status');
                         $router->get('config', 'Internal\AiConfigController@show');
                         $router->post('config', 'Internal\AiConfigController@store');
                         $router->post('test-provider', 'Internal\AiConfigController@testProvider');
