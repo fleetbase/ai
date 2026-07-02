@@ -1,6 +1,6 @@
 {
     "name": "@fleetbase/ai-engine",
-    "version": "0.0.1",
+    "version": "0.0.2",
     "description": "Fleetbase AI operations copilot and task automation module",
     "keywords": [
         "fleetbase-extension",
@@ -44,7 +44,7 @@
     "dependencies": {
         "@babel/core": "^7.23.2",
         "@fleetbase/ember-core": "^0.3.24",
-        "@fleetbase/ember-ui": "^0.3.39",
+        "@fleetbase/ember-ui": "^0.3.41",
         "@fortawesome/ember-fontawesome": "^2.0.0",
         "@fortawesome/fontawesome-svg-core": "6.4.0",
         "@fortawesome/free-brands-svg-icons": "6.4.0",

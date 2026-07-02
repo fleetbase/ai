@@ -69,6 +69,19 @@ export default class AiService extends Service {
         }
     }
 
+    @task *loadStatus() {
+        try {
+            const response = yield this.fetch.get('status', {}, { namespace: 'ai/int/v1' });
+            this.applyConfig({ enabled: response.enabled === true });
+
+            return this.config;
+        } catch (error) {
+            this.applyConfig({ enabled: false });
+
+            return this.config;
+        }
+    }
+
     @task *submit(prompt, attachments = []) {
         if (!this.isEnabled) {
             return null;
