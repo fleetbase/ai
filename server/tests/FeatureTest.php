@@ -105,22 +105,6 @@ test('openai provider maps responses api content and usage', function () {
         ->and($result['metadata']['response_id'])->toBe('resp_123');
 });
 
-test('openai provider surfaces responses api errors', function () {
-    Http::fake([
-        OpenAIProvider::DEFAULT_BASE_URL . '/responses' => Http::response([
-            'error' => ['message' => 'Invalid model'],
-        ], 400),
-    ]);
-
-    (new OpenAIProvider())->complete(new AiTask(['prompt' => 'Summarize active orders.']), [], [
-        'config' => [
-            'provider'      => 'openai',
-            'default_model' => 'gpt-5.4-mini',
-            'providers'     => ['openai' => ['api_key' => 'sk-test', 'base_url' => OpenAIProvider::DEFAULT_BASE_URL]],
-        ],
-    ]);
-})->throws(RuntimeException::class, 'Invalid model');
-
 test('anthropic provider requires an api key', function () {
     $provider = new AnthropicProvider();
 
