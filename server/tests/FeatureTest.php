@@ -106,11 +106,9 @@ test('openai provider maps responses api content and usage', function () {
 });
 
 test('openai provider surfaces responses api errors', function () {
-    Http::fake([
-        OpenAIProvider::DEFAULT_BASE_URL . '/*' => Http::response([
+    Http::fake(fn () => Http::response([
             'error' => ['message' => 'Invalid model'],
-        ], 400),
-    ]);
+        ], 400));
 
     (new OpenAIProvider())->complete(new AiTask(['prompt' => 'Summarize active orders.']), [], [
         'config' => [
