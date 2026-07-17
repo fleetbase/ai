@@ -107,7 +107,7 @@ test('openai provider maps responses api content and usage', function () {
 
 test('openai provider surfaces responses api errors', function () {
     Http::fake([
-        OpenAIProvider::DEFAULT_BASE_URL . '/responses' => Http::response([
+        OpenAIProvider::DEFAULT_BASE_URL . '/*' => Http::response([
             'error' => ['message' => 'Invalid model'],
         ], 400),
     ]);
