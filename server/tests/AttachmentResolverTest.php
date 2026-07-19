@@ -2,6 +2,7 @@
 
 use Fleetbase\Ai\Services\AiAttachmentResolver;
 use Fleetbase\Models\File;
+use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Support\Str;
 
 if (!function_exists('aiInvokeProtected')) {
@@ -22,20 +23,115 @@ function aiAttachmentFile(array $attributes = [], string|Throwable|null $content
             parent::__construct($attributes);
         }
 
-        public function getFilesystem()
+        public function getFilesystem(?string $disk = null): Filesystem
         {
-            return new class($this->contents) {
+            return new class($this->contents) implements Filesystem {
                 public function __construct(private string|Throwable|null $contents)
                 {
                 }
 
-                public function get(string $path): ?string
+                public function exists($path)
+                {
+                    return true;
+                }
+
+                public function get($path)
                 {
                     if ($this->contents instanceof Throwable) {
                         throw $this->contents;
                     }
 
                     return $this->contents;
+                }
+
+                public function readStream($path)
+                {
+                    return null;
+                }
+
+                public function put($path, $contents, $options = [])
+                {
+                    return true;
+                }
+
+                public function writeStream($path, $resource, array $options = [])
+                {
+                    return true;
+                }
+
+                public function getVisibility($path)
+                {
+                    return 'public';
+                }
+
+                public function setVisibility($path, $visibility)
+                {
+                    return true;
+                }
+
+                public function prepend($path, $data)
+                {
+                    return true;
+                }
+
+                public function append($path, $data)
+                {
+                    return true;
+                }
+
+                public function delete($paths)
+                {
+                    return true;
+                }
+
+                public function copy($from, $to)
+                {
+                    return true;
+                }
+
+                public function move($from, $to)
+                {
+                    return true;
+                }
+
+                public function size($path)
+                {
+                    return 0;
+                }
+
+                public function lastModified($path)
+                {
+                    return 0;
+                }
+
+                public function files($directory = null, $recursive = false)
+                {
+                    return [];
+                }
+
+                public function allFiles($directory = null)
+                {
+                    return [];
+                }
+
+                public function directories($directory = null, $recursive = false)
+                {
+                    return [];
+                }
+
+                public function allDirectories($directory = null)
+                {
+                    return [];
+                }
+
+                public function makeDirectory($path)
+                {
+                    return true;
+                }
+
+                public function deleteDirectory($directory)
+                {
+                    return true;
                 }
             };
         }
