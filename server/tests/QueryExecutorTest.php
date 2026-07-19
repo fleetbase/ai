@@ -88,7 +88,7 @@ test('query executor applies supported filters and skips invalid filters', funct
 test('query executor returns counts and grouped counts for registered resources', function () {
     $countQuery = $this->getMockBuilder(Builder::class)
         ->disableOriginalConstructor()
-        ->onlyMethods(['count'])
+        ->addMethods(['count'])
         ->getMock();
     $countQuery->expects($this->once())->method('count')->willReturn(7);
 
@@ -99,7 +99,7 @@ test('query executor returns counts and grouped counts for registered resources'
 
     $groupQuery = $this->getMockBuilder(Builder::class)
         ->disableOriginalConstructor()
-        ->onlyMethods(['selectRaw', 'groupBy', 'pluck'])
+        ->addMethods(['selectRaw', 'groupBy', 'pluck'])
         ->getMock();
     $groupQuery->expects($this->exactly(1))->method('selectRaw')->with('status, count(*) as aggregate')->willReturnSelf();
     $groupQuery->expects($this->once())->method('groupBy')->with('status')->willReturnSelf();
@@ -136,7 +136,7 @@ test('query executor returns counts and grouped counts for registered resources'
 test('query executor samples sanitize records and clamps requested limits', function () {
     $query = $this->getMockBuilder(Builder::class)
         ->disableOriginalConstructor()
-        ->onlyMethods(['latest', 'limit', 'get'])
+        ->addMethods(['latest', 'limit', 'get'])
         ->getMock();
     $query->expects($this->once())->method('latest')->willReturnSelf();
     $query->expects($this->once())->method('limit')->with(3)->willReturnSelf();
@@ -175,7 +175,7 @@ test('query executor builds location summaries with bounded coordinate samples',
     };
     $query = $this->getMockBuilder(Builder::class)
         ->disableOriginalConstructor()
-        ->onlyMethods(['whereNotNull', 'whereRaw', 'latest', 'limit', 'get'])
+        ->addMethods(['whereNotNull', 'whereRaw', 'latest', 'limit', 'get'])
         ->getMock();
     $query->expects($this->once())->method('whereNotNull')->with('location')->willReturnSelf();
     $query->expects($this->once())->method('whereRaw')->willReturnSelf();

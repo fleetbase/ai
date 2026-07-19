@@ -68,7 +68,9 @@ test('ai models expose backend table fillable searchable and cast contracts', fu
 
 test('ai models expose expected relationship contracts', function () {
     $capsule = new Capsule();
-    $capsule->addConnection(['driver' => 'sqlite', 'database' => ':memory:', 'prefix' => '']);
+    $connection = ['driver' => 'sqlite', 'database' => ':memory:', 'prefix' => ''];
+    $capsule->addConnection($connection);
+    $capsule->addConnection($connection, 'mysql');
     $capsule->setAsGlobal();
     $capsule->bootEloquent();
 
