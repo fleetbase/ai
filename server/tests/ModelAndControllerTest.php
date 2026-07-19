@@ -265,7 +265,12 @@ test('task controller shows and cancels found tasks', function () {
         {
             $this->recorded[] = $attributes;
 
-            return new AiTaskStep($attributes);
+            return new class($attributes) extends AiTaskStep {
+                public function __construct(array $attributes)
+                {
+                    $this->setRawAttributes($attributes, true);
+                }
+            };
         }
     };
 
