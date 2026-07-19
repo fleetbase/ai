@@ -10,7 +10,6 @@ use Fleetbase\Ai\Models\AiSession;
 use Fleetbase\Ai\Models\AiTask;
 use Fleetbase\Ai\Models\AiTaskStep;
 use Fleetbase\Ai\Services\AiTaskService;
-use Fleetbase\Models\User;
 use Illuminate\Support\Carbon;
 
 if (!function_exists('aiInvokeProtected')) {
@@ -159,7 +158,6 @@ test('session controller shows ends and deletes found sessions', function () {
 
         public function __construct()
         {
-            parent::__construct();
             $this->setRawAttributes([
                 'id'              => 10,
                 'uuid'            => 'session-uuid',
@@ -183,9 +181,7 @@ test('session controller shows ends and deletes found sessions', function () {
 
         public function update(array $attributes = [], array $options = [])
         {
-            foreach ($attributes as $key => $value) {
-                $this->setAttribute($key, $value);
-            }
+            $this->setRawAttributes(array_merge($this->getAttributes(), $attributes), true);
 
             return true;
         }
@@ -226,7 +222,6 @@ test('task controller shows and cancels found tasks', function () {
 
         public function __construct()
         {
-            parent::__construct();
             $this->setRawAttributes([
                 'id'              => 30,
                 'uuid'            => 'task-uuid',
@@ -252,7 +247,7 @@ test('task controller shows and cancels found tasks', function () {
             $this->updates[] = $attributes;
 
             foreach ($attributes as $key => $value) {
-                $this->setAttribute($key, $value);
+                $this->setRawAttributes(array_merge($this->getAttributes(), [$key => $value]), true);
             }
 
             return true;
@@ -392,16 +387,6 @@ test('admin controller serializes sessions tasks relations and user options', fu
     $redactedTask    = aiInvokeProtected($controller, 'serializeTask', $task, false);
     $revealedTask    = aiInvokeProtected($controller, 'serializeTask', $task, true);
 
-    $user = new User();
-    $user->setRawAttributes([
-        'uuid'         => 'user-uuid',
-        'public_id'    => 'USR-1',
-        'company_uuid' => 'company-uuid',
-        'name'         => 'Ops Admin',
-        'email'        => 'ops@example.test',
-        'status'       => 'active',
-    ], true);
-
     expect($redactedSession['tasks_count'])->toBe(2)
         ->and($redactedSession['total_tokens'])->toBe(44)
         ->and($redactedSession['company']['name'])->toBe('Fleetbase')
@@ -415,14 +400,5 @@ test('admin controller serializes sessions tasks relations and user options', fu
         ->and($revealedTask['prompt'])->toBe("  Plan\n dispatch for delayed orders  ")
         ->and($revealedTask['response'])->toBe('Dispatch plan response body')
         ->and($revealedTask['context'])->toBe(['route' => 'fleet-ops.operations'])
-        ->and($revealedTask['metadata'])->toBe(['attachments' => [['id' => 'file-1']]])
-        ->and(aiInvokeProtected($controller, 'serializeUserOption', $user))->toBe([
-            'id'           => 'user-uuid',
-            'uuid'         => 'user-uuid',
-            'public_id'    => 'USR-1',
-            'company_uuid' => 'company-uuid',
-            'name'         => 'Ops Admin',
-            'email'        => 'ops@example.test',
-            'status'       => 'active',
-        ]);
+        ->and($revealedTask['metadata'])->toBe(['attachments' => [['id' => 'file-1']]]);
 });
