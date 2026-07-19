@@ -139,9 +139,9 @@ test('ai service provider registers bindings and boots package resources', funct
             $this->booted[] = ['after_resolving', $name];
         }
 
-        public function registerExpansionsFrom($path)
+        public function registerExpansionsFrom($from = null, $namespace = null): void
         {
-            $this->booted[] = ['expansions', $path];
+            $this->booted[] = ['expansions', $from, $namespace];
         }
 
         public function loadRoutesFrom($path)
