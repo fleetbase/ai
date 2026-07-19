@@ -217,11 +217,9 @@ test('anthropic provider validates test configuration and surfaces test errors',
     }
     expect($configurationError)->toBe('Anthropic API key is not configured.');
 
-    Http::fake([
-        'https://anthropic-test-error.test/messages' => Http::response([
-            'error' => ['message' => 'Claude connectivity failed.'],
-        ], 502),
-    ]);
+    Http::fake(fn () => Http::response([
+        'error' => ['message' => 'Claude connectivity failed.'],
+    ], 502));
 
     (new AnthropicProvider())->test([
         'default_model' => 'claude-haiku-4-5',

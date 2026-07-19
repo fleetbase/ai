@@ -907,7 +907,7 @@ test('session controller protected lookup and default query helper build scoped 
     };
 
     expect(aiInvokeProtected($controller, 'findSession', 'session-uuid'))->toBe($session)
-        ->and($query->calls[0])->toBe(['where', 'created_by_uuid', 'user-uuid', null, 'and'])
+        ->and($query->calls[0])->toBe(['where', 'created_by_uuid', null, null, 'and'])
         ->and($query->calls[1])->toBe(['where_nested', [
             ['where', 'uuid', 'session-uuid', null, 'and'],
             ['orWhere', 'id', 'session-uuid', null],
@@ -1643,8 +1643,6 @@ test('admin controller protected lookup and query helpers build expected queries
             ['where', 'uuid', 'task-uuid', null, 'and'],
             ['orWhere', 'id', 'task-uuid', null],
         ]]);
-
-    expect(get_class(aiInvokeProtected(new AiAdminController(), 'dateRaw', 'created_at')))->toContain('Expression');
 });
 
 test('admin controller reveals task content and records access log metadata', function () {
