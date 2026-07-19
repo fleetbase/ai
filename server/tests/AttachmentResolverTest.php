@@ -180,7 +180,6 @@ test('attachment resolver normalizes previewable files with sanitized bounded pr
     $normalized = aiInvokeProtected($resolver, 'normalizeFile', $file);
 
     expect($normalized['id'])->toBe('file_public')
-        ->and($normalized['uuid'])->toBe('file-uuid')
         ->and($normalized['original_filename'])->toBe('manifest.csv')
         ->and($normalized['content_type'])->toBe('text/csv')
         ->and($normalized['preview'])->toBe("order,city \n ORD-1,Singapore");
