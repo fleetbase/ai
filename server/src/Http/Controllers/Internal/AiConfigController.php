@@ -13,7 +13,7 @@ class AiConfigController extends Controller
 {
     public function status(Request $request, AiProviderManager $providers)
     {
-        $config = $providers->normalizeConfig(Setting::system('ai', $providers->defaultConfig()));
+        $config = $providers->normalizeConfig($this->systemAiSetting($providers->defaultConfig()));
 
         return response()->json([
             'enabled' => (bool) data_get($config, 'enabled', false),
@@ -22,7 +22,7 @@ class AiConfigController extends Controller
 
     public function show(AdminRequest $request, AiProviderManager $providers)
     {
-        $config = $providers->normalizeConfig(Setting::system('ai', $providers->defaultConfig()));
+        $config = $providers->normalizeConfig($this->systemAiSetting($providers->defaultConfig()));
 
         return response()->json([
             'config'   => $this->maskSecrets($config),
@@ -33,11 +33,11 @@ class AiConfigController extends Controller
     public function store(AdminRequest $request, AiProviderManager $providers)
     {
         $config   = $request->input('config', []);
-        $existing = Setting::system('ai', []);
+        $existing = $this->systemAiSetting([]);
         $config   = $this->preserveMaskedSecrets($config, $existing);
         $config   = $providers->normalizeConfig($config);
 
-        Setting::configureSystem('ai', $config);
+        $this->configureSystemAi($config);
 
         return response()->json(['status' => 'OK', 'config' => $this->maskSecrets($config), 'metadata' => $providers->metadata()]);
     }
@@ -79,5 +79,15 @@ class AiConfigController extends Controller
         }
 
         return $config;
+    }
+
+    protected function systemAiSetting(array $default = []): array
+    {
+        return Setting::system('ai', $default);
+    }
+
+    protected function configureSystemAi(array $config): void
+    {
+        Setting::configureSystem('ai', $config);
     }
 }

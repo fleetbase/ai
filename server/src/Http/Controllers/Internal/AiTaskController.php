@@ -6,13 +6,14 @@ use Fleetbase\Ai\Models\AiTask;
 use Fleetbase\Ai\Services\AiTaskService;
 use Fleetbase\Http\Controllers\Controller;
 use Fleetbase\Models\Setting;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 
 class AiTaskController extends Controller
 {
     public function index(Request $request)
     {
-        $query = AiTask::where('company_uuid', session('company'))->with(['steps', 'session'])->latest();
+        $query = $this->tasksForCurrentCompany()->with(['steps', 'session'])->latest();
 
         if ($request->boolean('mine')) {
             $query->where('created_by_uuid', optional($request->user())->uuid);
@@ -87,12 +88,17 @@ class AiTaskController extends Controller
 
     protected function findTask(string $id): AiTask
     {
-        return AiTask::where('company_uuid', session('company'))
+        return $this->tasksForCurrentCompany()
             ->where('created_by_uuid', optional(request()->user())->uuid)
             ->where(function ($query) use ($id) {
                 $query->where('uuid', $id)->orWhere('id', $id);
             })
             ->firstOrFail();
+    }
+
+    protected function tasksForCurrentCompany(): Builder
+    {
+        return AiTask::where('company_uuid', session('company'));
     }
 
     protected function abortIfAiDisabled(): void

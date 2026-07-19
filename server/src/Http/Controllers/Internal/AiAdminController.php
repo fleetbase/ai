@@ -140,7 +140,7 @@ class AiAdminController extends Controller
 
         $task = $this->findTask($id)->load(['steps', 'session', 'company:uuid,public_id,name', 'createdBy:uuid,public_id,name,email']);
 
-        AiAdminAccessLog::create([
+        $this->createAccessLog([
             'company_uuid'     => $task->company_uuid,
             'ai_session_uuid'  => $task->ai_session_uuid,
             'ai_task_uuid'     => $task->uuid,
@@ -162,7 +162,7 @@ class AiAdminController extends Controller
     {
         abort_unless($this->can($request, 'ai view usage analytics'), 403, 'You are not authorized to view AI usage analytics.');
 
-        $base = AiTask::query();
+        $base = $this->tasksQuery();
         $this->applyTaskFilters($base, $request);
 
         $summary = (clone $base)
@@ -270,6 +270,16 @@ class AiAdminController extends Controller
         return AiTask::where(function (Builder $query) use ($id) {
             $query->where('uuid', $id)->orWhere('id', $id);
         })->firstOrFail();
+    }
+
+    protected function tasksQuery(): Builder
+    {
+        return AiTask::query();
+    }
+
+    protected function createAccessLog(array $attributes): AiAdminAccessLog
+    {
+        return AiAdminAccessLog::create($attributes);
     }
 
     protected function serializeSession(AiSession $session): array
@@ -443,7 +453,7 @@ class AiAdminController extends Controller
             ->selectRaw('DATE(created_at) as day')
             ->selectRaw('COUNT(*) as task_count')
             ->selectRaw('COALESCE(SUM(total_tokens), 0) as total_tokens')
-            ->groupBy(DB::raw('DATE(created_at)'))
+            ->groupBy($this->dateRaw('created_at'))
             ->orderBy('day')
             ->get()
             ->map(fn ($row) => [
@@ -451,6 +461,11 @@ class AiAdminController extends Controller
                 'task_count'   => (int) $row->task_count,
                 'total_tokens' => (int) $row->total_tokens,
             ]);
+    }
+
+    protected function dateRaw(string $column)
+    {
+        return DB::raw("DATE({$column})");
     }
 
     protected function excerpt(?string $value, int $limit = 180): ?string

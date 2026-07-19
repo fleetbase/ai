@@ -80,6 +80,8 @@ if (!function_exists('aiAdminRequestDouble')) {
             public function user($guard = null)
             {
                 return new class($this->admin) {
+                    public string $uuid = 'admin-user-uuid';
+
                     public function __construct(private bool $admin)
                     {
                     }
@@ -89,6 +91,16 @@ if (!function_exists('aiAdminRequestDouble')) {
                         return $this->admin;
                     }
                 };
+            }
+
+            public function ip()
+            {
+                return $this->input('ip', '127.0.0.1');
+            }
+
+            public function userAgent()
+            {
+                return $this->input('user_agent', 'Fleetbase AI test browser');
             }
         };
     }
@@ -205,6 +217,210 @@ if (!function_exists('aiAdminUsageBuilder')) {
                 $this->calls[] = ['get', $columns];
 
                 return collect($this->rows);
+            }
+        };
+    }
+}
+
+if (!function_exists('aiSessionControllerBuilder')) {
+    function aiSessionControllerBuilder(array $rows): Builder
+    {
+        return new class($rows) extends Builder {
+            public array $calls = [];
+
+            public function __construct(private array $rows)
+            {
+            }
+
+            public function withCount($relations)
+            {
+                $this->calls[] = ['withCount', $relations];
+
+                return $this;
+            }
+
+            public function with($relations, $callback = null)
+            {
+                $this->calls[] = ['with', $relations];
+
+                return $this;
+            }
+
+            public function latest($column = null)
+            {
+                $this->calls[] = ['latest', $column];
+
+                return $this;
+            }
+
+            public function where($column, $operator = null, $value = null, $boolean = 'and')
+            {
+                if (is_callable($column)) {
+                    $nested = aiSessionControllerBuilder([]);
+                    $column($nested);
+                    $this->calls[] = ['where_nested', $nested->calls];
+
+                    return $this;
+                }
+
+                $this->calls[] = ['where', $column, $operator, $value, $boolean];
+
+                return $this;
+            }
+
+            public function orWhere($column, $operator = null, $value = null)
+            {
+                $this->calls[] = ['orWhere', $column, $operator, $value];
+
+                return $this;
+            }
+
+            public function limit($value)
+            {
+                $this->calls[] = ['limit', $value];
+
+                return $this;
+            }
+
+            public function get($columns = ['*'])
+            {
+                $this->calls[] = ['get', $columns];
+
+                return collect($this->rows);
+            }
+
+            public function firstOrFail($columns = ['*'])
+            {
+                $this->calls[] = ['firstOrFail', $columns];
+
+                return $this->rows[0] ?? new AiSession();
+            }
+        };
+    }
+}
+
+if (!function_exists('aiAdminAnalyticsBuilder')) {
+    function aiAdminAnalyticsBuilder(): Builder
+    {
+        return new class() extends Builder {
+            public array $calls = [];
+
+            public function __construct()
+            {
+            }
+
+            public function where($column, $operator = null, $value = null, $boolean = 'and')
+            {
+                $this->calls[] = ['where', $column, $operator, $value, $boolean];
+
+                return $this;
+            }
+
+            public function select($columns = ['*'])
+            {
+                $this->calls[] = ['select', $columns];
+
+                return $this;
+            }
+
+            public function selectRaw($expression, array $bindings = [])
+            {
+                $this->calls[] = ['selectRaw', $expression, $bindings];
+
+                return $this;
+            }
+
+            public function first($columns = ['*'])
+            {
+                $this->calls[] = ['first', $columns];
+
+                return (object) [
+                    'task_count'      => '5',
+                    'input_tokens'    => '100',
+                    'output_tokens'   => '75',
+                    'total_tokens'    => '175',
+                    'failed_count'    => '1',
+                    'completed_count' => '4',
+                ];
+            }
+
+            public function groupBy(...$groups)
+            {
+                $this->calls[] = ['groupBy', $groups];
+
+                return $this;
+            }
+
+            public function orderByDesc($column)
+            {
+                $this->calls[] = ['orderByDesc', $column];
+
+                return $this;
+            }
+
+            public function orderBy($column, $direction = 'asc')
+            {
+                $this->calls[] = ['orderBy', $column, $direction];
+
+                return $this;
+            }
+
+            public function limit($value)
+            {
+                $this->calls[] = ['limit', $value];
+
+                return $this;
+            }
+
+            public function get($columns = ['*'])
+            {
+                $this->calls[] = ['get', $columns];
+
+                if (collect($this->calls)->contains(fn ($call) => $call[0] === 'orderBy' && $call[1] === 'day')) {
+                    return collect([
+                        (object) ['day' => '2026-07-19', 'task_count' => '2', 'total_tokens' => '70'],
+                    ]);
+                }
+
+                return collect([
+                    (object) [
+                        'provider'        => 'openai',
+                        'company_uuid'    => null,
+                        'created_by_uuid' => null,
+                        'model'           => null,
+                        'status'          => null,
+                        'task_count'      => '3',
+                        'input_tokens'    => '10',
+                        'output_tokens'   => '20',
+                        'total_tokens'    => '30',
+                    ],
+                ]);
+            }
+        };
+    }
+}
+
+if (!function_exists('aiProviderManagerDouble')) {
+    function aiProviderManagerDouble(): AiProviderManager
+    {
+        return new class() extends AiProviderManager {
+            public function __construct()
+            {
+            }
+
+            public function defaultConfig(): array
+            {
+                return ['enabled' => false, 'provider' => 'local', 'providers' => ['openai' => ['api_key' => '']]];
+            }
+
+            public function normalizeConfig(array $config): array
+            {
+                return array_replace_recursive($this->defaultConfig(), $config);
+            }
+
+            public function metadata(): array
+            {
+                return ['providers' => [['label' => 'Local Preview', 'value' => 'local']]];
             }
         };
     }
@@ -385,6 +601,55 @@ test('config controller masks and preserves provider secrets', function () {
         ->and($preserved['providers']['anthropic']['secret'])->toBe('existing-secret');
 });
 
+test('config controller status show and store use normalized masked settings', function () {
+    $controller = new class() extends AiConfigController {
+        public array $settings = [
+            'enabled'   => true,
+            'provider'  => 'openai',
+            'providers' => [
+                'openai' => ['api_key' => 'sk-existing', 'base_url' => 'https://api.openai.test'],
+            ],
+        ];
+        public ?array $configured = null;
+
+        protected function systemAiSetting(array $default = []): array
+        {
+            return $this->settings ?: $default;
+        }
+
+        protected function configureSystemAi(array $config): void
+        {
+            $this->configured = $config;
+            $this->settings   = $config;
+        }
+    };
+    $providers = aiProviderManagerDouble();
+
+    $status = aiJsonPayload($controller->status(Request::create('/'), $providers));
+    $show   = aiJsonPayload($controller->show(aiAdminRequestDouble(), $providers));
+    $store  = aiJsonPayload($controller->store(aiAdminRequestDouble([
+        'config' => [
+            'enabled'   => false,
+            'provider'  => 'openai',
+            'providers' => [
+                'openai' => [
+                    'api_key'  => '********',
+                    'base_url' => 'https://override.openai.test',
+                ],
+            ],
+        ],
+    ]), $providers));
+
+    expect($status)->toBe(['enabled' => true])
+        ->and($show['config']['providers']['openai']['api_key'])->toBe('********')
+        ->and($show['metadata']['providers'][0]['value'])->toBe('local')
+        ->and($controller->configured['enabled'])->toBeFalse()
+        ->and($controller->configured['providers']['openai']['api_key'])->toBe('sk-existing')
+        ->and($controller->configured['providers']['openai']['base_url'])->toBe('https://override.openai.test')
+        ->and($store['status'])->toBe('OK')
+        ->and($store['config']['providers']['openai']['api_key'])->toBe('********');
+});
+
 test('admin controller serializes redacted steps and metadata summaries', function () {
     $controller = new AiAdminController();
     $timestamp  = Carbon::parse('2026-07-19 10:00:00', 'UTC');
@@ -497,6 +762,80 @@ test('session controller shows ends and deletes found sessions', function () {
         ->and($session->deleted)->toBeTrue();
 });
 
+test('session controller indexes and stores sessions through overridable query helpers', function () {
+    session(['company' => 'company-uuid']);
+
+    $session = new class() extends AiSession {
+        public array $loaded = [];
+
+        public function __construct()
+        {
+            $this->setRawAttributes([
+                'uuid'            => 'session-uuid',
+                'company_uuid'    => 'company-uuid',
+                'created_by_uuid' => 'user-uuid',
+                'title'           => 'New AI chat',
+                'status'          => 'active',
+            ], true);
+        }
+
+        public function load($relations)
+        {
+            $this->loaded[] = $relations;
+
+            return $this;
+        }
+    };
+    $query = aiSessionControllerBuilder([$session]);
+
+    $controller = new class($query, $session) extends AiSessionController {
+        public array $created = [];
+
+        public function __construct(private Builder $query, private AiSession $session)
+        {
+        }
+
+        protected function sessionsForCurrentCompany(): Builder
+        {
+            return $this->query;
+        }
+
+        protected function createSession(array $attributes): AiSession
+        {
+            $this->created[] = $attributes;
+
+            return $this->session;
+        }
+    };
+
+    $indexRequest = Request::create('/', 'GET', ['mine' => '1', 'status' => 'active', 'limit' => 2]);
+    $indexRequest->setUserResolver(fn () => (object) ['uuid' => 'user-uuid']);
+
+    $storeRequest = Request::create('/', 'POST', ['title' => '   ']);
+    $storeRequest->setUserResolver(fn () => (object) ['uuid' => 'user-uuid']);
+
+    $index = aiJsonPayload($controller->index($indexRequest));
+    $store = aiJsonPayload($controller->store($storeRequest));
+
+    expect($index['sessions'])->toHaveCount(1)
+        ->and($query->calls)->toBe([
+            ['withCount', 'tasks'],
+            ['latest', 'last_message_at'],
+            ['latest', null],
+            ['where', 'created_by_uuid', 'user-uuid', null, 'and'],
+            ['where', 'status', 'active', null, 'and'],
+            ['limit', 2],
+            ['get', ['*']],
+        ])
+        ->and($controller->created[0]['company_uuid'])->toBe('company-uuid')
+        ->and($controller->created[0]['created_by_uuid'])->toBe('user-uuid')
+        ->and($controller->created[0]['title'])->toBe('New AI chat')
+        ->and($controller->created[0]['status'])->toBe('active')
+        ->and($controller->created[0]['last_message_at'])->not->toBeNull()
+        ->and($store['session']['uuid'])->toBe('session-uuid')
+        ->and($session->loaded[0])->toHaveKey('tasks');
+});
+
 test('task controller shows and cancels found tasks', function () {
     $task = new class() extends AiTask {
         public array $updates = [];
@@ -575,6 +914,42 @@ test('task controller shows and cancels found tasks', function () {
         ->and($service->recorded)->toHaveCount(1)
         ->and($service->recorded[0]['type'])->toBe('cancel')
         ->and($service->recorded[0]['tool'])->toBe('fleetbase.dispatch');
+});
+
+test('task controller indexes tasks through overridable query helpers', function () {
+    $task = new AiTask();
+    $task->setRawAttributes([
+        'uuid'            => 'task-uuid',
+        'company_uuid'    => 'company-uuid',
+        'created_by_uuid' => 'user-uuid',
+        'status'          => 'answered',
+    ], true);
+    $query = aiSessionControllerBuilder([$task]);
+
+    $controller = new class($query) extends AiTaskController {
+        public function __construct(private Builder $query)
+        {
+        }
+
+        protected function tasksForCurrentCompany(): Builder
+        {
+            return $this->query;
+        }
+    };
+
+    $request = Request::create('/', 'GET', ['mine' => '1', 'limit' => 3]);
+    $request->setUserResolver(fn () => (object) ['uuid' => 'user-uuid']);
+
+    $response = aiJsonPayload($controller->index($request));
+
+    expect($response['tasks'])->toHaveCount(1)
+        ->and($query->calls)->toBe([
+            ['with', ['steps', 'session']],
+            ['latest', null],
+            ['where', 'created_by_uuid', 'user-uuid', null, 'and'],
+            ['limit', 3],
+            ['get', ['*']],
+        ]);
 });
 
 test('task controller previews and applies found tasks through the task service', function () {
@@ -760,6 +1135,141 @@ test('admin controller serializes sessions tasks relations and user options', fu
         ->and($revealedTask['response'])->toBe('Dispatch plan response body')
         ->and($revealedTask['context'])->toBe(['route' => 'fleet-ops.operations'])
         ->and($revealedTask['metadata'])->toBe(['attachments' => [['id' => 'file-1']]]);
+});
+
+test('admin controller reveals task content and records access log metadata', function () {
+    $task = new class() extends AiTask {
+        public array $loaded = [];
+
+        public function __construct()
+        {
+            $this->setRawAttributes([
+                'id'               => 30,
+                'uuid'             => 'task-uuid',
+                'ai_session_uuid'  => 'session-uuid',
+                'company_uuid'     => 'company-uuid',
+                'created_by_uuid'  => 'user-uuid',
+                'task_type'        => 'chat',
+                'status'           => 'answered',
+                'provider'         => 'openai',
+                'model'            => 'gpt-5-mini',
+                'prompt'           => 'Plan the route',
+                'response'         => 'Route planned',
+                'metadata'         => ['attachments' => []],
+            ], true);
+            $this->setRelation('steps', collect());
+            $this->setRelation('company', (object) ['uuid' => 'company-uuid', 'public_id' => 'COMP-1', 'name' => 'Fleetbase']);
+            $this->setRelation('createdBy', (object) ['uuid' => 'user-uuid', 'public_id' => 'USR-1', 'name' => 'Ops', 'email' => 'ops@example.test']);
+        }
+
+        public function load($relations)
+        {
+            $this->loaded[] = $relations;
+
+            return $this;
+        }
+    };
+
+    $controller = new class($task) extends AiAdminController {
+        public array $logs = [];
+
+        public function __construct(private AiTask $task)
+        {
+        }
+
+        protected function findTask(string $id): AiTask
+        {
+            return $this->task;
+        }
+
+        protected function createAccessLog(array $attributes): AiAdminAccessLog
+        {
+            $this->logs[] = $attributes;
+
+            $log = new AiAdminAccessLog();
+            $log->setRawAttributes($attributes, true);
+
+            return $log;
+        }
+    };
+
+    $response = aiJsonPayload($controller->revealTaskContent('task-uuid', aiAdminRequestDouble([
+        'ip'         => '203.0.113.10',
+        'user_agent' => str_repeat('A', 1200),
+    ], true)));
+
+    expect($response['task']['prompt'])->toBe('Plan the route')
+        ->and($response['task']['response'])->toBe('Route planned')
+        ->and($response['task']['content_redacted'])->toBeFalse()
+        ->and($controller->logs)->toHaveCount(1)
+        ->and($controller->logs[0]['company_uuid'])->toBe('company-uuid')
+        ->and($controller->logs[0]['ai_session_uuid'])->toBe('session-uuid')
+        ->and($controller->logs[0]['ai_task_uuid'])->toBe('task-uuid')
+        ->and($controller->logs[0]['viewed_by_uuid'])->toBe('admin-user-uuid')
+        ->and($controller->logs[0]['action'])->toBe('view_task_content')
+        ->and($controller->logs[0]['ip_address'])->toBe('203.0.113.10')
+        ->and(strlen($controller->logs[0]['user_agent']))->toBe(1000)
+        ->and($controller->logs[0]['metadata'])->toBe([
+            'task_status' => 'answered',
+            'provider'    => 'openai',
+            'model'       => 'gpt-5-mini',
+        ]);
+});
+
+test('admin controller usage endpoint summarizes filtered analytics', function () {
+    $base = aiAdminAnalyticsBuilder();
+
+    $controller = new class($base) extends AiAdminController {
+        public function __construct(private Builder $base)
+        {
+        }
+
+        protected function tasksQuery(): Builder
+        {
+            return $this->base;
+        }
+
+        protected function dateRaw(string $column)
+        {
+            return "DATE({$column})";
+        }
+    };
+
+    $response = aiJsonPayload($controller->usage(aiAdminRequestDouble([
+        'company_uuid'    => 'company-uuid',
+        'created_by_uuid' => 'user-uuid',
+        'status'          => 'completed',
+        'provider'        => 'openai',
+        'model'           => 'gpt-5-mini',
+        'from'            => '2026-07-01',
+        'to'              => '2026-07-19',
+    ], true)));
+
+    expect($base->calls[0])->toBe(['where', 'company_uuid', 'company-uuid', null, 'and'])
+        ->and($base->calls[4])->toBe(['where', 'model', 'gpt-5-mini', null, 'and'])
+        ->and($base->calls[5][1])->toBe('created_at')
+        ->and($base->calls[5][2])->toBe('>=')
+        ->and($base->calls[5][3]->toDateTimeString())->toBe('2026-07-01 00:00:00')
+        ->and($base->calls[6][2])->toBe('<=')
+        ->and($response['summary'])->toBe([
+            'task_count'      => 5,
+            'input_tokens'    => 100,
+            'output_tokens'   => 75,
+            'total_tokens'    => 175,
+            'failed_count'    => 1,
+            'completed_count' => 4,
+        ])
+        ->and($response['by_provider'][0])->toMatchArray([
+            'key'          => 'openai',
+            'label'        => 'openai',
+            'task_count'   => 3,
+            'total_tokens' => 30,
+        ])
+        ->and($response['by_day'][0])->toBe([
+            'day'          => '2026-07-19',
+            'task_count'   => 2,
+            'total_tokens' => 70,
+        ]);
 });
 
 test('admin controller applies session task and user filters', function () {
