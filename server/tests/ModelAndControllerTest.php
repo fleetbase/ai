@@ -5,15 +5,15 @@ use Fleetbase\Ai\Http\Controllers\Internal\AiAdminController;
 use Fleetbase\Ai\Http\Controllers\Internal\AiConfigController;
 use Fleetbase\Ai\Http\Controllers\Internal\AiSessionController;
 use Fleetbase\Ai\Http\Controllers\Internal\AiTaskController;
-use Fleetbase\Ai\Providers\AiServiceProvider;
-use Fleetbase\Ai\Services\AiProviderManager;
-use Fleetbase\Ai\Services\AiQueryExecutor;
-use Fleetbase\Ai\Services\AiTemporalContext;
 use Fleetbase\Ai\Models\AiAdminAccessLog;
 use Fleetbase\Ai\Models\AiSession;
 use Fleetbase\Ai\Models\AiTask;
 use Fleetbase\Ai\Models\AiTaskStep;
+use Fleetbase\Ai\Providers\AiServiceProvider;
+use Fleetbase\Ai\Services\AiProviderManager;
+use Fleetbase\Ai\Services\AiQueryExecutor;
 use Fleetbase\Ai\Services\AiTaskService;
+use Fleetbase\Ai\Services\AiTemporalContext;
 use Fleetbase\Ai\Support\AiCapabilityRegistry;
 use Fleetbase\Ai\Support\AiQueryRegistry;
 use Fleetbase\Ai\Support\Capabilities\CurrentPageContextCapability;
@@ -50,9 +50,9 @@ if (!function_exists('aiJsonPayload')) {
 }
 
 if (!function_exists('aiAdminRequestDouble')) {
-    function aiAdminRequestDouble(array $input = [], bool $admin = false): \Fleetbase\Http\Requests\AdminRequest
+    function aiAdminRequestDouble(array $input = [], bool $admin = false): Fleetbase\Http\Requests\AdminRequest
     {
-        return new class($input, $admin) extends \Fleetbase\Http\Requests\AdminRequest {
+        return new class($input, $admin) extends Fleetbase\Http\Requests\AdminRequest {
             public function __construct(private array $values, private bool $admin)
             {
             }
@@ -110,7 +110,7 @@ if (!function_exists('aiAdminRequestDouble')) {
 if (!function_exists('aiAdminFilterBuilder')) {
     function aiAdminFilterBuilder(): Builder
     {
-        return new class() extends Builder {
+        return new class extends Builder {
             public array $calls = [];
 
             public function __construct()
@@ -303,7 +303,7 @@ if (!function_exists('aiSessionControllerBuilder')) {
 if (!function_exists('aiAdminAnalyticsBuilder')) {
     function aiAdminAnalyticsBuilder(): Builder
     {
-        return new class() extends Builder {
+        return new class extends Builder {
             public array $calls = [];
 
             public function __construct()
@@ -523,7 +523,7 @@ if (!function_exists('aiAdminEndpointBuilder')) {
 if (!function_exists('aiProviderManagerDouble')) {
     function aiProviderManagerDouble(): AiProviderManager
     {
-        return new class() extends AiProviderManager {
+        return new class extends AiProviderManager {
             public function __construct()
             {
             }
@@ -567,7 +567,7 @@ test('ai models expose backend table fillable searchable and cast contracts', fu
 });
 
 test('ai models expose expected relationship contracts', function () {
-    $capsule = new Capsule();
+    $capsule    = new Capsule();
     $connection = ['driver' => 'sqlite', 'database' => ':memory:', 'prefix' => ''];
     $capsule->addConnection($connection);
     $capsule->addConnection($connection, 'mysql');
@@ -610,7 +610,7 @@ test('resource controller points fleetbase resources at the ai namespace', funct
 });
 
 test('ai service provider registers bindings and boots package resources', function () {
-    $app = new class() {
+    $app = new class {
         public array $registered = [];
         public array $singletons = [];
 
@@ -662,7 +662,7 @@ test('ai service provider registers bindings and boots package resources', funct
 
     expect($app->registered)->toBe([CoreServiceProvider::class])
         ->and($app->singletons)->toMatchArray([
-            \Fleetbase\Ai\Contracts\AIProviderInterface::class => AiProviderManager::class,
+            Fleetbase\Ai\Contracts\AIProviderInterface::class   => AiProviderManager::class,
             AiCapabilityRegistry::class                         => AiCapabilityRegistry::class,
             AiQueryRegistry::class                              => AiQueryRegistry::class,
             AiQueryExecutor::class                              => AiQueryExecutor::class,
@@ -722,7 +722,7 @@ test('config controller masks and preserves provider secrets', function () {
 });
 
 test('config controller status show and store use normalized masked settings', function () {
-    $controller = new class() extends AiConfigController {
+    $controller = new class extends AiConfigController {
         public array $settings = [
             'enabled'   => true,
             'provider'  => 'openai',
@@ -819,7 +819,7 @@ test('admin controller serializes redacted steps and metadata summaries', functi
 });
 
 test('session controller shows ends and deletes found sessions', function () {
-    $session = new class() extends AiSession {
+    $session = new class extends AiSession {
         public bool $deleted = false;
 
         public function __construct()
@@ -886,7 +886,7 @@ test('session controller protected lookup and default query helper build scoped 
     session(['company' => 'company-uuid']);
 
     $request = Request::create('/ai/sessions/session-uuid', 'GET');
-    $request->setUserResolver(fn () => new class() {
+    $request->setUserResolver(fn () => new class {
         public string $uuid = 'user-uuid';
     });
     app()->instance('request', $request);
@@ -918,7 +918,7 @@ test('session controller protected lookup and default query helper build scoped 
 test('session controller indexes and stores sessions through overridable query helpers', function () {
     session(['company' => 'company-uuid']);
 
-    $session = new class() extends AiSession {
+    $session = new class extends AiSession {
         public array $loaded = [];
 
         public function __construct()
@@ -990,7 +990,7 @@ test('session controller indexes and stores sessions through overridable query h
 });
 
 test('task controller shows and cancels found tasks', function () {
-    $task = new class() extends AiTask {
+    $task = new class extends AiTask {
         public array $updates = [];
 
         public function __construct()
@@ -1027,7 +1027,7 @@ test('task controller shows and cancels found tasks', function () {
         }
     };
 
-    $service = new class() extends AiTaskService {
+    $service = new class extends AiTaskService {
         public array $recorded = [];
 
         public function __construct()
@@ -1106,7 +1106,7 @@ test('task controller indexes tasks through overridable query helpers', function
 });
 
 test('task controller previews and applies found tasks through the task service', function () {
-    $task = new class() extends AiTask {
+    $task = new class extends AiTask {
         public function __construct()
         {
             $this->setRawAttributes([
@@ -1182,11 +1182,7 @@ test('task controller stores tasks validates input and checks ai enabled state',
     $task = new AiTask();
     $task->setRawAttributes(['uuid' => 'created-task-uuid', 'status' => 'answered'], true);
 
-    $request = new class([
-        'prompt'       => 'Plan dispatch',
-        'session_uuid' => 'session-uuid',
-        'attachments'  => ['file-1'],
-    ]) extends Request {
+    $request = new class(['prompt' => 'Plan dispatch', 'session_uuid' => 'session-uuid', 'attachments' => ['file-1']]) extends Request {
         public array $validated = [];
 
         public function __construct(private array $values)
@@ -1225,7 +1221,7 @@ test('task controller stores tasks validates input and checks ai enabled state',
         }
     };
 
-    $controller = new class() extends AiTaskController {
+    $controller = new class extends AiTaskController {
         protected function systemAiConfig(): array
         {
             return ['enabled' => true];
@@ -1244,7 +1240,7 @@ test('task controller stores tasks validates input and checks ai enabled state',
             ]],
         ]);
 
-    $disabled = new class() extends AiTaskController {
+    $disabled = new class extends AiTaskController {
         protected function systemAiConfig(): array
         {
             return ['enabled' => false];
@@ -1593,8 +1589,8 @@ test('admin controller lists sessions and returns session and task detail payloa
         }
     };
 
-    $list   = aiJsonPayload($controller->sessions(aiAdminRequestDouble(['limit' => 500], true)));
-    $detail = aiJsonPayload($controller->session('session-uuid', aiAdminRequestDouble([], true)));
+    $list         = aiJsonPayload($controller->sessions(aiAdminRequestDouble(['limit' => 500], true)));
+    $detail       = aiJsonPayload($controller->session('session-uuid', aiAdminRequestDouble([], true)));
     $taskResponse = aiJsonPayload($controller->task('task-uuid', aiAdminRequestDouble([], true)));
 
     expect($list['sessions'][0]['uuid'])->toBe('session-uuid')
@@ -1660,7 +1656,7 @@ test('admin controller protected lookup and query helpers build expected queries
 });
 
 test('admin controller reveals task content and records access log metadata', function () {
-    $task = new class() extends AiTask {
+    $task = new class extends AiTask {
         public array $loaded = [];
 
         public function __construct()

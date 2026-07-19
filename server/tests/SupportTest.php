@@ -162,7 +162,7 @@ function aiContextCapability(array $overrides = []): AIContextCapabilityInterfac
 
 function aiRecordingBuilder(): Builder
 {
-    return new class() extends Builder {
+    return new class extends Builder {
         public array $calls = [];
 
         public function __construct()
@@ -240,7 +240,7 @@ test('queryable resource builds scoped model queries with optional directives', 
     session(['company' => 'company-uuid']);
 
     $builder    = aiRecordingBuilder();
-    $modelClass = get_class(new class() {
+    $modelClass = get_class(new class {
         public static Builder $builder;
 
         public static function query(): Builder
@@ -297,7 +297,7 @@ test('capability registry stores capabilities by key and lists metadata', functi
 });
 
 test('abstract capability provides default metadata and optional input schema', function () {
-    $capability = new class() extends AbstractAICapability {
+    $capability = new class extends AbstractAICapability {
         public function key(): string
         {
             return 'fleetbase.abstract';
@@ -421,7 +421,7 @@ test('temporal context builds grounded day week and month ranges in user timezon
     Carbon::setTestNow(Carbon::parse('2026-07-19 10:30:00', 'Asia/Ulaanbaatar'));
 
     try {
-        $context = (new class() extends AiTemporalContext {
+        $context = (new class extends AiTemporalContext {
             public function timezone(): string
             {
                 return 'Asia/Ulaanbaatar';

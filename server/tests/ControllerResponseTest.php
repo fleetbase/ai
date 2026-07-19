@@ -46,7 +46,7 @@ test('config controller status reports normalized disabled default config', func
 });
 
 test('config controller test provider returns provider response payload', function () {
-    $provider = new class() implements AIProviderInterface {
+    $provider = new class implements AIProviderInterface {
         public function complete(AiTask $task, array $messages = [], array $options = []): array
         {
             return [];
@@ -72,7 +72,7 @@ test('config controller test provider returns provider response payload', functi
 });
 
 test('config controller test provider serializes provider exceptions', function () {
-    $provider = new class() implements AIProviderInterface {
+    $provider = new class implements AIProviderInterface {
         public function complete(AiTask $task, array $messages = [], array $options = []): array
         {
             return [];

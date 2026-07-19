@@ -189,7 +189,7 @@ test('query executor allows permissioned resources for admins and delegated perm
     $adminExecutor = new class($registry) extends AiQueryExecutor {
         protected function userFromSession()
         {
-            return new class() {
+            return new class {
                 public function isAdmin(): bool
                 {
                     return true;
@@ -201,7 +201,7 @@ test('query executor allows permissioned resources for admins and delegated perm
     $permissionExecutor = new class($registry) extends AiQueryExecutor {
         protected function userFromSession()
         {
-            return new class() {
+            return new class {
                 public function isAdmin(): bool
                 {
                     return false;
@@ -283,7 +283,7 @@ test('query executor returns unknown and unauthorized location and sample respon
 });
 
 test('query executor builds location summaries with bounded coordinate samples', function () {
-    $point = new class() {
+    $point = new class {
         public function getLat(): float
         {
             return 1.234567;

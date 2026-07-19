@@ -127,7 +127,7 @@ function aiTaskDouble(array $attributes = []): AiTask
 
         public function update(array $attributes = [], array $options = [])
         {
-            $this->updates[] = $attributes;
+            $this->updates[]  = $attributes;
             $this->attributes = array_merge($this->attributes, $attributes);
 
             return true;
@@ -164,7 +164,7 @@ function aiStepDouble(array $attributes = []): AiTaskStep
 
         public function update(array $attributes = [], array $options = [])
         {
-            $this->updates[] = $attributes;
+            $this->updates[]  = $attributes;
             $this->attributes = array_merge($this->attributes, $attributes);
 
             return true;
@@ -196,7 +196,7 @@ function aiSessionDouble(array $attributes = []): AiSession
 
         public function update(array $attributes = [], array $options = [])
         {
-            $this->updates[] = $attributes;
+            $this->updates[]  = $attributes;
             $this->attributes = array_merge($this->attributes, $attributes);
 
             return true;
@@ -312,17 +312,12 @@ function aiProviderDouble(array $result = [], ?Throwable $throwable = null): AIP
 
 function aiTaskServiceDouble(AiCapabilityRegistry $registry, array &$steps): AiTaskService
 {
-    return new class(
-        new LocalAIProvider(),
-        new AiContextResolver($registry),
-        $registry,
-        new AiAttachmentResolver(),
-        new class() extends AiTemporalContext {
-            public function timezone(): string
-            {
-                return 'UTC';
-            }
-        },
+    return new class(new LocalAIProvider(), new AiContextResolver($registry), $registry, new AiAttachmentResolver(), new class extends AiTemporalContext {
+        public function timezone(): string
+        {
+            return 'UTC';
+        }
+    },
         $steps
     ) extends AiTaskService {
         public function __construct($provider, $contextResolver, $registry, $attachmentResolver, $temporalContext, private array &$steps)
@@ -416,7 +411,7 @@ function aiTaskServiceSqliteSchema(): void
 function aiCreateRequest(array $input): Request
 {
     $request = Request::create('/ai/tasks', 'POST', $input);
-    $request->setUserResolver(fn () => new class() {
+    $request->setUserResolver(fn () => new class {
         public string $uuid = 'user-uuid';
     });
 
@@ -432,11 +427,11 @@ test('task service creates tasks from requests with provider context attachments
         'preview' => ['draft' => ['order' => 'ORD-1']],
     ]));
 
-    $steps        = [];
-    $createdTasks = [];
+    $steps           = [];
+    $createdTasks    = [];
     $createdSessions = [];
-    $sessionRows = [aiSessionDouble(['status' => 'ended', 'title' => 'Old chat'])];
-    $provider    = aiProviderDouble();
+    $sessionRows     = [aiSessionDouble(['status' => 'ended', 'title' => 'Old chat'])];
+    $provider        = aiProviderDouble();
 
     $service = new class($provider, $registry, $steps, $createdTasks, $createdSessions, $sessionRows) extends AiTaskService {
         public function __construct(
@@ -456,13 +451,13 @@ test('task service creates tasks from requests with provider context attachments
                     }
                 },
                 $registry,
-                new class() extends AiAttachmentResolver {
+                new class extends AiAttachmentResolver {
                     public function resolveFromRequest(Request $request): array
                     {
                         return [['id' => 'file-1', 'preview' => 'manifest']];
                     }
                 },
-                new class() extends AiTemporalContext {
+                new class extends AiTemporalContext {
                     public function context(): array
                     {
                         return ['capability' => 'fleetbase.ai.temporal', 'timezone' => 'UTC'];
@@ -486,7 +481,7 @@ test('task service creates tasks from requests with provider context attachments
 
         protected function createTask(array $attributes): AiTask
         {
-            $task = aiTaskDouble(array_merge($attributes, ['uuid' => 'created-task-uuid']));
+            $task                 = aiTaskDouble(array_merge($attributes, ['uuid' => 'created-task-uuid']));
             $this->createdTasks[] = $attributes;
 
             return $task;
@@ -494,7 +489,7 @@ test('task service creates tasks from requests with provider context attachments
 
         protected function createSession(array $attributes): AiSession
         {
-            $session = aiSessionDouble(array_merge($attributes, ['uuid' => 'created-session-uuid']));
+            $session                 = aiSessionDouble(array_merge($attributes, ['uuid' => 'created-session-uuid']));
             $this->createdSessions[] = $attributes;
 
             return $session;
@@ -566,13 +561,13 @@ test('task service marks created task failed when provider completion throws', f
                 $provider,
                 new AiContextResolver($registry),
                 $registry,
-                new class() extends AiAttachmentResolver {
+                new class extends AiAttachmentResolver {
                     public function resolveFromRequest(Request $request): array
                     {
                         return [];
                     }
                 },
-                new class() extends AiTemporalContext {
+                new class extends AiTemporalContext {
                     public function context(): array
                     {
                         return ['capability' => 'fleetbase.ai.temporal'];
@@ -601,7 +596,7 @@ test('task service marks created task failed when provider completion throws', f
 
         protected function createSession(array $attributes): AiSession
         {
-            $session = aiSessionDouble(array_merge($attributes, ['uuid' => 'new-session-uuid']));
+            $session                 = aiSessionDouble(array_merge($attributes, ['uuid' => 'new-session-uuid']));
             $this->createdSessions[] = $attributes;
 
             return $session;
@@ -908,8 +903,8 @@ test('task service reuses requested and fallback active sessions before creating
         }
     };
 
-    $fallback = aiSessionDouble(['uuid' => 'fallback-session', 'status' => 'active']);
-    $fallbackRows = [$fallback];
+    $fallback        = aiSessionDouble(['uuid' => 'fallback-session', 'status' => 'active']);
+    $fallbackRows    = [$fallback];
     $fallbackService = new class($registry, $fallbackRows) extends AiTaskService {
         public int $created = 0;
 
@@ -946,7 +941,7 @@ test('task service default create helpers persist tasks sessions and steps', fun
         new AiContextResolver($registry),
         $registry,
         new AiAttachmentResolver(),
-        new class() extends AiTemporalContext {
+        new class extends AiTemporalContext {
             public function timezone(): string
             {
                 return 'UTC';

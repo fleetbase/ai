@@ -197,7 +197,7 @@ function aiAttachmentQueryBuilder(array $files): Builder
 function aiAttachmentRequest(array $input): Request
 {
     $request = Request::create('/ai/tasks', 'POST', $input);
-    $request->setUserResolver(fn () => new class() {
+    $request->setUserResolver(fn () => new class {
         public string $uuid = 'user-uuid';
     });
 
@@ -221,7 +221,7 @@ test('attachment resolver returns null context for empty attachments and wraps f
 });
 
 test('attachment resolver skips empty request attachments before querying files', function () {
-    $resolver = new class() extends AiAttachmentResolver {
+    $resolver = new class extends AiAttachmentResolver {
         protected function filesForCurrentCompany(): Builder
         {
             throw new RuntimeException('The file query should not be reached for empty attachments.');
