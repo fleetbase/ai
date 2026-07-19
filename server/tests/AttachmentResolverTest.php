@@ -22,12 +22,13 @@ function aiAttachmentFile(array $attributes = [], string|Throwable|null $content
     return new class($attributes, $contents) extends File {
         public function __construct(array $attributes = [], private string|Throwable|null $contents = null)
         {
-            parent::__construct($attributes);
+            parent::__construct();
+            $this->setRawAttributes($attributes, true);
         }
 
         public function getAttribute($key)
         {
-            if (in_array($key, ['id', 'url'], true)) {
+            if ($key === 'url') {
                 return $this->attributes[$key] ?? null;
             }
 
