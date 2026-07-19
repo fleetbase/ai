@@ -5,11 +5,24 @@ use Fleetbase\Ai\Http\Controllers\Internal\AiAdminController;
 use Fleetbase\Ai\Http\Controllers\Internal\AiConfigController;
 use Fleetbase\Ai\Http\Controllers\Internal\AiSessionController;
 use Fleetbase\Ai\Http\Controllers\Internal\AiTaskController;
+use Fleetbase\Ai\Providers\AiServiceProvider;
+use Fleetbase\Ai\Services\AiProviderManager;
+use Fleetbase\Ai\Services\AiQueryExecutor;
+use Fleetbase\Ai\Services\AiTemporalContext;
 use Fleetbase\Ai\Models\AiAdminAccessLog;
 use Fleetbase\Ai\Models\AiSession;
 use Fleetbase\Ai\Models\AiTask;
 use Fleetbase\Ai\Models\AiTaskStep;
 use Fleetbase\Ai\Services\AiTaskService;
+use Fleetbase\Ai\Support\AiCapabilityRegistry;
+use Fleetbase\Ai\Support\AiQueryRegistry;
+use Fleetbase\Ai\Support\Capabilities\CurrentPageContextCapability;
+use Fleetbase\Models\Company;
+use Fleetbase\Models\User;
+use Fleetbase\Providers\CoreServiceProvider;
+use Illuminate\Database\Capsule\Manager as Capsule;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
 
 if (!function_exists('aiInvokeProtected')) {
@@ -53,10 +66,112 @@ test('ai models expose backend table fillable searchable and cast contracts', fu
         ->and($log->getCasts())->toHaveKey('metadata');
 });
 
+test('ai models expose expected relationship contracts', function () {
+    $capsule = new Capsule();
+    $capsule->addConnection(['driver' => 'sqlite', 'database' => ':memory:', 'prefix' => '']);
+    $capsule->setAsGlobal();
+    $capsule->bootEloquent();
+
+    $task    = new AiTask();
+    $session = new AiSession();
+
+    expect($task->steps())->toBeInstanceOf(HasMany::class)
+        ->and($task->steps()->getRelated())->toBeInstanceOf(AiTaskStep::class)
+        ->and($task->steps()->getForeignKeyName())->toBe('ai_task_uuid')
+        ->and($task->steps()->getLocalKeyName())->toBe('uuid')
+        ->and($task->session())->toBeInstanceOf(BelongsTo::class)
+        ->and($task->session()->getRelated())->toBeInstanceOf(AiSession::class)
+        ->and($task->session()->getForeignKeyName())->toBe('ai_session_uuid')
+        ->and($task->session()->getOwnerKeyName())->toBe('uuid')
+        ->and($task->company())->toBeInstanceOf(BelongsTo::class)
+        ->and($task->company()->getRelated())->toBeInstanceOf(Company::class)
+        ->and($task->company()->getForeignKeyName())->toBe('company_uuid')
+        ->and($task->createdBy())->toBeInstanceOf(BelongsTo::class)
+        ->and($task->createdBy()->getRelated())->toBeInstanceOf(User::class)
+        ->and($task->createdBy()->getForeignKeyName())->toBe('created_by_uuid')
+        ->and($session->tasks())->toBeInstanceOf(HasMany::class)
+        ->and($session->tasks()->getRelated())->toBeInstanceOf(AiTask::class)
+        ->and($session->tasks()->getForeignKeyName())->toBe('ai_session_uuid')
+        ->and($session->tasks()->getLocalKeyName())->toBe('uuid')
+        ->and($session->company())->toBeInstanceOf(BelongsTo::class)
+        ->and($session->company()->getRelated())->toBeInstanceOf(Company::class)
+        ->and($session->company()->getForeignKeyName())->toBe('company_uuid')
+        ->and($session->createdBy())->toBeInstanceOf(BelongsTo::class)
+        ->and($session->createdBy()->getRelated())->toBeInstanceOf(User::class)
+        ->and($session->createdBy()->getForeignKeyName())->toBe('created_by_uuid');
+});
+
 test('resource controller points fleetbase resources at the ai namespace', function () {
     $defaults = (new ReflectionClass(AiResourceController::class))->getDefaultProperties();
 
     expect($defaults['namespace'])->toBe('\Fleetbase\Ai');
+});
+
+test('ai service provider registers bindings and boots package resources', function () {
+    $app = new class() {
+        public array $registered = [];
+        public array $singletons = [];
+
+        public function register(string $provider): void
+        {
+            $this->registered[] = $provider;
+        }
+
+        public function singleton(string $abstract, ?string $concrete = null): void
+        {
+            $this->singletons[$abstract] = $concrete ?? $abstract;
+        }
+    };
+
+    $provider = new class($app) extends AiServiceProvider {
+        public array $booted = [];
+        public AiCapabilityRegistry $registry;
+
+        public function registerObservers()
+        {
+            $this->booted[] = 'observers';
+        }
+
+        public function callAfterResolving($name, $callback)
+        {
+            $this->registry = new AiCapabilityRegistry();
+            $callback($this->registry);
+            $this->booted[] = ['after_resolving', $name];
+        }
+
+        public function registerExpansionsFrom($path)
+        {
+            $this->booted[] = ['expansions', $path];
+        }
+
+        public function loadRoutesFrom($path)
+        {
+            $this->booted[] = ['routes', $path];
+        }
+
+        public function loadMigrationsFrom($paths)
+        {
+            $this->booted[] = ['migrations', $paths];
+        }
+    };
+
+    $provider->register();
+    $provider->boot();
+
+    expect($app->registered)->toBe([CoreServiceProvider::class])
+        ->and($app->singletons)->toMatchArray([
+            \Fleetbase\Ai\Contracts\AIProviderInterface::class => AiProviderManager::class,
+            AiCapabilityRegistry::class                         => AiCapabilityRegistry::class,
+            AiQueryRegistry::class                              => AiQueryRegistry::class,
+            AiQueryExecutor::class                              => AiQueryExecutor::class,
+            AiTemporalContext::class                            => AiTemporalContext::class,
+        ])
+        ->and($provider->registry->get('core.current_page_context'))->toBeInstanceOf(CurrentPageContextCapability::class)
+        ->and($provider->booted[0])->toBe('observers')
+        ->and($provider->booted[1])->toBe(['after_resolving', AiCapabilityRegistry::class])
+        ->and($provider->booted[2][0])->toBe('expansions')
+        ->and($provider->booted[3][0])->toBe('routes')
+        ->and($provider->booted[4][0])->toBe('migrations');
 });
 
 test('config controller masks and preserves provider secrets', function () {

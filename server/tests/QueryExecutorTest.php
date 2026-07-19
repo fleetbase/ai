@@ -5,6 +5,38 @@ use Fleetbase\Ai\Support\AiQueryableResource;
 use Fleetbase\Ai\Support\AiQueryRegistry;
 use Illuminate\Database\Eloquent\Builder;
 
+function aiQueryResourceWithBuilder(Builder $builder, array $overrides = []): AiQueryableResource
+{
+    return new class($builder, $overrides) extends AiQueryableResource {
+        public function __construct(private Builder $builder, array $overrides = [])
+        {
+            parent::__construct(
+                key: $overrides['key'] ?? 'orders',
+                label: $overrides['label'] ?? 'Orders',
+                module: $overrides['module'] ?? 'fleet-ops',
+                modelClass: $overrides['modelClass'] ?? stdClass::class,
+                permission: $overrides['permission'] ?? null,
+                companyColumn: $overrides['companyColumn'] ?? '',
+                aliases: $overrides['aliases'] ?? [],
+                fields: $overrides['fields'] ?? [
+                    'status' => ['column' => 'status'],
+                    'city'   => ['column' => 'city'],
+                ],
+                sampleFields: $overrides['sampleFields'] ?? ['public_id', 'status', 'empty_value'],
+                locationField: $overrides['locationField'] ?? null,
+                directivePermission: $overrides['directivePermission'] ?? null,
+                defaultLimit: $overrides['defaultLimit'] ?? 10,
+                maxLimit: $overrides['maxLimit'] ?? 25,
+            );
+        }
+
+        public function query(): Builder
+        {
+            return $this->builder;
+        }
+    };
+}
+
 test('query executor applies supported filters and skips invalid filters', function () {
     $resource = new AiQueryableResource(
         key: 'orders',
@@ -51,6 +83,131 @@ test('query executor applies supported filters and skips invalid filters', funct
     ]);
 
     expect($result)->toBe($query);
+});
+
+test('query executor returns counts and grouped counts for registered resources', function () {
+    $countQuery = $this->getMockBuilder(Builder::class)
+        ->disableOriginalConstructor()
+        ->onlyMethods(['count'])
+        ->getMock();
+    $countQuery->expects($this->once())->method('count')->willReturn(7);
+
+    $registry = new AiQueryRegistry();
+    $registry->register(aiQueryResourceWithBuilder($countQuery, ['key' => 'orders']));
+
+    $count = (new AiQueryExecutor($registry))->count('orders');
+
+    $groupQuery = $this->getMockBuilder(Builder::class)
+        ->disableOriginalConstructor()
+        ->onlyMethods(['selectRaw', 'groupBy', 'pluck'])
+        ->getMock();
+    $groupQuery->expects($this->exactly(1))->method('selectRaw')->with('status, count(*) as aggregate')->willReturnSelf();
+    $groupQuery->expects($this->once())->method('groupBy')->with('status')->willReturnSelf();
+    $groupQuery->expects($this->once())->method('pluck')->with('aggregate', 'status')->willReturn(collect(['active' => 5, 'pending' => 2]));
+
+    $registry = new AiQueryRegistry();
+    $registry->register(aiQueryResourceWithBuilder($groupQuery, ['key' => 'orders']));
+
+    $countsBy = (new AiQueryExecutor($registry))->countsBy('orders', 'status');
+
+    expect($count)->toMatchArray([
+        'authorized' => true,
+        'resource'   => 'orders',
+        'metric'     => 'count',
+        'count'      => 7,
+    ])
+        ->and($countsBy)->toMatchArray([
+            'authorized' => true,
+            'resource'   => 'orders',
+            'metric'     => 'counts_by',
+            'group_by'   => 'status',
+            'counts'     => ['active' => 5, 'pending' => 2],
+        ])
+        ->and((new AiQueryExecutor(new AiQueryRegistry()))->count('missing'))->toBe([
+            'authorized' => false,
+            'error'      => 'Unknown query resource.',
+        ])
+        ->and((new AiQueryExecutor($registry))->countsBy('orders', 'missing'))->toBe([
+            'authorized' => false,
+            'error'      => 'Unknown resource or field.',
+        ]);
+});
+
+test('query executor samples sanitize records and clamps requested limits', function () {
+    $query = $this->getMockBuilder(Builder::class)
+        ->disableOriginalConstructor()
+        ->onlyMethods(['latest', 'limit', 'get'])
+        ->getMock();
+    $query->expects($this->once())->method('latest')->willReturnSelf();
+    $query->expects($this->once())->method('limit')->with(3)->willReturnSelf();
+    $query->expects($this->once())->method('get')->willReturn(collect([
+        (object) ['public_id' => 'ORD-1', 'status' => 'active', 'empty_value' => ''],
+        (object) ['public_id' => 'ORD-2', 'status' => null, 'empty_value' => null],
+    ]));
+
+    $registry = new AiQueryRegistry();
+    $registry->register(aiQueryResourceWithBuilder($query, [
+        'key'       => 'orders',
+        'maxLimit'  => 3,
+    ]));
+
+    $samples = (new AiQueryExecutor($registry))->samples('orders', [], 99);
+
+    expect($samples['authorized'])->toBeTrue()
+        ->and($samples['limit'])->toBe(3)
+        ->and($samples['records'])->toBe([
+            ['public_id' => 'ORD-1', 'status' => 'active'],
+            ['public_id' => 'ORD-2'],
+        ]);
+});
+
+test('query executor builds location summaries with bounded coordinate samples', function () {
+    $point = new class() {
+        public function getLat(): float
+        {
+            return 1.234567;
+        }
+
+        public function getLng(): float
+        {
+            return 103.987654;
+        }
+    };
+    $query = $this->getMockBuilder(Builder::class)
+        ->disableOriginalConstructor()
+        ->onlyMethods(['whereNotNull', 'whereRaw', 'latest', 'limit', 'get'])
+        ->getMock();
+    $query->expects($this->once())->method('whereNotNull')->with('location')->willReturnSelf();
+    $query->expects($this->once())->method('whereRaw')->willReturnSelf();
+    $query->expects($this->once())->method('latest')->willReturnSelf();
+    $query->expects($this->once())->method('limit')->with(2)->willReturnSelf();
+    $query->expects($this->once())->method('get')->willReturn(collect([
+        (object) ['public_id' => 'ORD-1', 'status' => 'active', 'city' => 'Singapore', 'country' => 'SG', 'location' => $point],
+        (object) ['public_id' => 'ORD-2', 'status' => 'active', 'city' => 'Singapore', 'country' => 'SG', 'location' => $point],
+    ]));
+
+    $registry = new AiQueryRegistry();
+    $registry->register(aiQueryResourceWithBuilder($query, [
+        'key'           => 'orders',
+        'locationField' => 'location',
+        'maxLimit'      => 2,
+    ]));
+
+    $summary = (new AiQueryExecutor($registry))->locationSummary('orders', [], 99);
+
+    expect($summary['authorized'])->toBeTrue()
+        ->and($summary['valid_location_count'])->toBe(2)
+        ->and($summary['majority_by_city'])->toBe(['Singapore' => 2])
+        ->and($summary['majority_by_country'])->toBe(['SG' => 2])
+        ->and($summary['coordinate_samples'][0])->toMatchArray([
+            'public_id' => 'ORD-1',
+            'latitude'  => 1.23457,
+            'longitude' => 103.98765,
+        ])
+        ->and((new AiQueryExecutor(new AiQueryRegistry()))->locationSummary('missing'))->toBe([
+            'authorized' => false,
+            'error'      => 'Resource has no registered location field.',
+        ]);
 });
 
 test('query executor applies not-null false-or-null and comparison filters', function () {
