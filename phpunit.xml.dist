@@ -11,6 +11,9 @@
     <filter>
         <whitelist processUncoveredFilesFromWhitelist="true">
             <directory suffix=".php">./server/src</directory>
+            <exclude>
+                <file>./server/src/routes.php</file>
+            </exclude>
         </whitelist>
     </filter>
 </phpunit>
