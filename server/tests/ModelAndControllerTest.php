@@ -18,6 +18,7 @@ use Fleetbase\Ai\Support\AiCapabilityRegistry;
 use Fleetbase\Ai\Support\AiQueryRegistry;
 use Fleetbase\Ai\Support\Capabilities\CurrentPageContextCapability;
 use Fleetbase\Models\Company;
+use Fleetbase\Models\CompanyUser;
 use Fleetbase\Models\User;
 use Fleetbase\Providers\CoreServiceProvider;
 use Illuminate\Database\Capsule\Manager as Capsule;
@@ -399,6 +400,121 @@ if (!function_exists('aiAdminAnalyticsBuilder')) {
                         'total_tokens'    => '30',
                     ],
                 ]);
+            }
+        };
+    }
+}
+
+if (!function_exists('aiAdminEndpointBuilder')) {
+    function aiAdminEndpointBuilder(array $rows): Builder
+    {
+        return new class($rows) extends Builder {
+            public array $calls = [];
+
+            public function __construct(private array $rows)
+            {
+            }
+
+            public function __clone()
+            {
+            }
+
+            public function select($columns = ['*'])
+            {
+                $this->calls[] = ['select', $columns];
+
+                return $this;
+            }
+
+            public function orderBy($column, $direction = 'asc')
+            {
+                $this->calls[] = ['orderBy', $column, $direction];
+
+                return $this;
+            }
+
+            public function where($column, $operator = null, $value = null, $boolean = 'and')
+            {
+                if (is_callable($column)) {
+                    $nested = aiAdminEndpointBuilder([]);
+                    $column($nested);
+                    $this->calls[] = ['where_nested', $nested->calls];
+
+                    return $this;
+                }
+
+                $this->calls[] = ['where', $column, $operator, $value, $boolean];
+
+                return $this;
+            }
+
+            public function orWhere($column, $operator = null, $value = null)
+            {
+                $this->calls[] = ['orWhere', $column, $operator, $value];
+
+                return $this;
+            }
+
+            public function whereHas($relation, $callback = null, $operator = '>=', $count = 1)
+            {
+                $nested = aiAdminEndpointBuilder([]);
+
+                if (is_callable($callback)) {
+                    $callback($nested);
+                }
+
+                $this->calls[] = ['whereHas', $relation, $nested->calls, $operator, $count];
+
+                return $this;
+            }
+
+            public function with($relations, $callback = null)
+            {
+                $this->calls[] = ['with', $relations];
+
+                return $this;
+            }
+
+            public function withCount($relations)
+            {
+                $this->calls[] = ['withCount', $relations];
+
+                return $this;
+            }
+
+            public function withSum($relation, $column)
+            {
+                $this->calls[] = ['withSum', $relation, $column];
+
+                return $this;
+            }
+
+            public function latest($column = null)
+            {
+                $this->calls[] = ['latest', $column];
+
+                return $this;
+            }
+
+            public function limit($value)
+            {
+                $this->calls[] = ['limit', $value];
+
+                return $this;
+            }
+
+            public function get($columns = ['*'])
+            {
+                $this->calls[] = ['get', $columns];
+
+                return collect($this->rows);
+            }
+
+            public function firstOrFail($columns = ['*'])
+            {
+                $this->calls[] = ['firstOrFail', $columns];
+
+                return $this->rows[0];
             }
         };
     }
@@ -1247,6 +1363,220 @@ test('admin controller serializes sessions tasks relations and user options', fu
         ->and($revealedTask['response'])->toBe('Dispatch plan response body')
         ->and($revealedTask['context'])->toBe(['route' => 'fleet-ops.operations'])
         ->and($revealedTask['metadata'])->toBe(['attachments' => [['id' => 'file-1']]]);
+});
+
+test('admin controller lists company and user filter options through query helpers', function () {
+    $company = new Company();
+    $company->setRawAttributes([
+        'uuid'      => 'company-uuid',
+        'public_id' => 'COMP-1',
+        'name'      => 'Fleetbase',
+        'status'    => 'active',
+    ], true);
+
+    $globalUser = new User();
+    $globalUser->setRawAttributes([
+        'uuid'         => 'user-uuid',
+        'public_id'    => 'USR-1',
+        'company_uuid' => 'company-uuid',
+        'name'         => 'Ops Admin',
+        'email'        => 'ops@example.test',
+        'status'       => 'active',
+    ], true);
+
+    $companyUser = new CompanyUser();
+    $companyUser->setRelation('user', $globalUser);
+
+    $companiesQuery    = aiAdminEndpointBuilder([$company]);
+    $usersQuery        = aiAdminEndpointBuilder([$globalUser]);
+    $companyUsersQuery = aiAdminEndpointBuilder([$companyUser]);
+
+    $controller = new class($companiesQuery, $usersQuery, $companyUsersQuery) extends AiAdminController {
+        public function __construct(private Builder $companies, private Builder $users, private Builder $companyUsers)
+        {
+        }
+
+        protected function companiesQuery(): Builder
+        {
+            return $this->companies;
+        }
+
+        protected function usersQuery(): Builder
+        {
+            return $this->users;
+        }
+
+        protected function companyUsersForCompany(string $companyUuid): Builder
+        {
+            $this->companyUsers->calls[] = ['company_uuid', $companyUuid];
+
+            return $this->companyUsers;
+        }
+    };
+
+    $companies = aiJsonPayload($controller->companies(aiAdminRequestDouble([
+        'query' => 'fleet',
+        'limit' => 200,
+    ], true)));
+    $users = aiJsonPayload($controller->users(aiAdminRequestDouble([
+        'search' => 'ops',
+        'limit'  => 2,
+    ], true)));
+    $companyUsers = aiJsonPayload($controller->users(aiAdminRequestDouble([
+        'company_uuid' => 'company-uuid',
+        'query'        => 'ops',
+        'limit'        => 0,
+    ], true)));
+
+    expect($companies[0])->toBe([
+        'id'        => 'company-uuid',
+        'uuid'      => 'company-uuid',
+        'public_id' => 'COMP-1',
+        'name'      => 'Fleetbase',
+        'status'    => 'active',
+    ])
+        ->and($companiesQuery->calls[0])->toBe(['select', ['uuid', 'public_id', 'name', 'status', 'created_at']])
+        ->and($companiesQuery->calls)->toContain(['orderBy', 'name', 'asc'])
+        ->and($companiesQuery->calls)->toContain(['limit', 50])
+        ->and($companiesQuery->calls[2][0])->toBe('where_nested')
+        ->and($users[0]['email'])->toBe('ops@example.test')
+        ->and($usersQuery->calls)->toContain(['select', ['uuid', 'public_id', 'company_uuid', 'name', 'email', 'status']])
+        ->and($usersQuery->calls)->toContain(['orderBy', 'name', 'asc'])
+        ->and($usersQuery->calls)->toContain(['limit', 2])
+        ->and($usersQuery->calls[2][0])->toBe('where_nested')
+        ->and($companyUsers[0]['uuid'])->toBe('user-uuid')
+        ->and($companyUsersQuery->calls[0])->toBe(['company_uuid', 'company-uuid'])
+        ->and($companyUsersQuery->calls[1][0])->toBe('whereHas')
+        ->and($companyUsersQuery->calls[2][0])->toBe('with')
+        ->and($companyUsersQuery->calls[3][0])->toBe('whereHas')
+        ->and($companyUsersQuery->calls)->toContain(['limit', 1]);
+});
+
+test('admin controller lists sessions and returns session and task detail payloads', function () {
+    $timestamp = Carbon::parse('2026-07-19 10:00:00', 'UTC');
+
+    $session = new class($timestamp) extends AiSession {
+        public array $loaded = [];
+
+        public function __construct(Carbon $timestamp)
+        {
+            $this->setRawAttributes([
+                'id'               => 10,
+                'uuid'             => 'session-uuid',
+                'company_uuid'     => 'company-uuid',
+                'created_by_uuid'  => 'user-uuid',
+                'title'            => 'Dispatch planning',
+                'status'           => 'active',
+                'tasks_count'      => 1,
+                'total_tokens_sum' => 12,
+                'last_message_at'  => $timestamp,
+                'created_at'       => $timestamp,
+                'updated_at'       => $timestamp,
+            ], true);
+            $this->setRelation('company', (object) ['uuid' => 'company-uuid', 'public_id' => 'COMP-1', 'name' => 'Fleetbase']);
+            $this->setRelation('createdBy', (object) ['uuid' => 'user-uuid', 'public_id' => 'USR-1', 'name' => 'Ops', 'email' => 'ops@example.test']);
+            $this->setRelation('tasks', collect());
+        }
+
+        public function load($relations)
+        {
+            $this->loaded[] = ['load', $relations];
+
+            return $this;
+        }
+
+        public function loadCount($relations)
+        {
+            $this->loaded[] = ['loadCount', $relations];
+
+            return $this;
+        }
+
+        public function loadSum($relations, $column)
+        {
+            $this->loaded[] = ['loadSum', $relations, $column];
+
+            return $this;
+        }
+    };
+
+    $task = new class($timestamp, $session) extends AiTask {
+        public array $loaded = [];
+
+        public function __construct(Carbon $timestamp, AiSession $session)
+        {
+            $this->setRawAttributes([
+                'id'               => 20,
+                'uuid'             => 'task-uuid',
+                'ai_session_uuid'  => 'session-uuid',
+                'company_uuid'     => 'company-uuid',
+                'created_by_uuid'  => 'user-uuid',
+                'task_type'        => 'chat',
+                'status'           => 'answered',
+                'provider'         => 'local',
+                'model'            => 'fleetbase-local-preview',
+                'prompt'           => 'Plan route',
+                'response_summary' => 'Route planned',
+                'metadata'         => [],
+                'created_at'       => $timestamp,
+                'updated_at'       => $timestamp,
+            ], true);
+            $this->setRelation('steps', collect());
+            $this->setRelation('session', $session);
+            $this->setRelation('company', (object) ['uuid' => 'company-uuid', 'public_id' => 'COMP-1', 'name' => 'Fleetbase']);
+            $this->setRelation('createdBy', (object) ['uuid' => 'user-uuid', 'public_id' => 'USR-1', 'name' => 'Ops', 'email' => 'ops@example.test']);
+        }
+
+        public function load($relations)
+        {
+            $this->loaded[] = $relations;
+
+            return $this;
+        }
+    };
+    $session->setRelation('tasks', collect([$task]));
+
+    $sessionsQuery = aiAdminEndpointBuilder([$session]);
+
+    $controller = new class($sessionsQuery, $session, $task) extends AiAdminController {
+        public function __construct(private Builder $sessions, private AiSession $session, private AiTask $task)
+        {
+        }
+
+        protected function sessionsQuery(): Builder
+        {
+            return $this->sessions;
+        }
+
+        protected function findSession(string $id): AiSession
+        {
+            return $this->session;
+        }
+
+        protected function findTask(string $id): AiTask
+        {
+            return $this->task;
+        }
+    };
+
+    $list   = aiJsonPayload($controller->sessions(aiAdminRequestDouble(['limit' => 500], true)));
+    $detail = aiJsonPayload($controller->session('session-uuid', aiAdminRequestDouble([], true)));
+    $taskResponse = aiJsonPayload($controller->task('task-uuid', aiAdminRequestDouble([], true)));
+
+    expect($list['sessions'][0]['uuid'])->toBe('session-uuid')
+        ->and($list['meta']['can_reveal_content'])->toBeTrue()
+        ->and($sessionsQuery->calls)->toContain(['withCount', 'tasks'])
+        ->and($sessionsQuery->calls)->toContain(['withSum', 'tasks as total_tokens_sum', 'total_tokens'])
+        ->and($sessionsQuery->calls)->toContain(['limit', 100])
+        ->and($detail['session']['tasks'][0]['uuid'])->toBe('task-uuid')
+        ->and($detail['meta']['can_reveal_content'])->toBeTrue()
+        ->and($session->loaded[0][0])->toBe('load')
+        ->and($session->loaded[1])->toBe(['loadCount', 'tasks'])
+        ->and($session->loaded[2])->toBe(['loadSum', 'tasks as total_tokens_sum', 'total_tokens'])
+        ->and($taskResponse['task']['uuid'])->toBe('task-uuid')
+        ->and($taskResponse['task']['content_redacted'])->toBeTrue()
+        ->and($taskResponse['meta']['can_reveal_content'])->toBeTrue()
+        ->and($task->loaded[0])->toBe(['steps', 'session', 'company:uuid,public_id,name', 'createdBy:uuid,public_id,name,email']);
 });
 
 test('admin controller reveals task content and records access log metadata', function () {

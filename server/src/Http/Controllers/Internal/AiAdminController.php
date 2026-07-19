@@ -22,7 +22,7 @@ class AiAdminController extends Controller
     {
         abort_unless($this->canUseAdminFilters($request), 403, 'You are not authorized to use AI admin filters.');
 
-        $query  = Company::query()->select(['uuid', 'public_id', 'name', 'status', 'created_at'])->orderBy('name');
+        $query  = $this->companiesQuery()->select(['uuid', 'public_id', 'name', 'status', 'created_at'])->orderBy('name');
         $search = $request->searchQuery() ?: $request->input('query');
 
         if ($search) {
@@ -50,7 +50,7 @@ class AiAdminController extends Controller
         $limit  = min(max((int) $request->input('limit', 25), 1), 50);
 
         if ($request->filled('company_uuid')) {
-            $usersQuery = CompanyUser::where('company_uuid', $request->input('company_uuid'))
+            $usersQuery = $this->companyUsersForCompany($request->input('company_uuid'))
                 ->whereHas('user')
                 ->with(['user' => fn ($query) => $query->select(['uuid', 'public_id', 'company_uuid', 'name', 'email', 'status'])]);
 
@@ -65,7 +65,7 @@ class AiAdminController extends Controller
             );
         }
 
-        $query = User::query()->select(['uuid', 'public_id', 'company_uuid', 'name', 'email', 'status'])->orderBy('name');
+        $query = $this->usersQuery()->select(['uuid', 'public_id', 'company_uuid', 'name', 'email', 'status'])->orderBy('name');
 
         if ($search) {
             $this->applyUserSearch($query, $search);
@@ -78,7 +78,7 @@ class AiAdminController extends Controller
     {
         abort_unless($this->can($request, 'ai view audit logs'), 403, 'You are not authorized to view AI audit logs.');
 
-        $query = AiSession::query()
+        $query = $this->sessionsQuery()
             ->with(['company:uuid,public_id,name', 'createdBy:uuid,public_id,name,email'])
             ->withCount('tasks')
             ->withSum('tasks as total_tokens_sum', 'total_tokens')
@@ -260,16 +260,36 @@ class AiAdminController extends Controller
 
     protected function findSession(string $id): AiSession
     {
-        return AiSession::where(function (Builder $query) use ($id) {
+        return $this->sessionsQuery()->where(function (Builder $query) use ($id) {
             $query->where('uuid', $id)->orWhere('id', $id);
         })->firstOrFail();
     }
 
     protected function findTask(string $id): AiTask
     {
-        return AiTask::where(function (Builder $query) use ($id) {
+        return $this->tasksQuery()->where(function (Builder $query) use ($id) {
             $query->where('uuid', $id)->orWhere('id', $id);
         })->firstOrFail();
+    }
+
+    protected function companiesQuery(): Builder
+    {
+        return Company::query();
+    }
+
+    protected function usersQuery(): Builder
+    {
+        return User::query();
+    }
+
+    protected function companyUsersForCompany(string $companyUuid): Builder
+    {
+        return CompanyUser::where('company_uuid', $companyUuid);
+    }
+
+    protected function sessionsQuery(): Builder
+    {
+        return AiSession::query();
     }
 
     protected function tasksQuery(): Builder
