@@ -1029,6 +1029,114 @@ test('task controller previews and applies found tasks through the task service'
         ->and($task->loaded_relations)->toBe('session');
 });
 
+test('task controller stores tasks validates input and checks ai enabled state', function () {
+    $task = new AiTask();
+    $task->setRawAttributes(['uuid' => 'created-task-uuid', 'status' => 'answered'], true);
+
+    $request = new class([
+        'prompt'       => 'Plan dispatch',
+        'session_uuid' => 'session-uuid',
+        'attachments'  => ['file-1'],
+    ]) extends Request {
+        public array $validated = [];
+
+        public function __construct(private array $values)
+        {
+        }
+
+        public function input($key = null, $default = null)
+        {
+            if ($key === null) {
+                return $this->values;
+            }
+
+            return data_get($this->values, $key, $default);
+        }
+
+        public function validate(array $rules, ...$params)
+        {
+            $this->validated = $rules;
+
+            return $this->values;
+        }
+    };
+
+    $service = new class($task) extends AiTaskService {
+        public array $calls = [];
+
+        public function __construct(private AiTask $task)
+        {
+        }
+
+        public function createFromRequest(Request $request): AiTask
+        {
+            $this->calls[] = ['createFromRequest', $request->input()];
+
+            return $this->task;
+        }
+    };
+
+    $controller = new class() extends AiTaskController {
+        protected function systemAiConfig(): array
+        {
+            return ['enabled' => true];
+        }
+    };
+
+    $response = aiJsonPayload($controller->store($request, $service));
+
+    expect($response['task']['uuid'])->toBe('created-task-uuid')
+        ->and($request->validated)->toHaveKeys(['prompt', 'session_uuid', 'attachments', 'attachments.*'])
+        ->and($service->calls)->toBe([
+            ['createFromRequest', [
+                'prompt'       => 'Plan dispatch',
+                'session_uuid' => 'session-uuid',
+                'attachments'  => ['file-1'],
+            ]],
+        ]);
+
+    $disabled = new class() extends AiTaskController {
+        protected function systemAiConfig(): array
+        {
+            return ['enabled' => false];
+        }
+    };
+
+    aiInvokeProtected($controller, 'abortIfAiDisabled');
+
+    expect(fn () => aiInvokeProtected($disabled, 'abortIfAiDisabled'))
+        ->toThrow(RuntimeException::class, 'Fleetbase AI is disabled.');
+});
+
+test('task controller find task builds scoped lookup query', function () {
+    $task = new AiTask();
+    $task->setRawAttributes(['uuid' => 'task-uuid'], true);
+    $query = aiSessionControllerBuilder([$task]);
+
+    $controller = new class($query) extends AiTaskController {
+        public function __construct(private Builder $query)
+        {
+        }
+
+        protected function tasksForCurrentCompany(): Builder
+        {
+            return $this->query;
+        }
+    };
+
+    $found = aiInvokeProtected($controller, 'findTask', 'task-uuid');
+
+    expect($found->uuid)->toBe('task-uuid')
+        ->and($query->calls)->toBe([
+            ['where', 'created_by_uuid', null, null, 'and'],
+            ['where_nested', [
+                ['where', 'uuid', 'task-uuid', null, 'and'],
+                ['orWhere', 'id', 'task-uuid', null],
+            ]],
+            ['firstOrFail', ['*']],
+        ]);
+});
+
 test('admin controller summarizes metadata and nullable related records', function () {
     $controller = new AiAdminController();
 

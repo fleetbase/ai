@@ -371,17 +371,44 @@ test('relative date resolver covers units and named date windows', function () {
 
     expect($resolver->resolveDateTime('in 45 minutes', 'Asia/Ulaanbaatar', $now)->toIso8601String())->toBe('2026-07-19T11:15:00+08:00')
         ->and($resolver->resolveDateTime('2 hours later', 'Asia/Ulaanbaatar', $now)->toIso8601String())->toBe('2026-07-19T12:30:00+08:00')
+        ->and($resolver->resolveDateTime('in 3 days', 'Asia/Ulaanbaatar', $now)->toDateString())->toBe('2026-07-22')
+        ->and($resolver->resolveDateTime('in 2 weeks', 'Asia/Ulaanbaatar', $now)->toDateString())->toBe('2026-08-02')
+        ->and($resolver->resolveDateTime('in 1 month', 'Asia/Ulaanbaatar', $now)->toDateString())->toBe('2026-08-19')
+        ->and($resolver->resolveDateTime('tomorrow', 'Asia/Ulaanbaatar', $now)->toDateString())->toBe('2026-07-20')
+        ->and($resolver->resolveDateTime('yesterday', 'Asia/Ulaanbaatar', $now)->toDateString())->toBe('2026-07-18')
+        ->and($resolver->resolveDateTime('today', 'Asia/Ulaanbaatar', $now)->toDateString())->toBe('2026-07-19')
         ->and($resolver->resolveDateTime('next week', 'Asia/Ulaanbaatar', $now)->toDateString())->toBe('2026-07-26')
         ->and($resolver->resolveDateTime('last week', 'Asia/Ulaanbaatar', $now)->toDateString())->toBe('2026-07-12')
         ->and($resolver->resolveDateTime('no date here', 'Asia/Ulaanbaatar', $now))->toBeNull();
 
     $lastThirtyDays = $resolver->resolveWindow('Show usage for the last 30 days', 'Asia/Ulaanbaatar', $now);
+    $yesterday      = $resolver->resolveWindow('Show usage yesterday', 'Asia/Ulaanbaatar', $now);
+    $tomorrow       = $resolver->resolveWindow('Show usage tomorrow', 'Asia/Ulaanbaatar', $now);
+    $today          = $resolver->resolveWindow('Show usage today', 'Asia/Ulaanbaatar', $now);
+    $lastWeek       = $resolver->resolveWindow('Show usage last week', 'Asia/Ulaanbaatar', $now);
+    $nextWeek       = $resolver->resolveWindow('Show usage next week', 'Asia/Ulaanbaatar', $now);
+    $thisWeek       = $resolver->resolveWindow('Show usage this week', 'Asia/Ulaanbaatar', $now);
+    $lastMonth      = $resolver->resolveWindow('Show usage last month', 'Asia/Ulaanbaatar', $now);
     $thisMonth      = $resolver->resolveWindow('Show usage this month', 'Asia/Ulaanbaatar', $now);
     $nextMonth      = $resolver->resolveWindow('Show usage next month', 'Asia/Ulaanbaatar', $now);
 
     expect($lastThirtyDays['label'])->toBe('last_30_days')
         ->and($lastThirtyDays['start']->toIso8601String())->toBe('2026-06-19T00:00:00+08:00')
         ->and($lastThirtyDays['end']->toIso8601String())->toBe('2026-07-19T23:59:59+08:00')
+        ->and($yesterday['label'])->toBe('yesterday')
+        ->and($yesterday['start']->toDateString())->toBe('2026-07-18')
+        ->and($tomorrow['label'])->toBe('tomorrow')
+        ->and($tomorrow['end']->toDateString())->toBe('2026-07-20')
+        ->and($today['label'])->toBe('today')
+        ->and($today['start']->toDateString())->toBe('2026-07-19')
+        ->and($lastWeek['label'])->toBe('last_week')
+        ->and($lastWeek['start']->toDateString())->toBe('2026-07-06')
+        ->and($nextWeek['label'])->toBe('next_week')
+        ->and($nextWeek['end']->toDateString())->toBe('2026-07-26')
+        ->and($thisWeek['label'])->toBe('this_week')
+        ->and($thisWeek['start']->toDateString())->toBe('2026-07-14')
+        ->and($lastMonth['label'])->toBe('last_month')
+        ->and($lastMonth['end']->toDateString())->toBe('2026-06-30')
         ->and($thisMonth['label'])->toBe('this_month')
         ->and($thisMonth['start']->toDateString())->toBe('2026-07-01')
         ->and($thisMonth['end']->toDateString())->toBe('2026-07-31')

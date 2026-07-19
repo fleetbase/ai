@@ -3,6 +3,8 @@
 use Fleetbase\Ai\Services\AiAttachmentResolver;
 use Fleetbase\Models\File;
 use Illuminate\Contracts\Filesystem\Filesystem;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
 if (!function_exists('aiInvokeProtected')) {
@@ -147,6 +149,60 @@ function aiAttachmentFile(array $attributes = [], string|Throwable|null $content
     };
 }
 
+function aiAttachmentQueryBuilder(array $files): Builder
+{
+    return new class($files) extends Builder {
+        public array $calls = [];
+
+        public function __construct(private array $files)
+        {
+        }
+
+        public function __clone()
+        {
+        }
+
+        public function where($column, $operator = null, $value = null, $boolean = 'and')
+        {
+            if (is_callable($column)) {
+                $nested = aiAttachmentQueryBuilder([]);
+                $column($nested);
+                $this->calls[] = ['where_nested', $nested->calls];
+
+                return $this;
+            }
+
+            $this->calls[] = ['where', $column, $operator, $value, $boolean];
+
+            return $this;
+        }
+
+        public function orWhere($column, $operator = null, $value = null)
+        {
+            $this->calls[] = ['orWhere', $column, $operator, $value];
+
+            return $this;
+        }
+
+        public function get($columns = ['*'])
+        {
+            $this->calls[] = ['get', $columns];
+
+            return collect($this->files);
+        }
+    };
+}
+
+function aiAttachmentRequest(array $input): Request
+{
+    $request = Request::create('/ai/tasks', 'POST', $input);
+    $request->setUserResolver(fn () => new class() {
+        public string $uuid = 'user-uuid';
+    });
+
+    return $request;
+}
+
 test('attachment resolver returns null context for empty attachments and wraps file metadata otherwise', function () {
     $resolver = new AiAttachmentResolver();
 
@@ -160,6 +216,53 @@ test('attachment resolver returns null context for empty attachments and wraps f
         ->and($context['type'])->toBe('file_attachments')
         ->and($context['data']['files'])->toBe([
             ['id' => 'file_1', 'original_filename' => 'manifest.csv'],
+        ]);
+});
+
+test('attachment resolver resolves request attachments through normalized scoped file query', function () {
+    session(['company' => 'company-uuid']);
+
+    $file = aiAttachmentFile([
+        'id'                => 99,
+        'uuid'              => 'file-uuid',
+        'public_id'         => '',
+        'original_filename' => 'notes.txt',
+        'content_type'      => 'text/plain',
+        'path'              => 'notes.txt',
+    ], " Route notes\n");
+    $query = aiAttachmentQueryBuilder([$file]);
+
+    $resolver = new class($query) extends AiAttachmentResolver {
+        public function __construct(public Builder $query)
+        {
+        }
+
+        protected function filesForCurrentCompany(): Builder
+        {
+            return $this->query;
+        }
+    };
+
+    $attachments = $resolver->resolveFromRequest(aiAttachmentRequest([
+        'attachments' => [' file-uuid ', '99', 'file-uuid', '', null, ['bad' => true]],
+    ]));
+
+    expect($attachments)->toHaveCount(1)
+        ->and($attachments[0])->toMatchArray([
+            'id'                => 99,
+            'uuid'              => 'file-uuid',
+            'original_filename' => 'notes.txt',
+            'content_type'      => 'text/plain',
+            'preview'           => 'Route notes',
+        ])
+        ->and($query->calls[0])->toBe(['where', 'uploader_uuid', 'user-uuid', null, 'and'])
+        ->and($query->calls[1][0])->toBe('where_nested')
+        ->and($query->calls[1][1])->toBe([
+            ['orWhere', 'uuid', 'file-uuid', null],
+            ['orWhere', 'public_id', 'file-uuid', null],
+            ['orWhere', 'uuid', '99', null],
+            ['orWhere', 'public_id', '99', null],
+            ['orWhere', 'id', 99, null],
         ]);
 });
 

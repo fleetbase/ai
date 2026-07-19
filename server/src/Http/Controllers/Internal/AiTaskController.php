@@ -103,6 +103,11 @@ class AiTaskController extends Controller
 
     protected function abortIfAiDisabled(): void
     {
-        abort_unless((bool) data_get(Setting::system('ai', []), 'enabled', false), 403, 'Fleetbase AI is disabled.');
+        abort_unless((bool) data_get($this->systemAiConfig(), 'enabled', false), 403, 'Fleetbase AI is disabled.');
+    }
+
+    protected function systemAiConfig(): array
+    {
+        return Setting::system('ai', []);
     }
 }
