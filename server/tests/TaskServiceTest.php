@@ -1,6 +1,7 @@
 <?php
 
 use Fleetbase\Ai\Contracts\AIActionCapabilityInterface;
+use Fleetbase\Ai\Models\AiSession;
 use Fleetbase\Ai\Models\AiTask;
 use Fleetbase\Ai\Models\AiTaskStep;
 use Fleetbase\Ai\Services\AiAttachmentResolver;
@@ -145,6 +146,38 @@ function aiStepDouble(array $attributes = []): AiTaskStep
         public function __construct(array $attributes = [])
         {
             $this->attributes = $attributes;
+        }
+
+        public function __get($key)
+        {
+            return $this->attributes[$key] ?? null;
+        }
+
+        public function __set($key, $value): void
+        {
+            $this->attributes[$key] = $value;
+        }
+
+        public function update(array $attributes = [], array $options = [])
+        {
+            $this->updates[] = $attributes;
+            $this->attributes = array_merge($this->attributes, $attributes);
+
+            return true;
+        }
+    };
+}
+
+function aiSessionDouble(array $attributes = []): AiSession
+{
+    return new class($attributes) extends AiSession {
+        protected $attributes = [];
+
+        public array $updates = [];
+
+        public function __construct(array $attributes = [])
+        {
+            $this->attributes = array_merge(['uuid' => 'session-uuid'], $attributes);
         }
 
         public function __get($key)
@@ -355,4 +388,61 @@ test('task service normalizes action previews and derives compact prompt titles'
         ->and(aiInvokeProtected($service, 'titleFromPrompt', "  Create\nroute for urgent shipment  "))->toBe('Create route for urgent shipment')
         ->and(aiInvokeProtected($service, 'titleFromPrompt', ''))->toBe('New AI chat')
         ->and(strlen(aiInvokeProtected($service, 'titleFromPrompt', str_repeat('A', 100))))->toBe(64);
+});
+
+test('task service filters preview capabilities and handles session helper branches', function () {
+    $registry = new AiCapabilityRegistry();
+    $registry->register(aiActionCapability([
+        'key'     => 'fleetbase.previewable',
+        'preview' => ['draft' => ['ready' => true]],
+    ]));
+    $registry->register(aiActionCapability([
+        'key'            => 'fleetbase.hidden',
+        'should_preview' => false,
+        'preview'        => ['draft' => ['ready' => false]],
+    ]));
+
+    $steps   = [];
+    $service = aiTaskServiceDouble($registry, $steps);
+    $task    = aiTaskDouble([
+        'uuid'             => 'task-uuid',
+        'company_uuid'     => 'company-uuid',
+        'ai_session_uuid'  => null,
+        'prompt'           => 'Create an urgent dispatch route',
+    ]);
+
+    $previews = aiInvokeProtected($service, 'resolveActionPreviews', $task);
+
+    expect($previews)->toHaveCount(1)
+        ->and($previews[0])->toMatchArray([
+            'key'   => 'fleetbase.previewable',
+            'draft' => ['ready' => true],
+        ])
+        ->and(aiInvokeProtected($service, 'sessionContext', $task))->toBeNull();
+
+    $session = aiSessionDouble([
+        'title'    => 'New AI chat',
+        'status'   => 'ended',
+        'ended_at' => '2026-07-19 10:00:00',
+    ]);
+
+    aiInvokeProtected($service, 'touchSessionForTask', $session, $task);
+
+    expect($session->updates)->toHaveCount(1)
+        ->and($session->updates[0]['title'])->toBe('Create an urgent dispatch route')
+        ->and($session->updates[0]['status'])->toBe('active')
+        ->and($session->updates[0]['ended_at'])->toBeNull()
+        ->and($session->updates[0]['last_message_at'])->not->toBeNull();
+
+    $sessionWithTitle = aiSessionDouble([
+        'title'  => 'Existing planning thread',
+        'status' => 'active',
+    ]);
+
+    aiInvokeProtected($service, 'touchSessionForTask', $sessionWithTitle, $task);
+
+    expect($sessionWithTitle->updates[0])->toHaveKey('last_message_at')
+        ->and($sessionWithTitle->updates[0])->not->toHaveKey('title')
+        ->and($sessionWithTitle->updates[0])->not->toHaveKey('status')
+        ->and($sessionWithTitle->updates[0])->not->toHaveKey('ended_at');
 });

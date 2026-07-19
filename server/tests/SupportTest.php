@@ -11,6 +11,7 @@ use Fleetbase\Ai\Support\AiQueryRegistry;
 use Fleetbase\Ai\Support\AiRelativeDateResolver;
 use Fleetbase\Ai\Support\Capabilities\AbstractAICapability;
 use Fleetbase\Ai\Support\Capabilities\CurrentPageContextCapability;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
 
 function aiTestCapability(array $overrides = []): AICapabilityInterface
@@ -159,6 +160,31 @@ function aiContextCapability(array $overrides = []): AIContextCapabilityInterfac
     };
 }
 
+function aiRecordingBuilder(): Builder
+{
+    return new class() extends Builder {
+        public array $calls = [];
+
+        public function __construct()
+        {
+        }
+
+        public function where($column, $operator = null, $value = null, $boolean = 'and')
+        {
+            $this->calls[] = ['where', $column, $operator, $value, $boolean];
+
+            return $this;
+        }
+
+        public function applyDirectivesForPermissions(string $permission)
+        {
+            $this->calls[] = ['applyDirectivesForPermissions', $permission];
+
+            return $this;
+        }
+    };
+}
+
 test('query registry stores resources and resolves case-insensitive aliases', function () {
     $resource = new AiQueryableResource(
         key: 'orders',
@@ -208,6 +234,48 @@ test('queryable resource exposes field metadata and registered columns', functio
         ->and($resource->locationField)->toBe('location')
         ->and($resource->defaultLimit)->toBe(5)
         ->and($resource->maxLimit)->toBe(25);
+});
+
+test('queryable resource builds scoped model queries with optional directives', function () {
+    session(['company' => 'company-uuid']);
+
+    $builder    = aiRecordingBuilder();
+    $modelClass = get_class(new class() {
+        public static Builder $builder;
+
+        public static function query(): Builder
+        {
+            return static::$builder;
+        }
+    });
+    $modelClass::$builder = $builder;
+
+    $resource = new AiQueryableResource(
+        key: 'orders',
+        label: 'Orders',
+        module: 'fleet-ops',
+        modelClass: $modelClass,
+        directivePermission: 'orders view'
+    );
+
+    expect($resource->query())->toBe($builder)
+        ->and($builder->calls)->toBe([
+            ['where', 'company_uuid', 'company-uuid', null, 'and'],
+            ['applyDirectivesForPermissions', 'orders view'],
+        ]);
+
+    $unscopedBuilder         = aiRecordingBuilder();
+    $modelClass::$builder    = $unscopedBuilder;
+    $unscopedResource        = new AiQueryableResource(
+        key: 'global',
+        label: 'Global',
+        module: 'ai',
+        modelClass: $modelClass,
+        companyColumn: ''
+    );
+
+    expect($unscopedResource->query())->toBe($unscopedBuilder)
+        ->and($unscopedBuilder->calls)->toBe([]);
 });
 
 test('capability registry stores capabilities by key and lists metadata', function () {
