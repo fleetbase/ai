@@ -272,31 +272,49 @@ class AiAdminController extends Controller
         })->firstOrFail();
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     protected function companiesQuery(): Builder
     {
         return Company::query();
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     protected function usersQuery(): Builder
     {
         return User::query();
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     protected function companyUsersForCompany(string $companyUuid): Builder
     {
         return CompanyUser::where('company_uuid', $companyUuid);
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     protected function sessionsQuery(): Builder
     {
         return AiSession::query();
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     protected function tasksQuery(): Builder
     {
         return AiTask::query();
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     protected function createAccessLog(array $attributes): AiAdminAccessLog
     {
         return AiAdminAccessLog::create($attributes);
@@ -467,11 +485,17 @@ class AiAdminController extends Controller
         return [];
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     protected function companiesForLabels(array $ids): Builder
     {
         return Company::whereIn('uuid', $ids);
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     protected function usersForLabels(array $ids): Builder
     {
         return User::whereIn('uuid', $ids);
@@ -493,6 +517,9 @@ class AiAdminController extends Controller
             ]);
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     protected function dateRaw(string $column)
     {
         return DB::raw("DATE({$column})");

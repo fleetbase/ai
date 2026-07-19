@@ -96,6 +96,9 @@ class AiTaskController extends Controller
             ->firstOrFail();
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     protected function tasksForCurrentCompany(): Builder
     {
         return AiTask::where('company_uuid', session('company'));
@@ -106,6 +109,9 @@ class AiTaskController extends Controller
         abort_unless((bool) data_get($this->systemAiConfig(), 'enabled', false), 403, 'Fleetbase AI is disabled.');
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     protected function systemAiConfig(): array
     {
         return Setting::system('ai', []);

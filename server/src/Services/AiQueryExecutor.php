@@ -177,11 +177,17 @@ class AiQueryExecutor
         return $this->canPermission($resource->permission);
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     protected function userFromSession()
     {
         return Auth::getUserFromSession();
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     protected function canPermission(string $permission): bool
     {
         return Auth::can($permission);

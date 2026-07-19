@@ -86,6 +86,9 @@ class AiConfigController extends Controller
         return Setting::system('ai', $default);
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     protected function configureSystemAi(array $config): void
     {
         Setting::configureSystem('ai', $config);

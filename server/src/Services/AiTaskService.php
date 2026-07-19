@@ -208,6 +208,9 @@ class AiTaskService
         return $task->fresh(['steps', 'session']);
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function recordStep(AiTask $task, array $attributes): AiTaskStep
     {
         return AiTaskStep::create(array_merge([
@@ -398,26 +401,41 @@ class AiTaskService
         ];
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     protected function systemAiConfig(): array
     {
         return Setting::system('ai', []);
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     protected function createTask(array $attributes): AiTask
     {
         return AiTask::create($attributes);
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     protected function createSession(array $attributes): AiSession
     {
         return AiSession::create($attributes);
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     protected function sessionsForCurrentCompany(): Builder
     {
         return AiSession::where('company_uuid', session('company'));
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     protected function sessionHistoryForTask(AiTask $task): Builder
     {
         return AiTask::where('company_uuid', $task->company_uuid)

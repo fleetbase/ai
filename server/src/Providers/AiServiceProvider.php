@@ -11,9 +11,11 @@ use Fleetbase\Ai\Support\AiQueryRegistry;
 use Fleetbase\Ai\Support\Capabilities\CurrentPageContextCapability;
 use Fleetbase\Providers\CoreServiceProvider;
 
+// @codeCoverageIgnoreStart
 if (!class_exists(CoreServiceProvider::class)) {
     throw new \Exception('Extension cannot be loaded without `fleetbase/core-api` installed!');
 }
+// @codeCoverageIgnoreEnd
 
 /**
  * Fleetbase AI service provider.

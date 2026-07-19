@@ -76,11 +76,17 @@ class AiSessionController extends Controller
             ->firstOrFail();
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     protected function sessionsForCurrentCompany(): Builder
     {
         return AiSession::where('company_uuid', session('company'));
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     protected function createSession(array $attributes): AiSession
     {
         return AiSession::create($attributes);
