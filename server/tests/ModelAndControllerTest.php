@@ -309,6 +309,10 @@ if (!function_exists('aiAdminAnalyticsBuilder')) {
             {
             }
 
+            public function __clone()
+            {
+            }
+
             public function where($column, $operator = null, $value = null, $boolean = 'and')
             {
                 $this->calls[] = ['where', $column, $operator, $value, $boolean];
