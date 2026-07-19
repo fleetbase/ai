@@ -101,7 +101,7 @@ function aiActionCapability(array $overrides = []): AIActionCapabilityInterface
 function aiTaskDouble(array $attributes = []): AiTask
 {
     return new class($attributes) extends AiTask {
-        private array $attributes = [];
+        protected $attributes = [];
 
         public array $updates = [];
 
@@ -138,7 +138,7 @@ function aiTaskDouble(array $attributes = []): AiTask
 function aiStepDouble(array $attributes = []): AiTaskStep
 {
     return new class($attributes) extends AiTaskStep {
-        private array $attributes = [];
+        protected $attributes = [];
 
         public array $updates = [];
 
