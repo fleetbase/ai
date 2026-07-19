@@ -21,6 +21,31 @@ if (!function_exists('config')) {
     }
 }
 
+if (!function_exists('cache')) {
+    function cache(): object
+    {
+        return new class() {
+            private array $values = [];
+
+            public function rememberForever(string $key, callable $callback): mixed
+            {
+                if (!array_key_exists($key, $this->values)) {
+                    $this->values[$key] = $callback();
+                }
+
+                return $this->values[$key];
+            }
+
+            public function forget(string $key): bool
+            {
+                unset($this->values[$key]);
+
+                return true;
+            }
+        };
+    }
+}
+
 if (class_exists('Illuminate\Container\Container') && class_exists('Illuminate\Support\Facades\Facade')) {
     $app = Illuminate\Container\Container::getInstance();
     Illuminate\Support\Facades\Facade::setFacadeApplication($app);
