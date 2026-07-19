@@ -23,6 +23,15 @@ function aiAttachmentFile(array $attributes = [], string|Throwable|null $content
             parent::__construct($attributes);
         }
 
+        public function getAttribute($key)
+        {
+            if ($key === 'url') {
+                return $this->attributes['url'] ?? null;
+            }
+
+            return parent::getAttribute($key);
+        }
+
         public function getFilesystem(?string $disk = null): Filesystem
         {
             return new class($this->contents) implements Filesystem {
