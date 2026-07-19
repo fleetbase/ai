@@ -149,7 +149,7 @@ if (!trait_exists('Illuminate\Foundation\Validation\ValidatesRequests')) {
 }
 
 if (!class_exists('Illuminate\Foundation\Http\FormRequest') && class_exists('Illuminate\Http\Request')) {
-    eval('namespace Illuminate\Foundation\Http; class FormRequest extends \Illuminate\Http\Request { public function authorize(): bool { return true; } public function rules(): array { return []; } public function responseWithErrors(\Illuminate\Contracts\Validation\Validator $validator) { return $validator; } }');
+    eval('namespace Illuminate\Foundation\Http; class FormRequest extends \Illuminate\Http\Request { public function authorize() { return true; } public function rules() { return []; } public function responseWithErrors(\Illuminate\Contracts\Validation\Validator $validator) { return $validator; } }');
 }
 
 if (!class_exists('Fleetbase\Http\Requests\AdminRequest') && class_exists('Illuminate\Foundation\Http\FormRequest')) {
