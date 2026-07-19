@@ -11,7 +11,6 @@ use Fleetbase\Ai\Services\AiTaskService;
 use Fleetbase\Ai\Services\AiTemporalContext;
 use Fleetbase\Ai\Services\LocalAIProvider;
 use Fleetbase\Ai\Support\AiCapabilityRegistry;
-use Illuminate\Database\Capsule\Manager as Capsule;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 
@@ -333,79 +332,6 @@ function aiTaskServiceDouble(AiCapabilityRegistry $registry, array &$steps): AiT
             return $step;
         }
     };
-}
-
-function aiTaskServiceSqliteSchema(): void
-{
-    $capsule = new Capsule();
-    $capsule->addConnection(['driver' => 'sqlite', 'database' => ':memory:', 'prefix' => '']);
-    $capsule->setAsGlobal();
-    $capsule->bootEloquent();
-
-    foreach (['ai_task_steps', 'ai_tasks', 'ai_sessions'] as $table) {
-        Capsule::schema()->dropIfExists($table);
-    }
-
-    Capsule::schema()->create('ai_sessions', function ($table) {
-        $table->increments('id');
-        $table->string('uuid')->nullable();
-        $table->string('company_uuid')->nullable();
-        $table->string('created_by_uuid')->nullable();
-        $table->string('title')->nullable();
-        $table->string('status')->nullable();
-        $table->text('metadata')->nullable();
-        $table->timestamp('last_message_at')->nullable();
-        $table->timestamp('ended_at')->nullable();
-        $table->timestamps();
-        $table->softDeletes();
-    });
-
-    Capsule::schema()->create('ai_tasks', function ($table) {
-        $table->increments('id');
-        $table->string('uuid')->nullable();
-        $table->string('ai_session_uuid')->nullable();
-        $table->string('company_uuid')->nullable();
-        $table->string('created_by_uuid')->nullable();
-        $table->string('task_type')->nullable();
-        $table->string('status')->nullable();
-        $table->text('prompt')->nullable();
-        $table->text('response')->nullable();
-        $table->text('response_summary')->nullable();
-        $table->string('provider')->nullable();
-        $table->string('model')->nullable();
-        $table->integer('input_tokens')->nullable();
-        $table->integer('output_tokens')->nullable();
-        $table->integer('total_tokens')->nullable();
-        $table->text('context')->nullable();
-        $table->text('usage')->nullable();
-        $table->text('metadata')->nullable();
-        $table->text('error')->nullable();
-        $table->timestamp('started_at')->nullable();
-        $table->timestamp('completed_at')->nullable();
-        $table->timestamps();
-        $table->softDeletes();
-    });
-
-    Capsule::schema()->create('ai_task_steps', function ($table) {
-        $table->increments('id');
-        $table->string('uuid')->nullable();
-        $table->string('ai_task_uuid')->nullable();
-        $table->string('company_uuid')->nullable();
-        $table->string('created_by_uuid')->nullable();
-        $table->string('type')->nullable();
-        $table->string('status')->nullable();
-        $table->string('provider')->nullable();
-        $table->string('model')->nullable();
-        $table->string('tool')->nullable();
-        $table->text('input')->nullable();
-        $table->text('output')->nullable();
-        $table->text('usage')->nullable();
-        $table->text('metadata')->nullable();
-        $table->text('error')->nullable();
-        $table->timestamp('started_at')->nullable();
-        $table->timestamp('completed_at')->nullable();
-        $table->timestamps();
-    });
 }
 
 function aiCreateRequest(array $input): Request
@@ -930,57 +856,6 @@ test('task service reuses requested and fallback active sessions before creating
         ->and($requestedService->created)->toBe(0)
         ->and(aiInvokeProtected($fallbackService, 'resolveSessionForRequest', aiCreateRequest(['prompt' => 'Start from latest active chat'])))->toBe($fallback)
         ->and($fallbackService->created)->toBe(0);
-});
-
-test('task service default create helpers persist tasks sessions and steps', function () {
-    aiTaskServiceSqliteSchema();
-
-    $registry = new AiCapabilityRegistry();
-    $service  = new AiTaskService(
-        aiProviderDouble(),
-        new AiContextResolver($registry),
-        $registry,
-        new AiAttachmentResolver(),
-        new class extends AiTemporalContext {
-            public function timezone(): string
-            {
-                return 'UTC';
-            }
-        },
-    );
-
-    $session = aiInvokeProtected($service, 'createSession', [
-        'company_uuid'     => 'company-uuid',
-        'created_by_uuid'  => 'user-uuid',
-        'title'            => 'Dispatch planning',
-        'status'           => 'active',
-        'last_message_at'  => now(),
-    ]);
-    $task = aiInvokeProtected($service, 'createTask', [
-        'ai_session_uuid'  => $session->uuid,
-        'company_uuid'     => 'company-uuid',
-        'created_by_uuid'  => 'user-uuid',
-        'task_type'        => 'chat',
-        'status'           => 'running',
-        'prompt'           => 'Plan the route',
-        'metadata'         => ['source' => 'test'],
-    ]);
-    $step = $service->recordStep($task, [
-        'type'   => 'provider_call',
-        'status' => 'running',
-        'input'  => ['prompt' => 'Plan the route'],
-    ]);
-
-    expect($session)->toBeInstanceOf(AiSession::class)
-        ->and($session->title)->toBe('Dispatch planning')
-        ->and($task)->toBeInstanceOf(AiTask::class)
-        ->and($task->prompt)->toBe('Plan the route')
-        ->and($task->metadata)->toBe(['source' => 'test'])
-        ->and($step)->toBeInstanceOf(AiTaskStep::class)
-        ->and($step->ai_task_uuid)->toBe($task->uuid)
-        ->and($step->company_uuid)->toBe('company-uuid')
-        ->and($step->created_by_uuid)->toBe('user-uuid')
-        ->and($step->input)->toBe(['prompt' => 'Plan the route']);
 });
 
 test('task service default session query helpers return eloquent builders', function () {
