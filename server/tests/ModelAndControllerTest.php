@@ -94,7 +94,9 @@ test('admin controller serializes redacted steps and metadata summaries', functi
     $controller = new AiAdminController();
     $timestamp  = Carbon::parse('2026-07-19 10:00:00', 'UTC');
 
-    $step = new AiTaskStep([
+    $step = (object) [
+        'id'           => 55,
+        'uuid'         => 'step-uuid',
         'type'         => 'provider_call',
         'status'       => 'completed',
         'provider'     => 'local',
@@ -107,10 +109,8 @@ test('admin controller serializes redacted steps and metadata summaries', functi
         'error'        => null,
         'started_at'   => $timestamp,
         'completed_at' => $timestamp,
-    ]);
-    $step->id         = 55;
-    $step->uuid       = 'step-uuid';
-    $step->created_at = $timestamp;
+        'created_at'   => $timestamp,
+    ];
 
     $redactedStep = aiInvokeProtected($controller, 'serializeStep', $step, false);
     $revealedStep = aiInvokeProtected($controller, 'serializeStep', $step, true);

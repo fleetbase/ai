@@ -18,7 +18,7 @@ if (!function_exists('aiInvokeProtected')) {
 function aiAttachmentFile(array $attributes = [], string|Throwable|null $contents = null): File
 {
     return new class($attributes, $contents) extends File {
-        public function __construct(array $attributes, private string|Throwable|null $contents)
+        public function __construct(array $attributes = [], private string|Throwable|null $contents = null)
         {
             parent::__construct($attributes);
         }

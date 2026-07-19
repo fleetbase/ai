@@ -93,7 +93,7 @@ test('query executor applies not-null false-or-null and comparison filters', fun
                 return $query;
             }
 
-            expect($arguments)->toBe(['odometer', '>=', 1000]);
+            expect($arguments)->toBe(['odometer', '>=', 1000, 'and']);
 
             return $query;
         });

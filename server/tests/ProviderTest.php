@@ -121,7 +121,7 @@ test('openai provider extracts nested output content and can test connectivity',
 
 test('openai provider surfaces api error messages', function () {
     Http::fake([
-        '*' => Http::response([
+        'https://openai-error.test/responses' => Http::response([
             'error' => ['message' => 'Model unavailable.'],
         ], 503),
     ]);
@@ -129,14 +129,14 @@ test('openai provider surfaces api error messages', function () {
     (new OpenAIProvider())->complete(new AiTask(['prompt' => 'Hello']), [], [
         'config' => [
             'default_model' => 'gpt-5.4-mini',
-            'providers'     => ['openai' => ['api_key' => 'sk-test']],
+            'providers'     => ['openai' => ['api_key' => 'sk-test', 'base_url' => 'https://openai-error.test']],
         ],
     ]);
 })->throws(RuntimeException::class, 'Model unavailable.');
 
 test('anthropic provider can test connectivity and reports fallback errors', function () {
     Http::fake([
-        'https://fleetbase-anthropic.test/messages' => Http::sequence()
+        '*' => Http::sequence()
             ->push([
                 'id'          => 'msg_ok',
                 'stop_reason' => 'end_turn',
