@@ -406,7 +406,7 @@ test('relative date resolver covers units and named date windows', function () {
         ->and($nextWeek['label'])->toBe('next_week')
         ->and($nextWeek['end']->toDateString())->toBe('2026-07-26')
         ->and($thisWeek['label'])->toBe('this_week')
-        ->and($thisWeek['start']->toDateString())->toBe('2026-07-14')
+        ->and($thisWeek['start']->toDateString())->toBe('2026-07-13')
         ->and($lastMonth['label'])->toBe('last_month')
         ->and($lastMonth['end']->toDateString())->toBe('2026-06-30')
         ->and($thisMonth['label'])->toBe('this_month')

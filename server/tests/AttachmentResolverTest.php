@@ -27,8 +27,8 @@ function aiAttachmentFile(array $attributes = [], string|Throwable|null $content
 
         public function getAttribute($key)
         {
-            if ($key === 'url') {
-                return $this->attributes['url'] ?? null;
+            if (in_array($key, ['id', 'url'], true)) {
+                return $this->attributes[$key] ?? null;
             }
 
             return parent::getAttribute($key);
