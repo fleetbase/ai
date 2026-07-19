@@ -127,7 +127,7 @@ test('ai service provider registers bindings and boots package resources', funct
         public array $booted = [];
         public AiCapabilityRegistry $registry;
 
-        public function registerObservers()
+        public function registerObservers(): void
         {
             $this->booted[] = 'observers';
         }
