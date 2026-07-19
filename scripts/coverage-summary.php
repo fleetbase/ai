@@ -26,6 +26,51 @@ function intMetric(SimpleXMLElement $node, string $name): int
     return (int) ($node->metrics[$name] ?? 0);
 }
 
+function hasMetric(SimpleXMLElement $node, string $name): bool
+{
+    return isset($node->metrics[$name]);
+}
+
+function classIsCovered(SimpleXMLElement $class): bool
+{
+    $methods           = intMetric($class, 'methods');
+    $coveredMethods    = intMetric($class, 'coveredmethods');
+    $statements        = intMetric($class, 'statements');
+    $coveredStatements = intMetric($class, 'coveredstatements');
+
+    if ($methods > 0 && $coveredMethods < $methods) {
+        return false;
+    }
+
+    if ($statements > 0 && $coveredStatements < $statements) {
+        return false;
+    }
+
+    return $methods > 0 || $statements > 0;
+}
+
+function derivedClassMetrics(SimpleXMLElement $project): array
+{
+    $classes        = 0;
+    $coveredClasses = 0;
+
+    foreach ($project->xpath('.//file') ?: [] as $file) {
+        if (intMetric($file, 'classes') === 0) {
+            continue;
+        }
+
+        foreach ($file->class as $class) {
+            $classes++;
+
+            if (classIsCovered($class)) {
+                $coveredClasses++;
+            }
+        }
+    }
+
+    return [$classes, $coveredClasses];
+}
+
 $project = $xml->project;
 $metrics = $project->metrics;
 
@@ -35,6 +80,15 @@ $methods           = (int) ($metrics['methods'] ?? 0);
 $coveredMethods    = (int) ($metrics['coveredmethods'] ?? 0);
 $classes           = (int) ($metrics['classes'] ?? 0);
 $coveredClasses    = (int) ($metrics['coveredclasses'] ?? 0);
+
+if (!hasMetric($project, 'coveredclasses')) {
+    [$derivedClasses, $derivedCoveredClasses] = derivedClassMetrics($project);
+
+    if ($derivedClasses > 0) {
+        $classes        = $derivedClasses;
+        $coveredClasses = $derivedCoveredClasses;
+    }
+}
 
 $files       = [];
 $directories = [];
