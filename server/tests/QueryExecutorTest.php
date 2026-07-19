@@ -99,7 +99,8 @@ test('query executor returns counts and grouped counts for registered resources'
 
     $groupQuery = $this->getMockBuilder(Builder::class)
         ->disableOriginalConstructor()
-        ->addMethods(['selectRaw', 'groupBy', 'pluck'])
+        ->onlyMethods(['pluck'])
+        ->addMethods(['selectRaw', 'groupBy'])
         ->getMock();
     $groupQuery->expects($this->exactly(1))->method('selectRaw')->with('status, count(*) as aggregate')->willReturnSelf();
     $groupQuery->expects($this->once())->method('groupBy')->with('status')->willReturnSelf();
@@ -136,7 +137,8 @@ test('query executor returns counts and grouped counts for registered resources'
 test('query executor samples sanitize records and clamps requested limits', function () {
     $query = $this->getMockBuilder(Builder::class)
         ->disableOriginalConstructor()
-        ->addMethods(['latest', 'limit', 'get'])
+        ->onlyMethods(['latest', 'get'])
+        ->addMethods(['limit'])
         ->getMock();
     $query->expects($this->once())->method('latest')->willReturnSelf();
     $query->expects($this->once())->method('limit')->with(3)->willReturnSelf();
@@ -175,7 +177,8 @@ test('query executor builds location summaries with bounded coordinate samples',
     };
     $query = $this->getMockBuilder(Builder::class)
         ->disableOriginalConstructor()
-        ->addMethods(['whereNotNull', 'whereRaw', 'latest', 'limit', 'get'])
+        ->onlyMethods(['latest', 'get'])
+        ->addMethods(['whereNotNull', 'whereRaw', 'limit'])
         ->getMock();
     $query->expects($this->once())->method('whereNotNull')->with('location')->willReturnSelf();
     $query->expects($this->once())->method('whereRaw')->willReturnSelf();
