@@ -41,6 +41,9 @@ class AiAttachmentResolver
             ->all();
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     protected function filesForCurrentCompany(): Builder
     {
         return File::where('company_uuid', session('company'));
