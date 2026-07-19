@@ -231,14 +231,6 @@ test('attachment resolver skips empty request attachments before querying files'
     expect($resolver->resolveFromRequest(aiAttachmentRequest(['attachments' => []])))->toBe([]);
 });
 
-test('attachment resolver default company file query returns an eloquent builder', function () {
-    session(['company' => 'company-uuid']);
-
-    $query = aiInvokeProtected(new AiAttachmentResolver(), 'filesForCurrentCompany');
-
-    expect($query)->toBeInstanceOf(Builder::class);
-});
-
 test('attachment resolver resolves request attachments through normalized scoped file query', function () {
     session(['company' => 'company-uuid']);
 

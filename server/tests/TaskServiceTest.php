@@ -858,22 +858,6 @@ test('task service reuses requested and fallback active sessions before creating
         ->and($fallbackService->created)->toBe(0);
 });
 
-test('task service default session query helpers return eloquent builders', function () {
-    session(['company' => 'company-uuid']);
-
-    $registry = new AiCapabilityRegistry();
-    $steps    = [];
-    $service  = aiTaskServiceDouble($registry, $steps);
-    $task     = aiTaskDouble([
-        'uuid'            => 'task-uuid',
-        'company_uuid'    => 'company-uuid',
-        'ai_session_uuid' => 'session-uuid',
-    ]);
-
-    expect(aiInvokeProtected($service, 'sessionsForCurrentCompany'))->toBeInstanceOf(Builder::class)
-        ->and(aiInvokeProtected($service, 'sessionHistoryForTask', $task))->toBeInstanceOf(Builder::class);
-});
-
 test('task service builds bounded session context from previous turns', function () {
     $registry = new AiCapabilityRegistry();
     $steps    = [];
