@@ -134,6 +134,91 @@ test('query executor returns counts and grouped counts for registered resources'
         ]);
 });
 
+test('query executor denies permissioned resources before running queries', function () {
+    $query = $this->getMockBuilder(Builder::class)
+        ->disableOriginalConstructor()
+        ->addMethods(['count'])
+        ->getMock();
+    $query->expects($this->never())->method('count');
+
+    $registry = new AiQueryRegistry();
+    $registry->register(aiQueryResourceWithBuilder($query, [
+        'key'        => 'secure-orders',
+        'permission' => 'orders view secure',
+    ]));
+
+    $executor = new class($registry) extends AiQueryExecutor {
+        protected function userFromSession()
+        {
+            return null;
+        }
+
+        protected function canPermission(string $permission): bool
+        {
+            return false;
+        }
+    };
+
+    expect($executor->count('secure-orders'))->toBe([
+        'authorized' => false,
+        'resource'   => 'secure-orders',
+    ])
+        ->and($executor->countsBy('secure-orders', 'status'))->toBe([
+            'authorized' => false,
+            'resource'   => 'secure-orders',
+        ])
+        ->and($executor->samples('secure-orders'))->toBe([
+            'authorized' => false,
+            'resource'   => 'secure-orders',
+        ]);
+});
+
+test('query executor allows permissioned resources for admins and delegated permissions', function () {
+    $query = $this->getMockBuilder(Builder::class)
+        ->disableOriginalConstructor()
+        ->addMethods(['count'])
+        ->getMock();
+    $query->expects($this->exactly(2))->method('count')->willReturn(3);
+
+    $registry = new AiQueryRegistry();
+    $registry->register(aiQueryResourceWithBuilder($query, [
+        'key'        => 'secure-orders',
+        'permission' => 'orders view secure',
+    ]));
+
+    $adminExecutor = new class($registry) extends AiQueryExecutor {
+        protected function userFromSession()
+        {
+            return new class() {
+                public function isAdmin(): bool
+                {
+                    return true;
+                }
+            };
+        }
+    };
+
+    $permissionExecutor = new class($registry) extends AiQueryExecutor {
+        protected function userFromSession()
+        {
+            return new class() {
+                public function isAdmin(): bool
+                {
+                    return false;
+                }
+            };
+        }
+
+        protected function canPermission(string $permission): bool
+        {
+            return $permission === 'orders view secure';
+        }
+    };
+
+    expect($adminExecutor->count('secure-orders')['authorized'])->toBeTrue()
+        ->and($permissionExecutor->count('secure-orders')['authorized'])->toBeTrue();
+});
+
 test('query executor samples sanitize records and clamps requested limits', function () {
     $query = $this->getMockBuilder(Builder::class)
         ->disableOriginalConstructor()
@@ -160,6 +245,40 @@ test('query executor samples sanitize records and clamps requested limits', func
         ->and($samples['records'])->toBe([
             ['public_id' => 'ORD-1', 'status' => 'active'],
             ['public_id' => 'ORD-2'],
+        ]);
+});
+
+test('query executor returns unknown and unauthorized location and sample responses', function () {
+    $query = $this->getMockBuilder(Builder::class)
+        ->disableOriginalConstructor()
+        ->getMock();
+
+    $registry = new AiQueryRegistry();
+    $registry->register(aiQueryResourceWithBuilder($query, [
+        'key'           => 'secure-vehicles',
+        'permission'    => 'vehicles view secure',
+        'locationField' => 'location',
+    ]));
+
+    $executor = new class($registry) extends AiQueryExecutor {
+        protected function userFromSession()
+        {
+            return null;
+        }
+
+        protected function canPermission(string $permission): bool
+        {
+            return false;
+        }
+    };
+
+    expect((new AiQueryExecutor(new AiQueryRegistry()))->samples('missing'))->toBe([
+        'authorized' => false,
+        'error'      => 'Unknown query resource.',
+    ])
+        ->and($executor->locationSummary('secure-vehicles'))->toBe([
+            'authorized' => false,
+            'resource'   => 'secure-vehicles',
         ]);
 });
 

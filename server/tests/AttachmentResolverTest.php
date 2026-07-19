@@ -220,6 +220,25 @@ test('attachment resolver returns null context for empty attachments and wraps f
         ]);
 });
 
+test('attachment resolver skips empty request attachments before querying files', function () {
+    $resolver = new class() extends AiAttachmentResolver {
+        protected function filesForCurrentCompany(): Builder
+        {
+            throw new RuntimeException('The file query should not be reached for empty attachments.');
+        }
+    };
+
+    expect($resolver->resolveFromRequest(aiAttachmentRequest(['attachments' => []])))->toBe([]);
+});
+
+test('attachment resolver default company file query returns an eloquent builder', function () {
+    session(['company' => 'company-uuid']);
+
+    $query = aiInvokeProtected(new AiAttachmentResolver(), 'filesForCurrentCompany');
+
+    expect($query)->toBeInstanceOf(Builder::class);
+});
+
 test('attachment resolver resolves request attachments through normalized scoped file query', function () {
     session(['company' => 'company-uuid']);
 

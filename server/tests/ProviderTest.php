@@ -55,6 +55,7 @@ test('provider manager normalizes config and routes test calls without respectin
         ->and($normalized['providers']['openai']['api_key'])->toBe('sk-test')
         ->and($manager->providerFor(['enabled' => false, 'provider' => 'openai']))->toBeInstanceOf(LocalAIProvider::class)
         ->and($manager->providerFor(['enabled' => false, 'provider' => 'openai'], false))->toBeInstanceOf(OpenAIProvider::class)
+        ->and($manager->modelFor(['enabled' => true, 'provider' => 'openai', 'default_model' => 'gpt-5.4']))->toBe('gpt-5.4')
         ->and($manager->test(['provider' => 'local'])['status'])->toBe('success');
 });
 
@@ -134,6 +135,33 @@ test('openai provider surfaces api error messages', function () {
     ]);
 })->throws(RuntimeException::class, 'Model unavailable.');
 
+test('openai provider requires an api key before completion requests', function () {
+    (new OpenAIProvider())->complete(new AiTask(['prompt' => 'Hello']), [], [
+        'config' => ['providers' => ['openai' => ['api_key' => '']]],
+    ]);
+})->throws(InvalidArgumentException::class, 'OpenAI API key is not configured.');
+
+test('openai provider validates test configuration and surfaces test errors', function () {
+    $configurationError = null;
+    try {
+        (new OpenAIProvider())->test();
+    } catch (InvalidArgumentException $exception) {
+        $configurationError = $exception->getMessage();
+    }
+    expect($configurationError)->toBe('OpenAI API key is not configured.');
+
+    Http::fake([
+        'https://openai-test-error.test/responses' => Http::response([
+            'error' => ['message' => 'Connectivity failed.'],
+        ], 429),
+    ]);
+
+    (new OpenAIProvider())->test([
+        'default_model' => 'gpt-5.4-mini',
+        'providers'     => ['openai' => ['api_key' => 'sk-test', 'base_url' => 'https://openai-test-error.test']],
+    ]);
+})->throws(RuntimeException::class, 'Connectivity failed.');
+
 test('anthropic provider can test connectivity and reports fallback errors', function () {
     Http::fake([
         '*' => Http::sequence()
@@ -173,3 +201,30 @@ test('anthropic provider can test connectivity and reports fallback errors', fun
 
     $provider->complete(new AiTask(['prompt' => 'Hello']), [], ['config' => $config]);
 })->throws(RuntimeException::class, 'Anthropic request failed with status code: 500');
+
+test('anthropic provider requires an api key before completion requests', function () {
+    (new AnthropicProvider())->complete(new AiTask(['prompt' => 'Hello']), [], [
+        'config' => ['providers' => ['anthropic' => ['api_key' => '']]],
+    ]);
+})->throws(InvalidArgumentException::class, 'Anthropic API key is not configured.');
+
+test('anthropic provider validates test configuration and surfaces test errors', function () {
+    $configurationError = null;
+    try {
+        (new AnthropicProvider())->test();
+    } catch (InvalidArgumentException $exception) {
+        $configurationError = $exception->getMessage();
+    }
+    expect($configurationError)->toBe('Anthropic API key is not configured.');
+
+    Http::fake([
+        'https://anthropic-test-error.test/messages' => Http::response([
+            'error' => ['message' => 'Claude connectivity failed.'],
+        ], 502),
+    ]);
+
+    (new AnthropicProvider())->test([
+        'default_model' => 'claude-haiku-4-5',
+        'providers'     => ['anthropic' => ['api_key' => 'sk-ant-test', 'base_url' => 'https://anthropic-test-error.test']],
+    ]);
+})->throws(RuntimeException::class, 'Claude connectivity failed.');

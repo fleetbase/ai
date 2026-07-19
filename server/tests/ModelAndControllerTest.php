@@ -882,6 +882,39 @@ test('session controller shows ends and deletes found sessions', function () {
         ->and($session->deleted)->toBeTrue();
 });
 
+test('session controller protected lookup and default query helper build scoped queries', function () {
+    session(['company' => 'company-uuid']);
+
+    $request = Request::create('/ai/sessions/session-uuid', 'GET');
+    $request->setUserResolver(fn () => new class() {
+        public string $uuid = 'user-uuid';
+    });
+    app()->instance('request', $request);
+
+    $session = new AiSession();
+    $session->setRawAttributes(['uuid' => 'session-uuid'], true);
+    $query = aiSessionControllerBuilder([$session]);
+
+    $controller = new class($query) extends AiSessionController {
+        public function __construct(public Builder $query)
+        {
+        }
+
+        protected function sessionsForCurrentCompany(): Builder
+        {
+            return $this->query;
+        }
+    };
+
+    expect(aiInvokeProtected($controller, 'findSession', 'session-uuid'))->toBe($session)
+        ->and($query->calls[0])->toBe(['where', 'created_by_uuid', 'user-uuid', null, 'and'])
+        ->and($query->calls[1])->toBe(['where_nested', [
+            ['where', 'uuid', 'session-uuid', null, 'and'],
+            ['orWhere', 'id', 'session-uuid', null],
+        ]])
+        ->and(aiInvokeProtected(new AiSessionController(), 'sessionsForCurrentCompany'))->toBeInstanceOf(Builder::class);
+});
+
 test('session controller indexes and stores sessions through overridable query helpers', function () {
     session(['company' => 'company-uuid']);
 
@@ -1250,7 +1283,8 @@ test('task controller find task builds scoped lookup query', function () {
                 ['orWhere', 'id', 'task-uuid', null],
             ]],
             ['firstOrFail', ['*']],
-        ]);
+        ])
+        ->and(aiInvokeProtected(new AiTaskController(), 'tasksForCurrentCompany'))->toBeInstanceOf(Builder::class);
 });
 
 test('admin controller summarizes metadata and nullable related records', function () {
@@ -1579,6 +1613,52 @@ test('admin controller lists sessions and returns session and task detail payloa
         ->and($task->loaded[0])->toBe(['steps', 'session', 'company:uuid,public_id,name', 'createdBy:uuid,public_id,name,email']);
 });
 
+test('admin controller protected lookup and query helpers build expected queries', function () {
+    $session = new AiSession();
+    $session->setRawAttributes(['uuid' => 'session-uuid'], true);
+
+    $task = new AiTask();
+    $task->setRawAttributes(['uuid' => 'task-uuid'], true);
+
+    $sessionQuery = aiAdminEndpointBuilder([$session]);
+    $taskQuery    = aiAdminEndpointBuilder([$task]);
+
+    $controller = new class($sessionQuery, $taskQuery) extends AiAdminController {
+        public function __construct(private Builder $sessions, private Builder $tasks)
+        {
+        }
+
+        protected function sessionsQuery(): Builder
+        {
+            return $this->sessions;
+        }
+
+        protected function tasksQuery(): Builder
+        {
+            return $this->tasks;
+        }
+    };
+
+    expect(aiInvokeProtected($controller, 'findSession', 'session-uuid'))->toBe($session)
+        ->and($sessionQuery->calls[0])->toBe(['where_nested', [
+            ['where', 'uuid', 'session-uuid', null, 'and'],
+            ['orWhere', 'id', 'session-uuid', null],
+        ]])
+        ->and(aiInvokeProtected($controller, 'findTask', 'task-uuid'))->toBe($task)
+        ->and($taskQuery->calls[0])->toBe(['where_nested', [
+            ['where', 'uuid', 'task-uuid', null, 'and'],
+            ['orWhere', 'id', 'task-uuid', null],
+        ]]);
+
+    $defaultController = new AiAdminController();
+
+    expect(aiInvokeProtected($defaultController, 'companiesQuery'))->toBeInstanceOf(Builder::class)
+        ->and(aiInvokeProtected($defaultController, 'usersQuery'))->toBeInstanceOf(Builder::class)
+        ->and(aiInvokeProtected($defaultController, 'companyUsersForCompany', 'company-uuid'))->toBeInstanceOf(Builder::class)
+        ->and(aiInvokeProtected($defaultController, 'sessionsQuery'))->toBeInstanceOf(Builder::class)
+        ->and(get_class(aiInvokeProtected($defaultController, 'dateRaw', 'created_at')))->toContain('Expression');
+});
+
 test('admin controller reveals task content and records access log metadata', function () {
     $task = new class() extends AiTask {
         public array $loaded = [];
@@ -1820,4 +1900,59 @@ test('admin controller groups usage rows without optional labels', function () {
         ->and(aiInvokeProtected($controller, 'usageLabels', null, ['openai']))->toBe([])
         ->and(aiInvokeProtected($controller, 'usageLabels', 'provider', []))->toBe([])
         ->and(aiInvokeProtected($controller, 'usageLabels', 'provider', ['openai']))->toBe([]);
+});
+
+test('admin controller resolves usage company and user labels through query helpers', function () {
+    $company = new Company();
+    $company->setRawAttributes([
+        'uuid'      => 'company-uuid',
+        'public_id' => 'COMP-1',
+        'name'      => 'Fleetbase',
+    ], true);
+
+    $user = new User();
+    $user->setRawAttributes([
+        'uuid'      => 'user-uuid',
+        'public_id' => 'USR-1',
+        'name'      => null,
+        'email'     => 'ops@example.test',
+    ], true);
+
+    $companyQuery = aiAdminEndpointBuilder([$company]);
+    $userQuery    = aiAdminEndpointBuilder([$user]);
+
+    $controller = new class($companyQuery, $userQuery) extends AiAdminController {
+        public array $labelLookups = [];
+
+        public function __construct(private Builder $companies, private Builder $users)
+        {
+        }
+
+        protected function companiesForLabels(array $ids): Builder
+        {
+            $this->labelLookups[] = ['companies', $ids];
+
+            return $this->companies;
+        }
+
+        protected function usersForLabels(array $ids): Builder
+        {
+            $this->labelLookups[] = ['users', $ids];
+
+            return $this->users;
+        }
+    };
+
+    expect(aiInvokeProtected($controller, 'usageLabels', 'company', ['company-uuid']))->toBe([
+        'company-uuid' => 'Fleetbase',
+    ])
+        ->and(aiInvokeProtected($controller, 'usageLabels', 'user', ['user-uuid']))->toBe([
+            'user-uuid' => 'ops@example.test',
+        ])
+        ->and($controller->labelLookups)->toBe([
+            ['companies', ['company-uuid']],
+            ['users', ['user-uuid']],
+        ])
+        ->and(aiInvokeProtected(new AiAdminController(), 'companiesForLabels', ['company-uuid']))->toBeInstanceOf(Builder::class)
+        ->and(aiInvokeProtected(new AiAdminController(), 'usersForLabels', ['user-uuid']))->toBeInstanceOf(Builder::class);
 });

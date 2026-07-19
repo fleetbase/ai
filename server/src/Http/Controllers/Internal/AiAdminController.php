@@ -453,18 +453,28 @@ class AiAdminController extends Controller
         }
 
         if ($type === 'company') {
-            return Company::whereIn('uuid', $ids)->get(['uuid', 'public_id', 'name'])->mapWithKeys(fn ($company) => [
+            return $this->companiesForLabels($ids)->get(['uuid', 'public_id', 'name'])->mapWithKeys(fn ($company) => [
                 $company->uuid => $company->name ?: ($company->public_id ?: $company->uuid),
             ])->all();
         }
 
         if ($type === 'user') {
-            return User::whereIn('uuid', $ids)->get(['uuid', 'public_id', 'name', 'email'])->mapWithKeys(fn ($user) => [
+            return $this->usersForLabels($ids)->get(['uuid', 'public_id', 'name', 'email'])->mapWithKeys(fn ($user) => [
                 $user->uuid => $user->name ?: ($user->email ?: ($user->public_id ?: $user->uuid)),
             ])->all();
         }
 
         return [];
+    }
+
+    protected function companiesForLabels(array $ids): Builder
+    {
+        return Company::whereIn('uuid', $ids);
+    }
+
+    protected function usersForLabels(array $ids): Builder
+    {
+        return User::whereIn('uuid', $ids);
     }
 
     protected function usageByDay(Builder $query)

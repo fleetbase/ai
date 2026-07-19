@@ -609,6 +609,34 @@ test('task service applies executable preview and records action results', funct
         ->and($steps[0]->output)->toBe(['status' => 'ok', 'message' => 'Dispatch created.']);
 });
 
+test('task service applies the first preview when no action key is provided', function () {
+    $registry = new AiCapabilityRegistry();
+    $registry->register(aiActionCapability([
+        'key'    => 'fleetbase.first',
+        'result' => ['status' => 'ok', 'message' => 'First preview applied.'],
+    ]));
+    $steps = [];
+    $task  = aiTaskDouble([
+        'company_uuid' => 'company-1',
+        'metadata'     => [
+            'action_previews' => [
+                ['key' => 'fleetbase.first', 'draft' => ['id' => 'ORD-1']],
+            ],
+        ],
+        'status'       => 'answered',
+    ]);
+
+    aiTaskServiceDouble($registry, $steps)->apply($task, null, ['confirm' => true]);
+
+    expect($task->status)->toBe('applied')
+        ->and($task->response_summary)->toBe('First preview applied.')
+        ->and($steps[0]->tool)->toBe('fleetbase.first')
+        ->and($steps[0]->input)->toBe([
+            'preview' => ['key' => 'fleetbase.first', 'draft' => ['id' => 'ORD-1']],
+            'input'   => ['confirm' => true],
+        ]);
+});
+
 test('task service stores apply errors when executable action throws', function () {
     $registry = new AiCapabilityRegistry();
     $registry->register(aiActionCapability(['key' => 'fleetbase.failure', 'throws' => true]));
@@ -773,6 +801,82 @@ test('task service filters preview capabilities and handles session helper branc
         ->and($sessionWithTitle->updates[0])->not->toHaveKey('title')
         ->and($sessionWithTitle->updates[0])->not->toHaveKey('status')
         ->and($sessionWithTitle->updates[0])->not->toHaveKey('ended_at');
+});
+
+test('task service reuses requested and fallback active sessions before creating new ones', function () {
+    $registry = new AiCapabilityRegistry();
+    $active   = aiSessionDouble(['uuid' => 'active-session', 'status' => 'active']);
+
+    $requestWithSession = aiCreateRequest([
+        'session_uuid' => 'active-session',
+        'prompt'       => 'Continue this chat',
+    ]);
+    $requestedRows = [$active];
+
+    $requestedService = new class($registry, $requestedRows) extends AiTaskService {
+        public int $created = 0;
+
+        public function __construct(AiCapabilityRegistry $registry, private array &$rows)
+        {
+            parent::__construct(new LocalAIProvider(), new AiContextResolver($registry), $registry, new AiAttachmentResolver(), new AiTemporalContext());
+        }
+
+        protected function sessionsForCurrentCompany(): Builder
+        {
+            return aiTaskServiceQueryBuilder($this->rows);
+        }
+
+        protected function createSession(array $attributes): AiSession
+        {
+            $this->created++;
+
+            return aiSessionDouble($attributes);
+        }
+    };
+
+    $fallback = aiSessionDouble(['uuid' => 'fallback-session', 'status' => 'active']);
+    $fallbackRows = [$fallback];
+    $fallbackService = new class($registry, $fallbackRows) extends AiTaskService {
+        public int $created = 0;
+
+        public function __construct(AiCapabilityRegistry $registry, private array &$rows)
+        {
+            parent::__construct(new LocalAIProvider(), new AiContextResolver($registry), $registry, new AiAttachmentResolver(), new AiTemporalContext());
+        }
+
+        protected function sessionsForCurrentCompany(): Builder
+        {
+            return aiTaskServiceQueryBuilder($this->rows);
+        }
+
+        protected function createSession(array $attributes): AiSession
+        {
+            $this->created++;
+
+            return aiSessionDouble($attributes);
+        }
+    };
+
+    expect(aiInvokeProtected($requestedService, 'resolveSessionForRequest', $requestWithSession))->toBe($active)
+        ->and($requestedService->created)->toBe(0)
+        ->and(aiInvokeProtected($fallbackService, 'resolveSessionForRequest', aiCreateRequest(['prompt' => 'Start from latest active chat'])))->toBe($fallback)
+        ->and($fallbackService->created)->toBe(0);
+});
+
+test('task service default session query helpers return eloquent builders', function () {
+    session(['company' => 'company-uuid']);
+
+    $registry = new AiCapabilityRegistry();
+    $steps    = [];
+    $service  = aiTaskServiceDouble($registry, $steps);
+    $task     = aiTaskDouble([
+        'uuid'            => 'task-uuid',
+        'company_uuid'    => 'company-uuid',
+        'ai_session_uuid' => 'session-uuid',
+    ]);
+
+    expect(aiInvokeProtected($service, 'sessionsForCurrentCompany'))->toBeInstanceOf(Builder::class)
+        ->and(aiInvokeProtected($service, 'sessionHistoryForTask', $task))->toBeInstanceOf(Builder::class);
 });
 
 test('task service builds bounded session context from previous turns', function () {
