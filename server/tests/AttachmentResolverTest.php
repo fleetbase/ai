@@ -225,7 +225,7 @@ test('attachment resolver resolves request attachments through normalized scoped
     $file = aiAttachmentFile([
         'id'                => 99,
         'uuid'              => 'file-uuid',
-        'public_id'         => '',
+        'public_id'         => 'file_public',
         'original_filename' => 'notes.txt',
         'content_type'      => 'text/plain',
         'path'              => 'notes.txt',
@@ -249,8 +249,9 @@ test('attachment resolver resolves request attachments through normalized scoped
 
     expect($attachments)->toHaveCount(1)
         ->and($attachments[0])->toMatchArray([
-            'id'                => 99,
+            'id'                => 'file_public',
             'uuid'              => 'file-uuid',
+            'public_id'         => 'file_public',
             'original_filename' => 'notes.txt',
             'content_type'      => 'text/plain',
             'preview'           => 'Route notes',
