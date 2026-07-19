@@ -111,6 +111,27 @@ if (!function_exists('now') && class_exists('Illuminate\Support\Carbon')) {
     }
 }
 
+if (!function_exists('response')) {
+    function response(): object
+    {
+        return new class() {
+            public function json(mixed $data = [], int $status = 200, array $headers = [], int $options = 0): mixed
+            {
+                if (class_exists('Illuminate\Http\JsonResponse')) {
+                    return new Illuminate\Http\JsonResponse($data, $status, $headers, $options);
+                }
+
+                return (object) [
+                    'data'    => $data,
+                    'status'  => $status,
+                    'headers' => $headers,
+                    'options' => $options,
+                ];
+            }
+        };
+    }
+}
+
 if (!trait_exists('Illuminate\Foundation\Auth\Access\AuthorizesRequests')) {
     eval('namespace Illuminate\Foundation\Auth\Access; trait AuthorizesRequests {}');
 }
@@ -129,6 +150,10 @@ if (!trait_exists('Illuminate\Foundation\Validation\ValidatesRequests')) {
 
 if (!class_exists('Illuminate\Foundation\Http\FormRequest') && class_exists('Illuminate\Http\Request')) {
     eval('namespace Illuminate\Foundation\Http; class FormRequest extends \Illuminate\Http\Request { public function authorize(): bool { return true; } public function rules(): array { return []; } public function responseWithErrors(\Illuminate\Contracts\Validation\Validator $validator) { return $validator; } }');
+}
+
+if (!class_exists('Fleetbase\Http\Requests\AdminRequest') && class_exists('Illuminate\Foundation\Http\FormRequest')) {
+    eval('namespace Fleetbase\Http\Requests; class AdminRequest extends \Illuminate\Foundation\Http\FormRequest {}');
 }
 
 if (!interface_exists('Fleetbase\Ai\Contracts\AIContextCapabilityInterface')) {
