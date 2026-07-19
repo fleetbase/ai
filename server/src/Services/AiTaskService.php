@@ -9,6 +9,7 @@ use Fleetbase\Ai\Models\AiTask;
 use Fleetbase\Ai\Models\AiTaskStep;
 use Fleetbase\Ai\Support\AiCapabilityRegistry;
 use Fleetbase\Models\Setting;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
@@ -21,13 +22,13 @@ class AiTaskService
 
     public function createFromRequest(Request $request): AiTask
     {
-        $config      = Setting::system('ai', []);
+        $config      = $this->systemAiConfig();
         $provider    = $this->provider instanceof AiProviderManager ? $this->provider->providerNameFor($config) : 'local';
         $model       = $this->provider instanceof AiProviderManager ? $this->provider->modelFor($config) : 'fleetbase-local-preview';
         $session     = $this->resolveSessionForRequest($request);
         $attachments = $this->attachmentResolver->resolveFromRequest($request);
 
-        $task = AiTask::create([
+        $task = $this->createTask([
             'ai_session_uuid'  => $session->uuid,
             'company_uuid'     => session('company'),
             'created_by_uuid'  => optional($request->user())->uuid,
@@ -294,7 +295,7 @@ class AiTaskService
         $sessionUuid = $request->input('session_uuid');
 
         if ($sessionUuid) {
-            $session = AiSession::where('company_uuid', session('company'))
+            $session = $this->sessionsForCurrentCompany()
                 ->where('created_by_uuid', $userUuid)
                 ->where(function ($query) use ($sessionUuid) {
                     $query->where('uuid', $sessionUuid)->orWhere('id', $sessionUuid);
@@ -310,7 +311,7 @@ class AiTaskService
             }
         }
 
-        $session = AiSession::where('company_uuid', session('company'))
+        $session = $this->sessionsForCurrentCompany()
             ->where('created_by_uuid', $userUuid)
             ->where('status', 'active')
             ->latest('last_message_at')
@@ -326,7 +327,7 @@ class AiTaskService
 
     protected function createSessionForPrompt(Request $request): AiSession
     {
-        return AiSession::create([
+        return $this->createSession([
             'company_uuid'    => session('company'),
             'created_by_uuid' => optional($request->user())->uuid,
             'title'           => $this->titleFromPrompt((string) $request->input('prompt')),
@@ -366,9 +367,7 @@ class AiTaskService
             return null;
         }
 
-        $turns = AiTask::where('company_uuid', $task->company_uuid)
-            ->where('ai_session_uuid', $task->ai_session_uuid)
-            ->where('uuid', '!=', $task->uuid)
+        $turns = $this->sessionHistoryForTask($task)
             ->whereNotNull('prompt')
             ->latest()
             ->limit(8)
@@ -397,5 +396,32 @@ class AiTaskService
                 'turns'        => $turns,
             ],
         ];
+    }
+
+    protected function systemAiConfig(): array
+    {
+        return Setting::system('ai', []);
+    }
+
+    protected function createTask(array $attributes): AiTask
+    {
+        return AiTask::create($attributes);
+    }
+
+    protected function createSession(array $attributes): AiSession
+    {
+        return AiSession::create($attributes);
+    }
+
+    protected function sessionsForCurrentCompany(): Builder
+    {
+        return AiSession::where('company_uuid', session('company'));
+    }
+
+    protected function sessionHistoryForTask(AiTask $task): Builder
+    {
+        return AiTask::where('company_uuid', $task->company_uuid)
+            ->where('ai_session_uuid', $task->ai_session_uuid)
+            ->where('uuid', '!=', $task->uuid);
     }
 }
