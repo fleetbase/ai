@@ -15,13 +15,14 @@ if (!is_file($pestRunner)) {
     exit(1);
 }
 
-$hasCoverageExtension = extension_loaded('xdebug') || extension_loaded('pcov');
+$hasCoverageExtension = extension_loaded('xdebug') || extension_loaded('pcov') || PHP_SAPI === 'phpdbg';
 
 if (!$hasCoverageExtension) {
     fwrite(STDERR, "No PHP coverage driver is available.\n\n");
     fwrite(STDERR, "Install or enable one of:\n");
     fwrite(STDERR, "  - Xdebug with XDEBUG_MODE=coverage\n");
     fwrite(STDERR, "  - PCOV\n");
+    fwrite(STDERR, "  - phpdbg by running `phpdbg -qrr scripts/coverage-runner.php ...`\n");
     fwrite(STDERR, "\n");
     fwrite(STDERR, 'Current PHP binary: ' . PHP_BINARY . "\n");
     exit(1);
