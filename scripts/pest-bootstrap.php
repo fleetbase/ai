@@ -132,6 +132,15 @@ if (!function_exists('response')) {
     }
 }
 
+if (!function_exists('abort_unless')) {
+    function abort_unless($boolean, $code = 403, $message = '', array $headers = []): void
+    {
+        if (!$boolean) {
+            throw new RuntimeException($message ?: "HTTP {$code}");
+        }
+    }
+}
+
 if (!trait_exists('Illuminate\Foundation\Auth\Access\AuthorizesRequests')) {
     eval('namespace Illuminate\Foundation\Auth\Access; trait AuthorizesRequests {}');
 }
