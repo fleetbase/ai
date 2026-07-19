@@ -21,6 +21,10 @@ if (!function_exists('config')) {
     }
 }
 
+if (!class_exists('PhpOption\Option')) {
+    eval('namespace PhpOption; class Option { public function __construct(private mixed $value) {} public static function fromValue(mixed $value): self { return new self($value); } public function map(callable $callback): self { return $this->value === null ? $this : new self($callback($this->value)); } public function getOrCall(callable $callback): mixed { return $this->value === null ? $callback() : $this->value; } public function getOrElse(mixed $default): mixed { return $this->value === null ? $default : $this->value; } }');
+}
+
 if (!function_exists('cache')) {
     function cache(): object
     {
