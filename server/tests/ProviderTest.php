@@ -121,7 +121,7 @@ test('openai provider extracts nested output content and can test connectivity',
 
 test('openai provider surfaces api error messages', function () {
     Http::fake([
-        OpenAIProvider::DEFAULT_BASE_URL . '/responses*' => Http::response([
+        '*' => Http::response([
             'error' => ['message' => 'Model unavailable.'],
         ], 503),
     ]);

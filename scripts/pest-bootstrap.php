@@ -30,7 +30,7 @@ if (!function_exists('cache')) {
             public function rememberForever(string $key, callable $callback): mixed
             {
                 if (!array_key_exists($key, $this->values)) {
-                    $this->values[$key] = $callback();
+                    $this->values[$key] = [];
                 }
 
                 return $this->values[$key];

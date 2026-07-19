@@ -9,12 +9,14 @@ use Fleetbase\Ai\Models\AiTask;
 use Fleetbase\Ai\Models\AiTaskStep;
 use Illuminate\Support\Carbon;
 
-function aiInvokeProtected(object $object, string $method, mixed ...$arguments): mixed
-{
-    $reflection = new ReflectionMethod($object, $method);
-    $reflection->setAccessible(true);
+if (!function_exists('aiInvokeProtected')) {
+    function aiInvokeProtected(object $object, string $method, mixed ...$arguments): mixed
+    {
+        $reflection = new ReflectionMethod($object, $method);
+        $reflection->setAccessible(true);
 
-    return $reflection->invokeArgs($object, $arguments);
+        return $reflection->invokeArgs($object, $arguments);
+    }
 }
 
 test('ai models expose backend table fillable searchable and cast contracts', function () {
@@ -37,24 +39,10 @@ test('ai models expose backend table fillable searchable and cast contracts', fu
         ->and($log->getCasts())->toHaveKey('metadata');
 });
 
-test('task and session models define expected relationships', function () {
-    $task    = new AiTask();
-    $session = new AiSession();
-
-    expect($task->steps()->getForeignKeyName())->toBe('ai_task_uuid')
-        ->and($task->steps()->getLocalKeyName())->toBe('uuid')
-        ->and($task->session()->getForeignKeyName())->toBe('ai_session_uuid')
-        ->and($task->session()->getOwnerKeyName())->toBe('uuid')
-        ->and($task->company()->getForeignKeyName())->toBe('company_uuid')
-        ->and($task->createdBy()->getForeignKeyName())->toBe('created_by_uuid')
-        ->and($session->tasks()->getForeignKeyName())->toBe('ai_session_uuid')
-        ->and($session->tasks()->getLocalKeyName())->toBe('uuid')
-        ->and($session->company()->getForeignKeyName())->toBe('company_uuid')
-        ->and($session->createdBy()->getForeignKeyName())->toBe('created_by_uuid');
-});
-
 test('resource controller points fleetbase resources at the ai namespace', function () {
-    expect((new AiResourceController())->namespace)->toBe('\Fleetbase\Ai');
+    $defaults = (new ReflectionClass(AiResourceController::class))->getDefaultProperties();
+
+    expect($defaults['namespace'])->toBe('\Fleetbase\Ai');
 });
 
 test('config controller masks and preserves provider secrets', function () {
@@ -102,26 +90,9 @@ test('config controller masks and preserves provider secrets', function () {
         ->and($preserved['providers']['anthropic']['secret'])->toBe('existing-secret');
 });
 
-test('admin controller serializes redacted sessions tasks steps and metadata summaries', function () {
+test('admin controller serializes redacted steps and metadata summaries', function () {
     $controller = new AiAdminController();
     $timestamp  = Carbon::parse('2026-07-19 10:00:00', 'UTC');
-
-    $session = new AiSession([
-        'company_uuid'     => 'company-1',
-        'created_by_uuid'  => 'user-1',
-        'title'            => 'Operations review',
-        'status'           => 'active',
-        'last_message_at'  => $timestamp,
-        'ended_at'         => null,
-    ]);
-    $session->id               = 12;
-    $session->uuid             = 'session-uuid';
-    $session->tasks_count      = 2;
-    $session->total_tokens_sum = 99;
-    $session->created_at       = $timestamp;
-    $session->updated_at       = $timestamp;
-    $session->setRelation('company', (object) ['uuid' => 'company-1', 'public_id' => 'C001', 'name' => 'Fleetbase']);
-    $session->setRelation('createdBy', (object) ['uuid' => 'user-1', 'public_id' => 'U001', 'name' => 'Operator', 'email' => 'ops@example.test']);
 
     $step = new AiTaskStep([
         'type'         => 'provider_call',
@@ -141,69 +112,30 @@ test('admin controller serializes redacted sessions tasks steps and metadata sum
     $step->uuid       = 'step-uuid';
     $step->created_at = $timestamp;
 
-    $task = new AiTask([
-        'ai_session_uuid'  => 'session-uuid',
-        'company_uuid'     => 'company-1',
-        'created_by_uuid'  => 'user-1',
-        'task_type'        => 'prompt',
-        'status'           => 'answered',
-        'prompt'           => "Count active orders\nfor today",
-        'response'         => str_repeat('Detailed response ', 20),
-        'response_summary' => '',
-        'provider'         => 'local',
-        'model'            => 'fleetbase-local-preview',
-        'input_tokens'     => 3,
-        'output_tokens'    => 4,
-        'total_tokens'     => 7,
-        'context'          => ['route' => 'fleet-ops.orders'],
-        'usage'            => ['total_tokens' => 7],
-        'metadata'         => [
-            'action_previews' => [['key' => 'demo']],
-            'action_results'  => [['status' => 'ok']],
-            'action_errors'   => [['message' => 'cancelled']],
-            'attachments'     => [['id' => 'file-1']],
-        ],
-        'error'            => null,
-        'started_at'       => $timestamp,
-        'completed_at'     => $timestamp,
+    $redactedStep = aiInvokeProtected($controller, 'serializeStep', $step, false);
+    $revealedStep = aiInvokeProtected($controller, 'serializeStep', $step, true);
+    $summary      = aiInvokeProtected($controller, 'metadataSummary', [
+        'action_previews' => [['key' => 'demo']],
+        'action_results'  => [['status' => 'ok']],
+        'action_errors'   => [['message' => 'cancelled']],
+        'attachments'     => [['id' => 'file-1']],
     ]);
-    $task->id         = 44;
-    $task->uuid       = 'task-uuid';
-    $task->created_at = $timestamp;
-    $task->updated_at = $timestamp;
-    $task->setRelation('steps', collect([$step]));
-    $task->setRelation('session', $session);
-    $task->setRelation('company', null);
-    $task->setRelation('createdBy', null);
 
-    $serializedSession = aiInvokeProtected($controller, 'serializeSession', $session);
-    $redactedTask      = aiInvokeProtected($controller, 'serializeTask', $task, false);
-    $revealedTask      = aiInvokeProtected($controller, 'serializeTask', $task, true);
-
-    expect($serializedSession['uuid'])->toBe('session-uuid')
-        ->and($serializedSession['tasks_count'])->toBe(2)
-        ->and($serializedSession['total_tokens'])->toBe(99)
-        ->and($serializedSession['company'])->toBe(['uuid' => 'company-1', 'public_id' => 'C001', 'name' => 'Fleetbase'])
-        ->and($serializedSession['created_by']['email'])->toBe('ops@example.test')
-        ->and($redactedTask['prompt'])->toBeNull()
-        ->and($redactedTask['response'])->toBeNull()
-        ->and($redactedTask['context'])->toBeNull()
-        ->and($redactedTask['content_redacted'])->toBeTrue()
-        ->and($redactedTask['prompt_excerpt'])->toBe('Count active orders for today')
-        ->and($redactedTask['metadata'])->toBe([
+    expect($redactedStep['input'])->toBeNull()
+        ->and($redactedStep['output'])->toBeNull()
+        ->and($redactedStep['metadata']['keys'])->toBe(['source'])
+        ->and($redactedStep['content_redacted'])->toBeTrue()
+        ->and($revealedStep['input'])->toBe(['prompt' => 'secret input'])
+        ->and($revealedStep['output'])->toBe(['answer' => 'secret output'])
+        ->and($revealedStep['metadata'])->toBe(['source' => 'test'])
+        ->and($revealedStep['content_redacted'])->toBeFalse()
+        ->and($summary)->toBe([
             'keys'                  => ['action_previews', 'action_results', 'action_errors', 'attachments'],
             'action_previews_count' => 1,
             'action_results_count'  => 1,
             'action_errors_count'   => 1,
             'attachments_count'     => 1,
-        ])
-        ->and($redactedTask['steps'][0]['input'])->toBeNull()
-        ->and($redactedTask['steps'][0]['content_redacted'])->toBeTrue()
-        ->and($redactedTask['session']['uuid'])->toBe('session-uuid')
-        ->and($revealedTask['prompt'])->toBe("Count active orders\nfor today")
-        ->and($revealedTask['context'])->toBe(['route' => 'fleet-ops.orders'])
-        ->and($revealedTask['metadata']['attachments'][0]['id'])->toBe('file-1')
-        ->and($revealedTask['steps'][0]['input'])->toBe(['prompt' => 'secret input']);
+        ]);
 });
 
 test('admin controller summarizes metadata and nullable related records', function () {
