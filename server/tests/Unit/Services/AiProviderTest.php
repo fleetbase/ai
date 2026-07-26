@@ -5,7 +5,12 @@ use Fleetbase\Ai\Services\AiProviderManager;
 use Fleetbase\Ai\Services\AnthropicProvider;
 use Fleetbase\Ai\Services\LocalAIProvider;
 use Fleetbase\Ai\Services\OpenAIProvider;
+use Illuminate\Http\Client\Factory as HttpFactory;
 use Illuminate\Support\Facades\Http;
+
+beforeEach(function () {
+    Http::swap(new HttpFactory());
+});
 
 function aiProviderManager(): AiProviderManager
 {
