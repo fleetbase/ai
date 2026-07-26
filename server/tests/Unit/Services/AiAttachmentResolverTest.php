@@ -7,16 +7,6 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
-if (!function_exists('aiInvokeProtected')) {
-    function aiInvokeProtected(object $object, string $method, mixed ...$arguments): mixed
-    {
-        $reflection = new ReflectionMethod($object, $method);
-        $reflection->setAccessible(true);
-
-        return $reflection->invokeArgs($object, $arguments);
-    }
-}
-
 function aiAttachmentFile(array $attributes = [], string|Throwable|null $contents = null): File
 {
     return new class($attributes, $contents) extends File {

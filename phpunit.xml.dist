@@ -4,8 +4,11 @@
          colors="true"
 >
     <testsuites>
-        <testsuite name="default">
-            <directory suffix=".php">./server/tests</directory>
+        <testsuite name="unit">
+            <directory suffix=".php">./server/tests/Unit</directory>
+        </testsuite>
+        <testsuite name="feature">
+            <directory suffix=".php">./server/tests/Feature</directory>
         </testsuite>
     </testsuites>
     <filter>

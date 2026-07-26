@@ -13,17 +13,6 @@ use Fleetbase\Ai\Support\Capabilities\CurrentPageContextCapability;
 use Fleetbase\Http\Requests\AdminRequest;
 use Illuminate\Http\Request;
 
-if (!function_exists('aiJsonPayload')) {
-    function aiJsonPayload(mixed $response): array
-    {
-        if (is_object($response) && method_exists($response, 'getData')) {
-            return $response->getData(true);
-        }
-
-        return is_object($response) && property_exists($response, 'data') ? $response->data : [];
-    }
-}
-
 test('tool controller returns registered capability metadata', function () {
     $registry = new AiCapabilityRegistry();
     $registry->register(new CurrentPageContextCapability());
