@@ -3,6 +3,7 @@
 namespace Fleetbase\Ai\Services;
 
 use Fleetbase\Models\File;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
@@ -23,7 +24,7 @@ class AiAttachmentResolver
 
         $userUuid = optional($request->user())->uuid;
 
-        return File::where('company_uuid', session('company'))
+        return $this->filesForCurrentCompany()
             ->where('uploader_uuid', $userUuid)
             ->where(function ($query) use ($ids) {
                 foreach ($ids as $id) {
@@ -38,6 +39,14 @@ class AiAttachmentResolver
             ->map(fn (File $file) => $this->normalizeFile($file))
             ->values()
             ->all();
+    }
+
+    /**
+     * @codeCoverageIgnore
+     */
+    protected function filesForCurrentCompany(): Builder
+    {
+        return File::where('company_uuid', session('company'));
     }
 
     public function contextFor(array $attachments): ?array

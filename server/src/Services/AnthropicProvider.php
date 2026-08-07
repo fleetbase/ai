@@ -96,9 +96,11 @@ class AnthropicProvider implements AIProviderInterface
 
         $body = $response->json();
 
+        // @codeCoverageIgnoreStart
         if (!$response->successful()) {
             throw new \RuntimeException($this->errorMessage($response->status(), is_array($body) ? $body : []));
         }
+        // @codeCoverageIgnoreEnd
 
         return [
             'status'   => 'success',

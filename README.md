@@ -1,5 +1,7 @@
 # Fleetbase AI
 
+[![Coverage](https://codecov.io/gh/fleetbase/ai/branch/main/graph/badge.svg)](https://codecov.io/gh/fleetbase/ai)
+
 Fleetbase AI is an operations copilot and task automation module for Fleetbase. It adds a global AI prompt to the Fleetbase console, records each AI turn as an auditable task, and gives Fleetbase extensions a capability framework for exposing safe AI-readable context and previewable actions.
 
 This extension was scaffolded with the Fleetbase CLI and contains both the Ember engine and Laravel backend package for `fleetbase/ai`.

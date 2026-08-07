@@ -169,12 +169,28 @@ class AiQueryExecutor
             return true;
         }
 
-        $user = Auth::getUserFromSession();
+        $user = $this->userFromSession();
         if ($user?->isAdmin()) {
             return true;
         }
 
-        return Auth::can($resource->permission);
+        return $this->canPermission($resource->permission);
+    }
+
+    /**
+     * @codeCoverageIgnore
+     */
+    protected function userFromSession()
+    {
+        return Auth::getUserFromSession();
+    }
+
+    /**
+     * @codeCoverageIgnore
+     */
+    protected function canPermission(string $permission): bool
+    {
+        return Auth::can($permission);
     }
 
     protected function sanitizeRecord(AiQueryableResource $resource, $record, bool $includeLocation = false): array

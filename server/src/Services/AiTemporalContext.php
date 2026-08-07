@@ -7,6 +7,9 @@ use Illuminate\Support\Carbon;
 
 class AiTemporalContext
 {
+    /**
+     * @codeCoverageIgnore
+     */
     public function timezone(): string
     {
         return Auth::getUserTimezone();

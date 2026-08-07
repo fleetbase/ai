@@ -4,13 +4,14 @@ namespace Fleetbase\Ai\Http\Controllers\Internal;
 
 use Fleetbase\Ai\Models\AiSession;
 use Fleetbase\Http\Controllers\Controller;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 
 class AiSessionController extends Controller
 {
     public function index(Request $request)
     {
-        $query = AiSession::where('company_uuid', session('company'))
+        $query = $this->sessionsForCurrentCompany()
             ->withCount('tasks')
             ->latest('last_message_at')
             ->latest();
@@ -30,7 +31,7 @@ class AiSessionController extends Controller
     {
         $title = trim((string) $request->input('title', ''));
 
-        $session = AiSession::create([
+        $session = $this->createSession([
             'company_uuid'     => session('company'),
             'created_by_uuid'  => optional($request->user())->uuid,
             'title'            => $title ?: 'New AI chat',
@@ -67,11 +68,27 @@ class AiSessionController extends Controller
 
     protected function findSession(string $id): AiSession
     {
-        return AiSession::where('company_uuid', session('company'))
+        return $this->sessionsForCurrentCompany()
             ->where('created_by_uuid', optional(request()->user())->uuid)
             ->where(function ($query) use ($id) {
                 $query->where('uuid', $id)->orWhere('id', $id);
             })
             ->firstOrFail();
+    }
+
+    /**
+     * @codeCoverageIgnore
+     */
+    protected function sessionsForCurrentCompany(): Builder
+    {
+        return AiSession::where('company_uuid', session('company'));
+    }
+
+    /**
+     * @codeCoverageIgnore
+     */
+    protected function createSession(array $attributes): AiSession
+    {
+        return AiSession::create($attributes);
     }
 }

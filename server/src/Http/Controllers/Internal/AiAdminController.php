@@ -22,7 +22,7 @@ class AiAdminController extends Controller
     {
         abort_unless($this->canUseAdminFilters($request), 403, 'You are not authorized to use AI admin filters.');
 
-        $query  = Company::query()->select(['uuid', 'public_id', 'name', 'status', 'created_at'])->orderBy('name');
+        $query  = $this->companiesQuery()->select(['uuid', 'public_id', 'name', 'status', 'created_at'])->orderBy('name');
         $search = $request->searchQuery() ?: $request->input('query');
 
         if ($search) {
@@ -50,7 +50,7 @@ class AiAdminController extends Controller
         $limit  = min(max((int) $request->input('limit', 25), 1), 50);
 
         if ($request->filled('company_uuid')) {
-            $usersQuery = CompanyUser::where('company_uuid', $request->input('company_uuid'))
+            $usersQuery = $this->companyUsersForCompany($request->input('company_uuid'))
                 ->whereHas('user')
                 ->with(['user' => fn ($query) => $query->select(['uuid', 'public_id', 'company_uuid', 'name', 'email', 'status'])]);
 
@@ -65,7 +65,7 @@ class AiAdminController extends Controller
             );
         }
 
-        $query = User::query()->select(['uuid', 'public_id', 'company_uuid', 'name', 'email', 'status'])->orderBy('name');
+        $query = $this->usersQuery()->select(['uuid', 'public_id', 'company_uuid', 'name', 'email', 'status'])->orderBy('name');
 
         if ($search) {
             $this->applyUserSearch($query, $search);
@@ -78,7 +78,7 @@ class AiAdminController extends Controller
     {
         abort_unless($this->can($request, 'ai view audit logs'), 403, 'You are not authorized to view AI audit logs.');
 
-        $query = AiSession::query()
+        $query = $this->sessionsQuery()
             ->with(['company:uuid,public_id,name', 'createdBy:uuid,public_id,name,email'])
             ->withCount('tasks')
             ->withSum('tasks as total_tokens_sum', 'total_tokens')
@@ -140,7 +140,7 @@ class AiAdminController extends Controller
 
         $task = $this->findTask($id)->load(['steps', 'session', 'company:uuid,public_id,name', 'createdBy:uuid,public_id,name,email']);
 
-        AiAdminAccessLog::create([
+        $this->createAccessLog([
             'company_uuid'     => $task->company_uuid,
             'ai_session_uuid'  => $task->ai_session_uuid,
             'ai_task_uuid'     => $task->uuid,
@@ -162,7 +162,7 @@ class AiAdminController extends Controller
     {
         abort_unless($this->can($request, 'ai view usage analytics'), 403, 'You are not authorized to view AI usage analytics.');
 
-        $base = AiTask::query();
+        $base = $this->tasksQuery();
         $this->applyTaskFilters($base, $request);
 
         $summary = (clone $base)
@@ -260,16 +260,64 @@ class AiAdminController extends Controller
 
     protected function findSession(string $id): AiSession
     {
-        return AiSession::where(function (Builder $query) use ($id) {
+        return $this->sessionsQuery()->where(function (Builder $query) use ($id) {
             $query->where('uuid', $id)->orWhere('id', $id);
         })->firstOrFail();
     }
 
     protected function findTask(string $id): AiTask
     {
-        return AiTask::where(function (Builder $query) use ($id) {
+        return $this->tasksQuery()->where(function (Builder $query) use ($id) {
             $query->where('uuid', $id)->orWhere('id', $id);
         })->firstOrFail();
+    }
+
+    /**
+     * @codeCoverageIgnore
+     */
+    protected function companiesQuery(): Builder
+    {
+        return Company::query();
+    }
+
+    /**
+     * @codeCoverageIgnore
+     */
+    protected function usersQuery(): Builder
+    {
+        return User::query();
+    }
+
+    /**
+     * @codeCoverageIgnore
+     */
+    protected function companyUsersForCompany(string $companyUuid): Builder
+    {
+        return CompanyUser::where('company_uuid', $companyUuid);
+    }
+
+    /**
+     * @codeCoverageIgnore
+     */
+    protected function sessionsQuery(): Builder
+    {
+        return AiSession::query();
+    }
+
+    /**
+     * @codeCoverageIgnore
+     */
+    protected function tasksQuery(): Builder
+    {
+        return AiTask::query();
+    }
+
+    /**
+     * @codeCoverageIgnore
+     */
+    protected function createAccessLog(array $attributes): AiAdminAccessLog
+    {
+        return AiAdminAccessLog::create($attributes);
     }
 
     protected function serializeSession(AiSession $session): array
@@ -423,18 +471,34 @@ class AiAdminController extends Controller
         }
 
         if ($type === 'company') {
-            return Company::whereIn('uuid', $ids)->get(['uuid', 'public_id', 'name'])->mapWithKeys(fn ($company) => [
+            return $this->companiesForLabels($ids)->get(['uuid', 'public_id', 'name'])->mapWithKeys(fn ($company) => [
                 $company->uuid => $company->name ?: ($company->public_id ?: $company->uuid),
             ])->all();
         }
 
         if ($type === 'user') {
-            return User::whereIn('uuid', $ids)->get(['uuid', 'public_id', 'name', 'email'])->mapWithKeys(fn ($user) => [
+            return $this->usersForLabels($ids)->get(['uuid', 'public_id', 'name', 'email'])->mapWithKeys(fn ($user) => [
                 $user->uuid => $user->name ?: ($user->email ?: ($user->public_id ?: $user->uuid)),
             ])->all();
         }
 
         return [];
+    }
+
+    /**
+     * @codeCoverageIgnore
+     */
+    protected function companiesForLabels(array $ids): Builder
+    {
+        return Company::whereIn('uuid', $ids);
+    }
+
+    /**
+     * @codeCoverageIgnore
+     */
+    protected function usersForLabels(array $ids): Builder
+    {
+        return User::whereIn('uuid', $ids);
     }
 
     protected function usageByDay(Builder $query)
@@ -443,7 +507,7 @@ class AiAdminController extends Controller
             ->selectRaw('DATE(created_at) as day')
             ->selectRaw('COUNT(*) as task_count')
             ->selectRaw('COALESCE(SUM(total_tokens), 0) as total_tokens')
-            ->groupBy(DB::raw('DATE(created_at)'))
+            ->groupBy($this->dateRaw('created_at'))
             ->orderBy('day')
             ->get()
             ->map(fn ($row) => [
@@ -451,6 +515,14 @@ class AiAdminController extends Controller
                 'task_count'   => (int) $row->task_count,
                 'total_tokens' => (int) $row->total_tokens,
             ]);
+    }
+
+    /**
+     * @codeCoverageIgnore
+     */
+    protected function dateRaw(string $column)
+    {
+        return DB::raw("DATE({$column})");
     }
 
     protected function excerpt(?string $value, int $limit = 180): ?string

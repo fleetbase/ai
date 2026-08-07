@@ -8,8 +8,13 @@ use Fleetbase\Ai\Services\OpenAIProvider;
 use Fleetbase\Ai\Support\AiCapabilityRegistry;
 use Fleetbase\Ai\Support\AiRelativeDateResolver;
 use Fleetbase\Ai\Support\Capabilities\CurrentPageContextCapability;
+use Illuminate\Http\Client\Factory as HttpFactory;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Http;
+
+beforeEach(function () {
+    Http::swap(new HttpFactory());
+});
 
 test('provider manager exposes backend curated provider and model metadata', function () {
     $manager   = new AiProviderManager(new LocalAIProvider(), new OpenAIProvider(), new AnthropicProvider());

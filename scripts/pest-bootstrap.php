@@ -21,6 +21,35 @@ if (!function_exists('config')) {
     }
 }
 
+if (!class_exists('PhpOption\Option')) {
+    eval('namespace PhpOption; class Option { public function __construct(private mixed $value) {} public static function fromValue(mixed $value): self { return new self($value); } public function map(callable $callback): self { return $this->value === null ? $this : new self($callback($this->value)); } public function getOrCall(callable $callback): mixed { return $this->value === null ? $callback() : $this->value; } public function getOrElse(mixed $default): mixed { return $this->value === null ? $default : $this->value; } }');
+}
+
+if (!function_exists('cache')) {
+    function cache(): object
+    {
+        return new class() {
+            private array $values = [];
+
+            public function rememberForever(string $key, callable $callback): mixed
+            {
+                if (!array_key_exists($key, $this->values)) {
+                    $this->values[$key] = [];
+                }
+
+                return $this->values[$key];
+            }
+
+            public function forget(string $key): bool
+            {
+                unset($this->values[$key]);
+
+                return true;
+            }
+        };
+    }
+}
+
 if (class_exists('Illuminate\Container\Container') && class_exists('Illuminate\Support\Facades\Facade')) {
     $app = Illuminate\Container\Container::getInstance();
     Illuminate\Support\Facades\Facade::setFacadeApplication($app);
@@ -82,6 +111,36 @@ if (!function_exists('now') && class_exists('Illuminate\Support\Carbon')) {
     }
 }
 
+if (!function_exists('response')) {
+    function response(): object
+    {
+        return new class() {
+            public function json(mixed $data = [], int $status = 200, array $headers = [], int $options = 0): mixed
+            {
+                if (class_exists('Illuminate\Http\JsonResponse')) {
+                    return new Illuminate\Http\JsonResponse($data, $status, $headers, $options);
+                }
+
+                return (object) [
+                    'data'    => $data,
+                    'status'  => $status,
+                    'headers' => $headers,
+                    'options' => $options,
+                ];
+            }
+        };
+    }
+}
+
+if (!function_exists('abort_unless')) {
+    function abort_unless($boolean, $code = 403, $message = '', array $headers = []): void
+    {
+        if (!$boolean) {
+            throw new RuntimeException($message ?: "HTTP {$code}");
+        }
+    }
+}
+
 if (!trait_exists('Illuminate\Foundation\Auth\Access\AuthorizesRequests')) {
     eval('namespace Illuminate\Foundation\Auth\Access; trait AuthorizesRequests {}');
 }
@@ -99,7 +158,15 @@ if (!trait_exists('Illuminate\Foundation\Validation\ValidatesRequests')) {
 }
 
 if (!class_exists('Illuminate\Foundation\Http\FormRequest') && class_exists('Illuminate\Http\Request')) {
-    eval('namespace Illuminate\Foundation\Http; class FormRequest extends \Illuminate\Http\Request { public function authorize(): bool { return true; } public function rules(): array { return []; } public function responseWithErrors(\Illuminate\Contracts\Validation\Validator $validator) { return $validator; } }');
+    eval('namespace Illuminate\Foundation\Http; class FormRequest extends \Illuminate\Http\Request { public function authorize() { return true; } public function rules() { return []; } public function responseWithErrors(\Illuminate\Contracts\Validation\Validator $validator) { return $validator; } }');
+}
+
+if (!class_exists('Illuminate\Foundation\Auth\User') && class_exists('Illuminate\Database\Eloquent\Model')) {
+    eval('namespace Illuminate\Foundation\Auth; class User extends \Illuminate\Database\Eloquent\Model {}');
+}
+
+if (!class_exists('Fleetbase\Http\Requests\AdminRequest') && class_exists('Illuminate\Foundation\Http\FormRequest')) {
+    eval('namespace Fleetbase\Http\Requests; class AdminRequest extends \Illuminate\Foundation\Http\FormRequest {}');
 }
 
 if (!interface_exists('Fleetbase\Ai\Contracts\AIContextCapabilityInterface')) {
@@ -128,6 +195,11 @@ if (!class_exists('Fleetbase\Ai\Support\AiQueryRegistry')) {
 
 if (!class_exists('Fleetbase\Ai\Support\AiRelativeDateResolver') && class_exists('Illuminate\Support\Carbon')) {
     eval('namespace Fleetbase\Ai\Support; class AiRelativeDateResolver { public function __construct($parser = null) {} public function resolveDateTime(string $prompt, ?string $timezone = null): ?\Illuminate\Support\Carbon { if (preg_match("/(\d+)\s+days?\s+from\s+now/i", $prompt, $matches)) { return \Illuminate\Support\Carbon::now($timezone)->addDays((int) $matches[1]); } return null; } public function resolveWindow(string $prompt, ?string $timezone = null): ?array { $timezone = $timezone ?: date_default_timezone_get(); $now = \Illuminate\Support\Carbon::now($timezone); if (str_contains(strtolower($prompt), "last week")) { $start = $now->copy()->subWeek()->startOfWeek(); $end = $now->copy()->subWeek()->endOfWeek(); return ["label" => "last week", "timezone" => $timezone, "start" => $start, "end" => $end]; } if (str_contains(strtolower($prompt), "yesterday")) { $start = $now->copy()->subDay()->startOfDay(); $end = $now->copy()->subDay()->endOfDay(); return ["label" => "yesterday", "timezone" => $timezone, "start" => $start, "end" => $end]; } return null; } }');
+}
+
+$testHelpers = getcwd() . '/server/tests/Support/helpers.php';
+if (is_file($testHelpers)) {
+    require_once $testHelpers;
 }
 
 set_error_handler(function (int $severity, string $message): bool {
