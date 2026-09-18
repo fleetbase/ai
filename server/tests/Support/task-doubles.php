@@ -4,9 +4,12 @@
  * Test doubles for AI tasks, steps, sessions, and query builders shared across test files.
  */
 
+use Fleetbase\Ai\Contracts\AIConversationalProviderInterface;
+use Fleetbase\Ai\Contracts\AIProviderInterface;
 use Fleetbase\Ai\Models\AiSession;
 use Fleetbase\Ai\Models\AiTask;
 use Fleetbase\Ai\Models\AiTaskStep;
+use Fleetbase\Ai\Support\AiProviderTurn;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 
@@ -200,5 +203,43 @@ if (!function_exists('aiCreateRequest')) {
         });
 
         return $request;
+    }
+}
+
+if (!function_exists('aiScriptedProvider')) {
+    /**
+     * Conversational provider that replays scripted turns and records every request.
+     */
+    function aiScriptedProvider(array $turns): AIConversationalProviderInterface
+    {
+        return new class($turns) implements AIConversationalProviderInterface, AIProviderInterface {
+            public array $requests = [];
+
+            public function __construct(private array $turns)
+            {
+            }
+
+            public function supportsTools(array $config = []): bool
+            {
+                return true;
+            }
+
+            public function converse(string $system, array $messages, array $tools = [], array $options = []): AiProviderTurn
+            {
+                $this->requests[] = compact('system', 'messages', 'tools', 'options');
+
+                return array_shift($this->turns) ?? new AiProviderTurn(text: 'Fallback answer', provider: 'anthropic', model: 'claude-haiku-4-5');
+            }
+
+            public function complete(AiTask $task, array $messages = [], array $options = []): array
+            {
+                throw new RuntimeException('complete() must not be used when tools are available.');
+            }
+
+            public function test(array $config = []): array
+            {
+                return [];
+            }
+        };
     }
 }

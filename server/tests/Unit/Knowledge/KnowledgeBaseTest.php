@@ -267,6 +267,27 @@ test('docs parser returns null for pages without an article', function () {
     expect((new DocsHtmlParser())->parse('<html><body><p>Not found</p></body></html>'))->toBeNull();
 });
 
+test('docs parser ignores comments and list markup that is not a list item', function () {
+    $html = <<<'HTML'
+<html><body><article>
+<h1>Map</h1><p>Pick a provider.</p>
+<div>
+  <!-- build note -->
+  <h2 id="providers">Providers</h2>
+  <ul><div>Not an item</div><li>Leaflet <!-- default --></li><li>Google</li></ul>
+</div>
+</article></body></html>
+HTML;
+
+    $result = (new DocsHtmlParser())->parse($html);
+
+    expect($result['title'])->toBe('Map')
+        ->and($result['sections'])->toHaveCount(1)
+        ->and($result['sections'][0])->toMatchArray(['heading' => 'Providers', 'content' => "- Leaflet\n- Google"])
+        ->and(json_encode($result))->not->toContain('build note')
+        ->and(json_encode($result))->not->toContain('Not an item');
+});
+
 test('audience classifier tags pages by path and never loosens a section', function () {
     $classifier = aiKnowledgeClassifier();
 
@@ -430,11 +451,12 @@ test('read returns sections by id or anchor and whole pages by url, respecting a
 test('docs site source discovers docs pages from the sitemap and parses them', function () {
     Http::swap(new HttpFactory());
     Http::fake([
-        'https://docs.test/sitemap.xml'                             => Http::response('<urlset><url><loc>https://docs.test/docs</loc></url><url><loc>https://docs.test/pricing</loc></url><url><loc>https://docs.test/docs/platform/identity-and-access/users</loc></url><url><loc>https://docs.test/docs/ui/buttons</loc></url><url><loc>https://docs.test/docs/fleet-ops/settings/map</loc></url><url><loc>https://docs.test/docs/api/fleetbase/orders</loc></url></urlset>'),
+        'https://docs.test/sitemap.xml'                             => Http::response('<urlset><url><loc>https://docs.test/docs</loc></url><url><loc>https://docs.test/pricing</loc></url><url><loc>https://docs.test/docs/platform/identity-and-access/users</loc></url><url><loc>https://docs.test/docs/ui/buttons</loc></url><url><loc>https://docs.test/docs/fleet-ops/settings/map</loc></url><url><loc>https://docs.test/docs/api/fleetbase/orders</loc></url><url><loc>https://docs.test/docs/ledger/overview</loc></url></urlset>'),
         'https://docs.test/docs/platform/identity-and-access/users' => Http::response('<article><h1>Users</h1><p>Manage users.</p><div><h2 id="invite">Invite</h2><p>Click Invite User.</p></div></article>'),
         'https://docs.test/docs/fleet-ops/settings/map'             => Http::response('Server error', 500),
         'https://docs.test/docs/api/fleetbase/orders'               => Http::response('<article><h1>Orders API</h1><div><p>Create orders.</p></div></article>'),
         'https://docs.test/docs'                                    => Http::response('<html><body>No article</body></html>'),
+        'https://docs.test/docs/ledger/overview'                    => fn () => throw new Illuminate\Http\Client\ConnectionException('Connection timed out'),
     ]);
 
     $source   = new DocsSiteSource(['sitemap_url' => 'https://docs.test/sitemap.xml', 'exclude' => ['ui'], 'request_delay_ms' => 0]);
@@ -449,6 +471,7 @@ test('docs site source discovers docs pages from the sitemap and parses them', f
         'https://docs.test/docs/platform/identity-and-access/users',
         'https://docs.test/docs/fleet-ops/settings/map',
         'https://docs.test/docs/api/fleetbase/orders',
+        'https://docs.test/docs/ledger/overview',
     ])
         ->and($documents)->toHaveCount(2)
         ->and($documents[0])->toMatchArray([
@@ -460,7 +483,7 @@ test('docs site source discovers docs pages from the sitemap and parses them', f
             'section'     => 'Platform › Identity & Access',
         ])
         ->and($documents[1]['section'])->toBe('API › Fleetbase')
-        ->and($source->failures)->toBe(['https://docs.test/docs', 'https://docs.test/docs/fleet-ops/settings/map'])
+        ->and($source->failures)->toBe(['https://docs.test/docs', 'https://docs.test/docs/fleet-ops/settings/map', 'https://docs.test/docs/ledger/overview'])
         ->and($progress)->toContain(['https://docs.test/docs/fleet-ops/settings/map', 'failed'])
         ->and($source->key())->toBe('fleetbase-docs')
         ->and($source->moduleFor(''))->toBe('overview')
@@ -509,4 +532,22 @@ test('docs tools search and read for the current audience with validation', func
         ->and($read->invoke($task, ['reference' => $found['results'][0]['url']], $context)['title'])->toBe('Users')
         ->and($read->invoke($task, ['reference' => ''], $context))->toBe(['error' => 'A documentation reference is required.'])
         ->and($read->invoke($task, ['reference' => 'https://fleetbase.io/docs/platform/system-setup/services'], $context)['error'])->toContain('not available');
+});
+
+test('knowledge models generate a uuid when one is not supplied', function () {
+    aiKnowledgeDatabase();
+    EloquentModel::setEventDispatcher(new Illuminate\Events\Dispatcher());
+    EloquentModel::clearBootedModels();
+
+    $document = AiKnowledgeDocument::create(['source' => 'fleetbase-docs', 'url' => 'https://fleetbase.io/docs/platform', 'title' => 'Platform']);
+    $chunk    = AiKnowledgeChunk::create(['ai_knowledge_document_uuid' => $document->uuid, 'heading' => 'Platform', 'content' => 'Body']);
+    $given    = AiKnowledgeChunk::create(['uuid' => '6f9619ff-8b86-d011-b42d-00cf4fc964ff', 'ai_knowledge_document_uuid' => $document->uuid, 'content' => 'Body']);
+
+    expect(Illuminate\Support\Str::isUuid((string) $document->uuid))->toBeTrue()
+        ->and(Illuminate\Support\Str::isUuid((string) $chunk->uuid))->toBeTrue()
+        ->and($given->uuid)->toBe('6f9619ff-8b86-d011-b42d-00cf4fc964ff')
+        ->and($document->chunks()->count())->toBe(2);
+
+    EloquentModel::unsetEventDispatcher();
+    EloquentModel::clearBootedModels();
 });

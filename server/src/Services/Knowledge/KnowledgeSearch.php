@@ -180,16 +180,12 @@ class KnowledgeSearch
 
     protected function pageSections(?AiKnowledgeDocument $document, array $allowed): array
     {
-        if (!$document) {
-            return [];
-        }
-
-        return $this->allowedChunks($document, $allowed)
+        return $document ? $this->allowedChunks($document, $allowed)
             ->pluck('heading')
             ->filter()
             ->unique()
             ->values()
-            ->all();
+            ->all() : [];
     }
 
     /**

@@ -18,42 +18,6 @@ use Fleetbase\Ai\Support\Capabilities\AbstractAIToolCapability;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 
-/**
- * Conversational provider that replays scripted turns and records every request.
- */
-function aiScriptedProvider(array $turns): AIConversationalProviderInterface
-{
-    return new class($turns) implements AIConversationalProviderInterface, AIProviderInterface {
-        public array $requests = [];
-
-        public function __construct(private array $turns)
-        {
-        }
-
-        public function supportsTools(array $config = []): bool
-        {
-            return true;
-        }
-
-        public function converse(string $system, array $messages, array $tools = [], array $options = []): AiProviderTurn
-        {
-            $this->requests[] = compact('system', 'messages', 'tools', 'options');
-
-            return array_shift($this->turns) ?? new AiProviderTurn(text: 'Fallback answer', provider: 'anthropic', model: 'claude-haiku-4-5');
-        }
-
-        public function complete(AiTask $task, array $messages = [], array $options = []): array
-        {
-            throw new RuntimeException('complete() must not be used when tools are available.');
-        }
-
-        public function test(array $config = []): array
-        {
-            return [];
-        }
-    };
-}
-
 function aiTestTool(string $name, callable $handler, array $permissions = [], array $required = ['query']): AbstractAIToolCapability
 {
     return new class($name, $handler, $permissions, $required) extends AbstractAIToolCapability {
@@ -253,7 +217,7 @@ test('task service answers through the tool runtime with conversation history an
                 new class extends AiAttachmentResolver {
                     public function resolveFromRequest(Request $request): array
                     {
-                        return [];
+                        return [['id' => 'file-1', 'preview' => 'manifest']];
                     }
                 },
                 new class extends AiTemporalContext {
@@ -309,8 +273,9 @@ test('task service answers through the tool runtime with conversation history an
     };
 
     $task = $service->createFromRequest(aiCreateRequest([
-        'prompt'  => 'Where do I add a user?',
-        'context' => ['route' => 'console.fleet-ops.operations.orders.index'],
+        'prompt'      => 'Where do I add a user?',
+        'context'     => ['route' => 'console.fleet-ops.operations.orders.index'],
+        'attachments' => ['file-1'],
     ]));
 
     $firstRequest = $provider->requests[0];
@@ -330,10 +295,13 @@ test('task service answers through the tool runtime with conversation history an
         ->and($firstRequest['messages'][2])->toBe(['role' => 'user', 'content' => 'Broken turn'])
         ->and($firstRequest['messages'][3]['content'])->toStartWith("<user_request>\nWhere do I add a user?\n</user_request>")
         ->and($firstRequest['messages'][3]['content'])->toContain('fleetbase.ai.temporal_context')
+        ->and($firstRequest['messages'][3]['content'])->toContain('fleetbase.ai.attachments')
+        ->and($task->metadata['attachments'])->toBe([['id' => 'file-1', 'preview' => 'manifest']])
         ->and($firstRequest['system'])->toContain('## Tools')
         ->and($firstRequest['system'])->toContain('search the documentation first')
         ->and($firstRequest['system'])->toContain('The user is currently on: Fleet-Ops › Operations › Orders')
-        ->and(array_map(fn ($step) => $step->type, $steps))->toBe(['temporal_context', 'provider_call', 'tool_call'])
+        ->and(array_map(fn ($step) => $step->type, $steps))->toBe(['temporal_context', 'attachment_context', 'provider_call', 'tool_call'])
+        ->and(collect($steps)->firstWhere('type', 'attachment_context')->input)->toBe(['attachments' => ['file-1']])
         ->and($providerStep->status)->toBe('completed')
         ->and($providerStep->input['tools'])->toBe(['search_docs'])
         ->and($providerStep->input['history'])->toHaveCount(3);

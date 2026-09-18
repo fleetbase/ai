@@ -44,12 +44,16 @@ function aiSyncDocsIndexer(): KnowledgeIndexer
     };
 }
 
-function aiRunSyncDocs(KnowledgeIndexer $indexer, array $input, string $snapshotPath = '/packaged/docs.json.gz'): array
+function aiRunSyncDocs(KnowledgeIndexer $indexer, array $input, string $snapshotPath = '/packaged/docs.json.gz', bool $verbose = false): array
 {
     $command = new SyncAiDocs();
     $command->setLaravel(new Illuminate\Container\Container());
     $output = new BufferedOutput();
     $input  = new ArrayInput($input, $command->getDefinition());
+
+    if ($verbose) {
+        $output->setVerbosity(BufferedOutput::VERBOSITY_VERBOSE);
+    }
 
     $command->setInput($input);
     $command->setOutput(new Illuminate\Console\OutputStyle($input, $output));
@@ -68,6 +72,14 @@ test('sync docs crawls and indexes the documentation site by default', function 
         ->and($indexer->calls)->toBe(['index'])
         ->and($output)->toContain('Failed: https://fleetbase.io/docs/b')
         ->and($output)->toContain('Documentation indexed: 3 updated, 2 unchanged, 1 failed, 0 removed.');
+});
+
+test('sync docs lists every fetched page when run verbosely', function () {
+    [$code, $output] = aiRunSyncDocs(aiSyncDocsIndexer(), [], '/packaged/docs.json.gz', true);
+
+    expect($code)->toBe(0)
+        ->and($output)->toContain('Fetched: https://fleetbase.io/docs/a')
+        ->and($output)->toContain('Failed: https://fleetbase.io/docs/b');
 });
 
 test('sync docs imports the packaged or a given snapshot', function () {

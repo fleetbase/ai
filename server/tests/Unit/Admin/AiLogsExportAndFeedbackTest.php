@@ -201,21 +201,40 @@ test('admin export requires content permission, logs access, and streams the cho
 
         protected function download(callable $callback, string $filename, string $contentType)
         {
-            return compact('filename', 'contentType');
+            ob_start();
+            $callback();
+            $body = ob_get_clean();
+
+            return compact('filename', 'contentType', 'body');
         }
     };
 
-    $response = $controller->export(aiAdminRequestDouble(['format' => 'csv', 'feedback' => 'negative', 'degraded' => '1', 'truncated' => '1'], true), new AiLogExporter());
-    $default  = $controller->export(aiAdminRequestDouble(['format' => 'xml', 'feedback' => 'positive'], true), new AiLogExporter());
+    $exporter = new class extends AiLogExporter {
+        public array $formats = [];
+
+        public function write(Builder $tasks, $handle, string $format = 'jsonl'): int
+        {
+            $this->formats[] = $format;
+            fwrite($handle, 'streamed as ' . $format);
+
+            return 1;
+        }
+    };
+
+    $response = $controller->export(aiAdminRequestDouble(['format' => 'csv', 'feedback' => 'negative', 'degraded' => '1', 'truncated' => '1'], true), $exporter);
+    $default  = $controller->export(aiAdminRequestDouble(['format' => 'xml', 'feedback' => 'positive'], true), $exporter);
 
     expect($response['contentType'])->toBe('text/csv')
         ->and($response['filename'])->toEndWith('.csv')
+        ->and($response['body'])->toBe('streamed as csv')
         ->and($default['contentType'])->toBe('application/x-ndjson')
+        ->and($default['body'])->toBe('streamed as jsonl')
+        ->and($exporter->formats)->toBe(['csv', 'jsonl'])
         ->and($controller->logs[0]['action'])->toBe('export_tasks')
         ->and($controller->logs[0]['metadata']['format'])->toBe('csv')
         ->and($controller->logs[0]['metadata']['filters'])->toMatchArray(['feedback' => 'negative'])
         ->and($controller->query->calls)->toContain(['where', 'feedback_rating', '>', 0, 'and'])
-        ->and(fn () => tap($controller, fn ($c) => $c->allowed = false)->export(aiAdminRequestDouble([], true), new AiLogExporter()))->toThrow(RuntimeException::class);
+        ->and(fn () => tap($controller, fn ($c) => $c->allowed = false)->export(aiAdminRequestDouble([], true), $exporter))->toThrow(RuntimeException::class);
 });
 
 test('session filters find sessions with rated, degraded, or truncated answers', function () {

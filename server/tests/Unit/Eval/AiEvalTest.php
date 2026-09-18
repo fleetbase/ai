@@ -257,3 +257,79 @@ test('ai:replay re-runs a recorded turn with its history and shows both answers'
         ->and($notFound)->toBe(1)
         ->and($notFoundOutput)->toContain('AI task not found');
 });
+
+test('ai:eval and ai:replay stop when the billed run is not confirmed', function () {
+    $provider = aiScriptedProvider([]);
+
+    $evaluate = new class extends EvaluateAi {
+        protected function systemConfig(): array
+        {
+            return ['enabled' => true, 'provider' => 'anthropic', 'default_model' => 'claude-haiku-4-5'];
+        }
+    };
+
+    $replay = new class extends ReplayAiTask {
+        protected function findTask(string $uuid): ?AiTask
+        {
+            return aiTaskDouble(['uuid' => $uuid, 'company_uuid' => 'company-1', 'prompt' => 'hi']);
+        }
+
+        protected function previousTurns(AiTask $task)
+        {
+            return collect();
+        }
+
+        protected function systemConfig(): array
+        {
+            return ['enabled' => true, 'provider' => 'anthropic', 'default_model' => 'claude-haiku-4-5'];
+        }
+    };
+
+    [$evalCode]   = aiEvalCommand(get_class($evaluate), $provider, ['--case' => ['add-user-where']]);
+    [$replayCode] = aiEvalCommand(get_class($replay), $provider, ['task' => 'task-1']);
+
+    expect($evalCode)->toBe(1)
+        ->and($replayCode)->toBe(1)
+        ->and($provider->requests)->toBe([]);
+});
+
+test('ai:replay needs a tool calling provider and warns about leaked route names', function () {
+    $withoutTools = new class implements Fleetbase\Ai\Contracts\AIProviderInterface {
+        public function complete(AiTask $task, array $messages = [], array $options = []): array
+        {
+            return [];
+        }
+
+        public function test(array $config = []): array
+        {
+            return [];
+        }
+    };
+
+    $leaking = aiScriptedProvider([new AiProviderTurn(text: 'Open console.iam.users.index and click New.', provider: 'anthropic', model: 'claude-haiku-4-5')]);
+
+    $command = new class extends ReplayAiTask {
+        protected function findTask(string $uuid): ?AiTask
+        {
+            return aiTaskDouble(['uuid' => $uuid, 'company_uuid' => 'company-2', 'prompt' => 'where do i add a user?', 'response' => 'Somewhere.']);
+        }
+
+        protected function previousTurns(AiTask $task)
+        {
+            return collect();
+        }
+
+        protected function systemConfig(): array
+        {
+            return ['enabled' => true, 'provider' => 'anthropic', 'default_model' => 'claude-haiku-4-5'];
+        }
+    };
+
+    [$unsupported, $unsupportedOutput] = aiEvalCommand(get_class($command), $withoutTools, ['task' => 'task-2', '--yes' => true]);
+    [$leaked, $leakedOutput]           = aiEvalCommand(get_class($command), $leaking, ['task' => 'task-2', '--yes' => true]);
+
+    expect($unsupported)->toBe(1)
+        ->and($unsupportedOutput)->toContain('Replays need an enabled OpenAI or Claude provider with tool calling.')
+        ->and($leaked)->toBe(0)
+        ->and($leakedOutput)->toContain('console.iam.users.index');
+});
