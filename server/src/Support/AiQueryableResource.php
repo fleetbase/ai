@@ -20,6 +20,7 @@ class AiQueryableResource
         public readonly ?string $directivePermission = null,
         public readonly int $defaultLimit = 10,
         public readonly int $maxLimit = 100,
+        public readonly ?string $description = null,
     ) {
     }
 
@@ -46,6 +47,19 @@ class AiQueryableResource
     public function hasField(string $field): bool
     {
         return isset($this->fields[$field]);
+    }
+
+    /**
+     * Allowed values for a field, when the resource declares them (e.g. order statuses).
+     */
+    public function enumFor(string $field): array
+    {
+        return (array) ($this->fields[$field]['enum'] ?? []);
+    }
+
+    public function typeFor(string $field): string
+    {
+        return (string) ($this->fields[$field]['type'] ?? 'string');
     }
 
     public function columnFor(string $field): ?string

@@ -1255,3 +1255,98 @@ body[data-theme='dark'] .fleetbase-ai-answer-header {
         animation: none;
     }
 }
+
+.fleetbase-ai-feedback {
+    display: flex;
+    gap: 4px;
+    margin-top: 6px;
+}
+
+.fleetbase-ai-feedback-button {
+    border: 1px solid transparent;
+    border-radius: 6px;
+    background: transparent;
+    padding: 3px 6px;
+    color: #94a3b8;
+    font-size: 12px;
+    line-height: 1;
+}
+
+.fleetbase-ai-feedback-button:hover,
+.fleetbase-ai-feedback-button:focus-visible {
+    border-color: rgb(148 163 184 / 30%);
+    color: #475569;
+}
+
+.fleetbase-ai-feedback-button.is-selected {
+    border-color: rgb(37 99 235 / 30%);
+    background: rgb(37 99 235 / 10%);
+    color: #1d4ed8;
+}
+
+body[data-theme='dark'] .fleetbase-ai-feedback-button:hover,
+body[data-theme='dark'] .fleetbase-ai-feedback-button:focus-visible {
+    color: #e2e8f0;
+}
+
+body[data-theme='dark'] .fleetbase-ai-feedback-button.is-selected {
+    color: #93c5fd;
+}
+
+.fleetbase-ai-ui-action[data-status='dismissed'],
+.fleetbase-ai-ui-action[data-status='confirmed'] {
+    opacity: 0.75;
+}
+
+.fleetbase-ai-admin-toggles {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.fleetbase-ai-admin-pagination {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.fleetbase-ai-admin-badge.is-danger {
+    background: rgb(239 68 68 / 12%);
+    color: #991b1b;
+}
+
+.fleetbase-ai-admin-badge.is-success {
+    background: rgb(34 197 94 / 12%);
+    color: #166534;
+}
+
+.fleetbase-ai-admin-badge.is-warning {
+    background: rgb(245 158 11 / 14%);
+    color: #92400e;
+}
+
+.fleetbase-ai-admin-step-detail pre {
+    max-height: 320px;
+    overflow: auto;
+    white-space: pre-wrap;
+    word-break: break-word;
+    font-size: 11px;
+}
+
+.fleetbase-ai-admin-step-detail h4 {
+    margin: 6px 0 2px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.fleetbase-ai-admin-help {
+    margin: 0 0 10px;
+    color: #475569;
+    font-size: 13px;
+    line-height: 1.45;
+}
+
+body[data-theme='dark'] .fleetbase-ai-admin-help {
+    color: #cbd5e1;
+}

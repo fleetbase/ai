@@ -33,8 +33,10 @@ export default class AdminAiUsageAnalyticsComponent extends Component {
 
     statusOptions = [
         { label: 'Any status', value: '' },
-        { label: 'Completed', value: 'completed' },
+        { label: 'Answered', value: 'answered' },
+        { label: 'Applied', value: 'applied' },
         { label: 'Failed', value: 'failed' },
+        { label: 'Apply failed', value: 'apply_failed' },
         { label: 'Cancelled', value: 'cancelled' },
         { label: 'Running', value: 'running' },
     ];

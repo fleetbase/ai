@@ -3,11 +3,16 @@
 namespace Fleetbase\Ai\Services;
 
 use Fleetbase\Ai\Contracts\AIActionCapabilityInterface;
+use Fleetbase\Ai\Contracts\AIConversationalProviderInterface;
 use Fleetbase\Ai\Contracts\AIProviderInterface;
 use Fleetbase\Ai\Models\AiSession;
 use Fleetbase\Ai\Models\AiTask;
 use Fleetbase\Ai\Models\AiTaskStep;
+use Fleetbase\Ai\Support\AiActionPreview;
+use Fleetbase\Ai\Support\AiAudience;
 use Fleetbase\Ai\Support\AiCapabilityRegistry;
+use Fleetbase\Ai\Support\AiSystemPrompt;
+use Fleetbase\Ai\Support\AiToolContext;
 use Fleetbase\Models\Setting;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
@@ -16,6 +21,11 @@ use Illuminate\Support\Str;
 
 class AiTaskService
 {
+    /**
+     * Maximum characters of each previous answer included in session history.
+     */
+    public const HISTORY_RESPONSE_LIMIT = 3000;
+
     public function __construct(protected AIProviderInterface $provider, protected AiContextResolver $contextResolver, protected AiCapabilityRegistry $registry, protected AiAttachmentResolver $attachmentResolver, protected AiTemporalContext $temporalContext)
     {
     }
@@ -42,15 +52,24 @@ class AiTaskService
             'started_at'       => now(),
         ]);
 
+        if ($this->usesTools($config)) {
+            return $this->answerWithTools($request, $task, $session, $config, $attachments);
+        }
+
+        $audience          = $this->audienceFor($request);
         $temporalContext   = $this->temporalContext->context();
         $capabilityContext = $this->contextResolver->resolve($task);
+        $degraded          = AiContextResolver::hasFailures($capabilityContext);
         $actionPreviews    = $this->resolveActionPreviews($task);
         $sessionContext    = $this->sessionContext($task);
         $attachmentContext = $this->attachmentResolver->contextFor($attachments);
-        $providerContext   = array_values(array_filter(array_merge([$temporalContext], $sessionContext ? [$sessionContext] : [], $attachmentContext ? [$attachmentContext] : [], $capabilityContext)));
+        $providerContext   = array_values(array_filter(array_merge([$temporalContext], $sessionContext ? [$sessionContext] : [], $attachmentContext ? [$attachmentContext] : [], AiContextResolver::forProvider($capabilityContext))));
+        $systemPrompt      = AiSystemPrompt::build($audience, [
+            'page' => AiSystemPrompt::pageName(data_get($task->context, 'route')),
+        ]);
 
         $task->update([
-            'metadata' => array_merge((array) $task->metadata, ['temporal_context' => $temporalContext]),
+            'metadata' => array_merge((array) $task->metadata, ['temporal_context' => $temporalContext, 'audience' => $audience->toArray(), 'degraded' => $degraded]),
         ]);
 
         $this->recordStep($task, [
@@ -106,13 +125,14 @@ class AiTaskService
             'status'     => 'running',
             'provider'   => $provider,
             'model'      => $model,
-            'input'      => ['prompt' => $task->prompt, 'context' => $task->context, 'capability_context' => $providerContext],
+            'input'      => ['prompt' => $task->prompt, 'context' => $task->context, 'system_prompt' => $systemPrompt, 'capability_context' => $providerContext],
             'started_at' => now(),
         ]);
 
         try {
             $result = $this->provider->complete($task, $providerContext, [
-                'config' => $config,
+                'config'        => $config,
+                'system_prompt' => $systemPrompt,
             ]);
 
             $usage = Arr::get($result, 'usage', []);
@@ -126,7 +146,7 @@ class AiTaskService
                 'input_tokens'     => Arr::get($usage, 'input_tokens'),
                 'output_tokens'    => Arr::get($usage, 'output_tokens'),
                 'total_tokens'     => Arr::get($usage, 'total_tokens'),
-                'metadata'         => array_merge((array) Arr::get($result, 'metadata', []), ['attachments' => $attachments, 'temporal_context' => $temporalContext, 'capability_context' => $capabilityContext, 'action_previews' => $actionPreviews]),
+                'metadata'         => array_merge((array) Arr::get($result, 'metadata', []), ['attachments' => $attachments, 'temporal_context' => $temporalContext, 'capability_context' => $capabilityContext, 'action_previews' => $actionPreviews, 'audience' => $audience->toArray(), 'degraded' => $degraded]),
                 'completed_at'     => now(),
             ]);
 
@@ -150,16 +170,162 @@ class AiTaskService
         return $task->fresh(['steps', 'session']);
     }
 
+    /**
+     * Whether this turn runs as a tool-calling conversation with a live provider.
+     */
+    public function usesTools(array $config): bool
+    {
+        return $this->provider instanceof AIConversationalProviderInterface && $this->provider->supportsTools($config);
+    }
+
+    /**
+     * Answer a prompt with the tool-calling runtime: the model gathers Fleetbase documentation and data
+     * through permission-checked tools instead of keyword-selected context.
+     */
+    protected function answerWithTools(Request $request, AiTask $task, AiSession $session, array $config, array $attachments): AiTask
+    {
+        $audience          = $this->audienceFor($request);
+        $toolContext       = new AiToolContext($task, $audience);
+        $runner            = $this->agentRunner();
+        $tools             = $runner->toolsFor($toolContext);
+        $temporalContext   = $this->temporalContext->context();
+        $attachmentContext = $this->attachmentResolver->contextFor($attachments);
+        $turnContext       = array_values(array_filter([$temporalContext, $attachmentContext]));
+        $history           = $this->conversationHistory($task);
+        $userMessage       = AiSystemPrompt::userMessage($task, $turnContext);
+        $systemPrompt      = AiSystemPrompt::build($audience, [
+            'page'     => AiSystemPrompt::pageName(data_get($task->context, 'route')),
+            'has_docs' => isset($tools['search_docs']),
+            'tools'    => !empty($tools),
+            'commands' => isset($tools['propose_console_command']),
+        ]);
+
+        $task->update([
+            'metadata' => array_merge((array) $task->metadata, ['temporal_context' => $temporalContext, 'audience' => $audience->toArray()]),
+        ]);
+
+        $this->recordStep($task, [
+            'type'         => 'temporal_context',
+            'status'       => 'completed',
+            'output'       => $temporalContext,
+            'completed_at' => now(),
+        ]);
+
+        if (!empty($attachments)) {
+            $this->recordStep($task, [
+                'type'         => 'attachment_context',
+                'status'       => 'completed',
+                'input'        => ['attachments' => $request->input('attachments', [])],
+                'output'       => ['attachments' => $attachments],
+                'completed_at' => now(),
+            ]);
+        }
+
+        $step = $this->recordStep($task, [
+            'type'       => 'provider_call',
+            'status'     => 'running',
+            'provider'   => $task->provider,
+            'model'      => $task->model,
+            'input'      => [
+                'prompt'        => $task->prompt,
+                'context'       => $task->context,
+                'system_prompt' => $systemPrompt,
+                'history'       => $history,
+                'user_message'  => $userMessage,
+                'tools'         => array_keys($tools),
+            ],
+            'started_at' => now(),
+        ]);
+
+        try {
+            $result = $runner->run($task, $toolContext, $systemPrompt, $history, $userMessage, $config, fn (array $attributes) => $this->recordStep($task, $attributes));
+            $usage  = Arr::get($result, 'usage', []);
+
+            $task->update([
+                'status'           => 'answered',
+                'provider'         => Arr::get($result, 'provider', $task->provider),
+                'model'            => Arr::get($result, 'model', $task->model),
+                'response'         => Arr::get($result, 'content'),
+                'response_summary' => Arr::get($result, 'summary'),
+                'usage'            => $usage,
+                'input_tokens'     => Arr::get($usage, 'input_tokens'),
+                'output_tokens'    => Arr::get($usage, 'output_tokens'),
+                'total_tokens'     => Arr::get($usage, 'total_tokens'),
+                'metadata'         => array_merge((array) Arr::get($result, 'metadata', []), [
+                    'attachments'      => $attachments,
+                    'temporal_context' => $temporalContext,
+                    'audience'         => $audience->toArray(),
+                    'action_previews'  => $toolContext->actionPreviews,
+                    'ui_actions'       => $toolContext->uiActions,
+                ]),
+                'completed_at'     => now(),
+            ]);
+
+            $this->touchSessionForTask($session, $task);
+
+            $step->update([
+                'status'       => 'completed',
+                'provider'     => $task->provider,
+                'model'        => $task->model,
+                'output'       => $result,
+                'usage'        => $usage,
+                'completed_at' => now(),
+            ]);
+        } catch (\Throwable $e) {
+            $error = ['message' => $e->getMessage(), 'type' => get_class($e)];
+            $task->update(['status' => 'failed', 'error' => $error, 'completed_at' => now()]);
+            $this->touchSessionForTask($session, $task);
+            $step->update(['status' => 'failed', 'error' => $error, 'completed_at' => now()]);
+        }
+
+        return $task->fresh(['steps', 'session']);
+    }
+
+    /**
+     * Previous turns of the session as real conversation messages, oldest first.
+     */
+    protected function conversationHistory(AiTask $task): array
+    {
+        if (!$task->ai_session_uuid) {
+            return [];
+        }
+
+        return $this->sessionHistoryForTask($task)
+            ->whereNotNull('prompt')
+            ->latest()
+            ->limit(8)
+            ->get()
+            ->reverse()
+            ->flatMap(function (AiTask $turn) {
+                $response = trim((string) ($turn->response ?: $turn->response_summary));
+
+                return array_values(array_filter([
+                    ['role' => 'user', 'content' => (string) $turn->prompt],
+                    $response !== '' ? ['role' => 'assistant', 'content' => Str::limit($response, static::HISTORY_RESPONSE_LIMIT, '…')] : null,
+                ]));
+            })
+            ->values()
+            ->all();
+    }
+
+    protected function agentRunner(): AiAgentRunner
+    {
+        return new AiAgentRunner($this->provider, $this->registry);
+    }
+
     public function apply(AiTask $task, ?string $actionKey = null, array $input = []): AiTask
     {
-        $previews = collect((array) data_get($task->metadata, 'action_previews', []));
-        $preview  = $actionKey
-            ? $previews->firstWhere('key', $actionKey)
-            : $previews->first();
+        $previewId = $input['preview_id'] ?? null;
+        unset($input['preview_id']);
+
+        $preview = AiActionPreview::find((array) data_get($task->metadata, 'action_previews', []), $previewId, $actionKey);
         $actionKey ??= is_array($preview) ? ($preview['key'] ?? null) : null;
+        if ($previewId && is_array($preview)) {
+            $actionKey = $preview['key'] ?? $actionKey;
+        }
 
         $capability = $actionKey ? $this->registry->get($actionKey) : null;
-        if (!$capability instanceof AIActionCapabilityInterface) {
+        if (!$capability instanceof AIActionCapabilityInterface || ($previewId && !$preview)) {
             $this->recordStep($task, [
                 'type'         => 'apply',
                 'status'       => 'cancelled',
@@ -181,7 +347,7 @@ class AiTaskService
         ]);
 
         try {
-            $result                     = $capability->apply($task, (array) $preview, $input);
+            $result                     = array_merge($capability->apply($task, (array) $preview, $input), array_filter(['preview_id' => $preview['preview_id'] ?? null]));
             $metadata                   = (array) $task->metadata;
             $metadata['action_results'] = array_values(array_merge((array) data_get($metadata, 'action_results', []), [$result]));
 
@@ -197,7 +363,7 @@ class AiTaskService
                 'completed_at' => now(),
             ]);
         } catch (\Throwable $e) {
-            $error                     = ['message' => $e->getMessage(), 'type' => get_class($e)];
+            $error                     = array_filter(['message' => $e->getMessage(), 'type' => get_class($e), 'action' => $capability->key(), 'preview_id' => $preview['preview_id'] ?? null]);
             $metadata                  = (array) $task->metadata;
             $metadata['action_errors'] = array_values(array_merge((array) data_get($metadata, 'action_errors', []), [$error]));
 
@@ -232,6 +398,15 @@ class AiTaskService
 
     public function refreshPreview(AiTask $task, ?string $actionKey = null, array $input = []): AiTask
     {
+        $previewId = $input['preview_id'] ?? null;
+        unset($input['preview_id']);
+
+        $metadata = (array) $task->metadata;
+        $existing = AiActionPreview::find((array) data_get($metadata, 'action_previews', []), $previewId, $actionKey);
+        if ($previewId && $existing) {
+            $actionKey = $existing['key'] ?? $actionKey;
+        }
+
         $capability = $actionKey ? $this->registry->get($actionKey) : null;
         if (!$capability instanceof AIActionCapabilityInterface) {
             $this->recordStep($task, [
@@ -245,18 +420,20 @@ class AiTaskService
             return $task->fresh(['steps', 'session']);
         }
 
-        $preview  = $this->normalizeActionPreview($capability, $capability->preview($task, $input));
-        $metadata = (array) $task->metadata;
+        // The capability refreshes the preview being edited, not whichever preview happens to be first.
+        $capabilityInput = $existing && isset($existing['draft']) ? array_merge($input, ['existing_draft' => $existing['draft']]) : $input;
+
+        $preview  = AiActionPreview::normalize($capability, $capability->preview($task, $capabilityInput), $existing['preview_id'] ?? null);
         $previews = collect((array) data_get($metadata, 'action_previews', []));
         $updated  = false;
-        $previews = $previews->map(function ($existing) use ($preview, &$updated) {
-            if (($existing['key'] ?? $existing['action'] ?? null) === ($preview['key'] ?? $preview['action'] ?? null)) {
+        $previews = $previews->map(function ($current) use ($preview, &$updated) {
+            if (!$updated && is_array($current) && AiActionPreview::same($current, $preview)) {
                 $updated = true;
 
                 return $preview;
             }
 
-            return $existing;
+            return $current;
         });
 
         if (!$updated) {
@@ -280,16 +457,7 @@ class AiTaskService
 
     protected function normalizeActionPreview(AIActionCapabilityInterface $capability, array $preview): array
     {
-        return array_merge([
-            'key'          => $capability->key(),
-            'label'        => $capability->label(),
-            'module'       => $capability->module(),
-            'type'         => $capability->type(),
-            'mode'         => $capability->mode(),
-            'permissions'  => $capability->permissions(),
-            'preview_only' => $capability->previewOnly(),
-            'executable'   => $capability->executable(),
-        ], $preview);
+        return AiActionPreview::normalize($capability, $preview);
     }
 
     protected function resolveSessionForRequest(Request $request): AiSession
@@ -377,9 +545,11 @@ class AiTaskService
             ->get()
             ->reverse()
             ->map(function (AiTask $turn) {
+                // Send the answer itself, not the 140 character display summary, so follow-ups such as
+                // "yes" or "2" can be resolved against what was actually offered.
                 return [
                     'prompt'   => $turn->prompt,
-                    'response' => $turn->response_summary ?: Str::limit(trim((string) $turn->response), 600, ''),
+                    'response' => Str::limit(trim((string) ($turn->response ?: $turn->response_summary)), static::HISTORY_RESPONSE_LIMIT, '…'),
                     'status'   => $turn->status,
                 ];
             })
@@ -393,12 +563,17 @@ class AiTaskService
         return [
             'capability'  => 'fleetbase.ai.session_context',
             'type'        => 'session_context',
-            'instruction' => 'Use this recent Fleetbase AI chat history as conversation context. Do not repeat questions already answered by the user in earlier turns.',
+            'instruction' => 'Recent Fleetbase AI chat history, oldest first. Use it to understand follow-ups: when the user replies to an earlier question or offer (for example "yes" or a number from a list), act on that offer. Do not repeat questions the user already answered.',
             'data'        => [
                 'session_uuid' => $task->ai_session_uuid,
                 'turns'        => $turns,
             ],
         ];
+    }
+
+    protected function audienceFor(Request $request): AiAudience
+    {
+        return AiAudience::forUser($request->user());
     }
 
     /**

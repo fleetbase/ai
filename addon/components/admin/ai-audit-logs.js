@@ -8,16 +8,10 @@ export default class AdminAiAuditLogsComponent extends Component {
     @service fetch;
     @service notifications;
 
-    @tracked filters = {
-        search: '',
-        status: '',
-        provider: '',
-        model: '',
-        company_uuid: '',
-        created_by_uuid: '',
-        from: '',
-        to: '',
-    };
+    @tracked filters = this.emptyFilters();
+    @tracked page = 1;
+    @tracked hasMore = false;
+    @tracked expandedStep = null;
     @tracked sessions = [];
     @tracked selectedSession = null;
     @tracked selectedTask = null;
@@ -27,14 +21,26 @@ export default class AdminAiAuditLogsComponent extends Component {
     @tracked selectedUser = null;
     @tracked dateRange = null;
 
-    statusOptions = [
-        { label: 'Any status', value: '' },
+    sessionStatusOptions = [
+        { label: 'Any session status', value: '' },
         { label: 'Active', value: 'active' },
         { label: 'Ended', value: 'ended' },
-        { label: 'Completed', value: 'completed' },
+    ];
+
+    taskStatusOptions = [
+        { label: 'Any answer status', value: '' },
+        { label: 'Answered', value: 'answered' },
+        { label: 'Applied', value: 'applied' },
         { label: 'Failed', value: 'failed' },
+        { label: 'Apply failed', value: 'apply_failed' },
         { label: 'Cancelled', value: 'cancelled' },
         { label: 'Running', value: 'running' },
+    ];
+
+    feedbackOptions = [
+        { label: 'Any feedback', value: '' },
+        { label: 'Not helpful', value: 'negative' },
+        { label: 'Helpful', value: 'positive' },
     ];
 
     constructor() {
@@ -80,14 +86,43 @@ export default class AdminAiAuditLogsComponent extends Component {
     }
 
     get selectedTaskSteps() {
-        return this.selectedTask?.steps ?? [];
+        return (this.selectedTask?.steps ?? []).map((step) => ({
+            ...step,
+            key: step.uuid ?? step.id,
+            label: step.type === 'tool_call' ? `Tool: ${step.input?.name ?? step.tool ?? 'unknown'}` : step.type,
+            isExpanded: this.expandedStep === (step.uuid ?? step.id),
+            inputJson: this.formatJson(step.input),
+            outputJson: this.formatJson(step.output),
+            errorJson: this.formatJson(step.error),
+        }));
     }
 
-    @task *loadSessions() {
+    get hasPreviousPage() {
+        return this.page > 1;
+    }
+
+    get selectedTaskSummary() {
+        return this.selectedTask?.metadata ?? {};
+    }
+
+    @task *loadSessions(page = 1) {
         try {
-            const response = yield this.fetch.get('admin/sessions', this.cleanFilters({ ...this.filters, limit: 50 }), { namespace: 'ai/int/v1' });
+            const response = yield this.fetch.get('admin/sessions', this.cleanFilters({ ...this.filters, limit: 50, page }), { namespace: 'ai/int/v1' });
             this.sessions = response.sessions ?? [];
+            this.page = response.meta?.page ?? page;
+            this.hasMore = response.meta?.has_more === true;
             this.canRevealContent = response.meta?.can_reveal_content === true;
+        } catch (error) {
+            this.notifications.serverError(error);
+        }
+    }
+
+    @task *exportLogs(format = 'jsonl') {
+        try {
+            yield this.fetch.download('admin/export', this.cleanFilters({ ...this.filters, status: this.filters.task_status, format }), {
+                namespace: 'ai/int/v1',
+                fileName: `fleetbase-ai-logs.${format}`,
+            });
         } catch (error) {
             this.notifications.serverError(error);
         }
@@ -228,9 +263,49 @@ export default class AdminAiAuditLogsComponent extends Component {
     }
 
     @action clearFilters() {
+        this.filters = this.emptyFilters();
+        this.selectedCompany = null;
+        this.selectedUser = null;
+        this.dateRange = null;
+        this.loadSessions.perform(1);
+    }
+
+    @action toggleFilter(field) {
         this.filters = {
+            ...this.filters,
+            [field]: this.filters[field] ? '' : '1',
+        };
+    }
+
+    @action search() {
+        this.loadSessions.perform(1);
+    }
+
+    @action nextPage() {
+        this.loadSessions.perform(this.page + 1);
+    }
+
+    @action previousPage() {
+        this.loadSessions.perform(Math.max(this.page - 1, 1));
+    }
+
+    @action toggleStep(step) {
+        const id = step?.uuid ?? step?.id;
+        this.expandedStep = this.expandedStep === id ? null : id;
+    }
+
+    formatJson(value) {
+        return value === null || value === undefined ? '' : JSON.stringify(value, null, 2);
+    }
+
+    emptyFilters() {
+        return {
             search: '',
             status: '',
+            task_status: '',
+            feedback: '',
+            degraded: '',
+            truncated: '',
             provider: '',
             model: '',
             company_uuid: '',
@@ -238,10 +313,6 @@ export default class AdminAiAuditLogsComponent extends Component {
             from: '',
             to: '',
         };
-        this.selectedCompany = null;
-        this.selectedUser = null;
-        this.dateRange = null;
-        this.loadSessions.perform();
     }
 
     @action selectSession(session) {

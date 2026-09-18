@@ -361,8 +361,13 @@ test('context resolver includes only resolvable context capabilities and capture
         ->and($context[0]['key'])->toBe('fleetbase.resolve')
         ->and($context[0]['result'])->toBe(['route' => 'fleet-ops.orders.index'])
         ->and($context[1]['key'])->toBe('fleetbase.failing')
-        ->and($context[1]['result']['error']['message'])->toBe('Context source failed.')
-        ->and($context[1]['result']['error']['type'])->toBe(RuntimeException::class);
+        ->and($context[1]['result'])->toBe(['error' => 'capability_unavailable'])
+        ->and($context[1]['failure']['message'])->toBe('Context source failed.')
+        ->and($context[1]['failure']['type'])->toBe(RuntimeException::class)
+        ->and(AiContextResolver::hasFailures($context))->toBeTrue()
+        ->and(AiContextResolver::hasFailures([$context[0]]))->toBeFalse()
+        ->and(AiContextResolver::forProvider($context)[1])->not->toHaveKey('failure')
+        ->and(json_encode(AiContextResolver::forProvider($context)))->not->toContain('Context source failed.');
 });
 
 test('relative date resolver covers units and named date windows', function () {

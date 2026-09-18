@@ -3,9 +3,14 @@
 namespace Fleetbase\Ai\Http\Controllers\Internal;
 
 use Carbon\Carbon;
+use Fleetbase\Ai\Jobs\SyncAiKnowledge;
 use Fleetbase\Ai\Models\AiAdminAccessLog;
+use Fleetbase\Ai\Models\AiKnowledgeChunk;
+use Fleetbase\Ai\Models\AiKnowledgeDocument;
 use Fleetbase\Ai\Models\AiSession;
 use Fleetbase\Ai\Models\AiTask;
+use Fleetbase\Ai\Services\AiLogExporter;
+use Fleetbase\Ai\Services\Knowledge\KnowledgeBootstrapper;
 use Fleetbase\Http\Controllers\Controller;
 use Fleetbase\Http\Requests\AdminRequest;
 use Fleetbase\Models\Company;
@@ -87,12 +92,17 @@ class AiAdminController extends Controller
 
         $this->applySessionFilters($query, $request);
 
-        $limit = min(max((int) $request->input('limit', 30), 1), 100);
+        $limit    = min(max((int) $request->input('limit', 30), 1), 100);
+        $page     = max((int) $request->input('page', 1), 1);
+        $sessions = $query->offset(($page - 1) * $limit)->limit($limit + 1)->get();
 
         return response()->json([
-            'sessions' => $query->limit($limit)->get()->map(fn (AiSession $session) => $this->serializeSession($session)),
+            'sessions' => $sessions->take($limit)->map(fn (AiSession $session) => $this->serializeSession($session))->values(),
             'meta'     => [
                 'can_reveal_content' => $this->can($request, 'ai view task content'),
+                'page'               => $page,
+                'limit'              => $limit,
+                'has_more'           => $sessions->count() > $limit,
             ],
         ]);
     }
@@ -171,7 +181,7 @@ class AiAdminController extends Controller
             ->selectRaw('COALESCE(SUM(output_tokens), 0) as output_tokens')
             ->selectRaw('COALESCE(SUM(total_tokens), 0) as total_tokens')
             ->selectRaw("SUM(CASE WHEN status = 'failed' THEN 1 ELSE 0 END) as failed_count")
-            ->selectRaw("SUM(CASE WHEN status = 'completed' THEN 1 ELSE 0 END) as completed_count")
+            ->selectRaw("SUM(CASE WHEN status IN ('answered', 'applied') THEN 1 ELSE 0 END) as completed_count")
             ->first();
 
         return response()->json([
@@ -190,6 +200,103 @@ class AiAdminController extends Controller
             'by_status'  => $this->usageGroup(clone $base, 'status'),
             'by_day'     => $this->usageByDay(clone $base),
         ]);
+    }
+
+    /**
+     * Download matching tasks with their steps as JSON Lines or CSV. Exports include prompts and responses,
+     * so they require the same permission as revealing content and are recorded in the access log.
+     */
+    public function export(AdminRequest $request, AiLogExporter $exporter)
+    {
+        abort_unless($this->can($request, 'ai view task content'), 403, 'You are not authorized to export AI task content.');
+
+        $format = in_array($request->input('format'), AiLogExporter::FORMATS, true) ? $request->input('format') : 'jsonl';
+        $query  = $this->tasksQuery()->latest('id');
+        $this->applyTaskFilters($query, $request);
+
+        $this->createAccessLog([
+            'viewed_by_uuid' => optional($request->user())->uuid,
+            'action'         => 'export_tasks',
+            'ip_address'     => $request->ip(),
+            'user_agent'     => substr((string) $request->userAgent(), 0, 1000),
+            'metadata'       => ['format' => $format, 'filters' => collect(['company_uuid', 'created_by_uuid', 'status', 'provider', 'model', 'from', 'to', 'feedback', 'degraded', 'truncated'])->mapWithKeys(fn ($key) => [$key => $request->input($key)])->filter()->all()],
+        ]);
+
+        return $this->download(function () use ($exporter, $query, $format) {
+            $handle = fopen('php://output', 'w');
+            $exporter->write($query, $handle, $format);
+            fclose($handle);
+        }, 'fleetbase-ai-logs-' . now()->format('Y-m-d-His') . '.' . $format, $format === 'csv' ? 'text/csv' : 'application/x-ndjson');
+    }
+
+    /**
+     * @codeCoverageIgnore
+     */
+    protected function download(callable $callback, string $filename, string $contentType)
+    {
+        return response()->streamDownload($callback, $filename, ['Content-Type' => $contentType]);
+    }
+
+    /**
+     * Documentation index status. Only system administrators manage the knowledge base.
+     */
+    public function knowledge(AdminRequest $request, KnowledgeBootstrapper $bootstrapper)
+    {
+        abort_unless($this->isSystemAdmin($request), 403, 'Only system administrators can manage the AI knowledge base.');
+
+        return response()->json(['knowledge' => array_merge($this->knowledgeStats(), [
+            'snapshot_available' => is_file($bootstrapper->snapshotPath()),
+            'docs_enabled'       => (bool) config('ai.knowledge.docs.enabled', true),
+        ])]);
+    }
+
+    /**
+     * Queue a refresh of the documentation index from the docs site, or from the packaged snapshot.
+     */
+    public function syncKnowledge(AdminRequest $request)
+    {
+        abort_unless($this->isSystemAdmin($request), 403, 'Only system administrators can manage the AI knowledge base.');
+
+        $source = $request->input('source') === 'snapshot' ? 'snapshot' : 'site';
+
+        $this->createAccessLog([
+            'viewed_by_uuid' => optional($request->user())->uuid,
+            'action'         => 'knowledge_sync',
+            'ip_address'     => $request->ip(),
+            'user_agent'     => substr((string) $request->userAgent(), 0, 1000),
+            'metadata'       => ['source' => $source],
+        ]);
+
+        $this->dispatchKnowledgeSync($source);
+
+        return response()->json(['status' => 'queued', 'source' => $source]);
+    }
+
+    protected function isSystemAdmin(AdminRequest $request): bool
+    {
+        return data_get($request->user(), 'type') === 'admin' || optional($request->user())->isAdmin() === true;
+    }
+
+    /**
+     * @codeCoverageIgnore
+     */
+    protected function knowledgeStats(): array
+    {
+        return [
+            'documents'    => AiKnowledgeDocument::count(),
+            'chunks'       => AiKnowledgeChunk::count(),
+            'by_audience'  => AiKnowledgeDocument::query()->selectRaw('audience, count(*) as total')->groupBy('audience')->pluck('total', 'audience')->all(),
+            'by_module'    => AiKnowledgeDocument::query()->selectRaw('module, count(*) as total')->groupBy('module')->orderByDesc('total')->pluck('total', 'module')->all(),
+            'last_synced'  => optional(AiKnowledgeDocument::max('fetched_at') ? Carbon::parse(AiKnowledgeDocument::max('fetched_at')) : null)->toIso8601String(),
+        ];
+    }
+
+    /**
+     * @codeCoverageIgnore
+     */
+    protected function dispatchKnowledgeSync(string $source): void
+    {
+        SyncAiKnowledge::dispatch($source);
     }
 
     protected function applySessionFilters(Builder $query, AdminRequest $request): void
@@ -239,6 +346,37 @@ class AiAdminController extends Controller
                 }
             });
         }
+
+        if ($request->filled('task_status') || $request->filled('feedback') || $request->boolean('degraded') || $request->boolean('truncated')) {
+            $query->whereHas('tasks', function (Builder $query) use ($request) {
+                if ($request->filled('task_status')) {
+                    $query->where('status', $request->input('task_status'));
+                }
+
+                $this->applyQualityFilters($query, $request);
+            });
+        }
+    }
+
+    /**
+     * Filters that find answers worth reviewing: rated by the user, degraded by an unavailable
+     * capability, or cut off at the output limit.
+     */
+    protected function applyQualityFilters(Builder $query, AdminRequest $request): void
+    {
+        if ($request->input('feedback') === 'negative') {
+            $query->where('feedback_rating', '<', 0);
+        } elseif ($request->input('feedback') === 'positive') {
+            $query->where('feedback_rating', '>', 0);
+        }
+
+        if ($request->boolean('degraded')) {
+            $query->where('metadata->degraded', true);
+        }
+
+        if ($request->boolean('truncated')) {
+            $query->where('metadata->truncated', true);
+        }
     }
 
     protected function applyTaskFilters(Builder $query, AdminRequest $request): void
@@ -256,6 +394,8 @@ class AiAdminController extends Controller
         if ($request->filled('to')) {
             $query->where('created_at', '<=', Carbon::parse($request->input('to'))->endOfDay());
         }
+
+        $this->applyQualityFilters($query, $request);
     }
 
     protected function findSession(string $id): AiSession
@@ -357,6 +497,8 @@ class AiAdminController extends Controller
             'input_tokens'      => (int) ($task->input_tokens ?? 0),
             'output_tokens'     => (int) ($task->output_tokens ?? 0),
             'total_tokens'      => (int) ($task->total_tokens ?? 0),
+            'feedback_rating'   => $task->feedback_rating,
+            'feedback_comment'  => $includeContent ? $task->feedback_comment : null,
             'prompt_excerpt'    => $this->excerpt($task->prompt),
             'response_summary'  => $responseSummary,
             'prompt'            => $includeContent ? $task->prompt : null,
@@ -436,6 +578,12 @@ class AiAdminController extends Controller
             'action_results_count'  => count((array) data_get($metadata, 'action_results', [])),
             'action_errors_count'   => count((array) data_get($metadata, 'action_errors', [])),
             'attachments_count'     => count((array) data_get($metadata, 'attachments', [])),
+            'ui_actions_count'      => count((array) data_get($metadata, 'ui_actions', [])),
+            'mode'                  => data_get($metadata, 'mode'),
+            'tool_calls'            => (int) data_get($metadata, 'tool_calls', 0),
+            'degraded'              => (bool) data_get($metadata, 'degraded', false),
+            'truncated'             => (bool) data_get($metadata, 'truncated', false),
+            'refused'               => (bool) data_get($metadata, 'refused', false),
         ];
     }
 

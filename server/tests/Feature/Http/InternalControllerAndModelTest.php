@@ -28,125 +28,6 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 
-if (!function_exists('aiAdminRequestDouble')) {
-    function aiAdminRequestDouble(array $input = [], bool $admin = false): Fleetbase\Http\Requests\AdminRequest
-    {
-        return new class($input, $admin) extends Fleetbase\Http\Requests\AdminRequest {
-            public function __construct(private array $values, private bool $admin)
-            {
-            }
-
-            public function input($key = null, $default = null)
-            {
-                if ($key === null) {
-                    return $this->values;
-                }
-
-                return data_get($this->values, $key, $default);
-            }
-
-            public function filled($key)
-            {
-                $value = $this->input($key);
-
-                return $value !== null && $value !== '';
-            }
-
-            public function searchQuery()
-            {
-                return $this->input('search');
-            }
-
-            public function user($guard = null)
-            {
-                return new class($this->admin) {
-                    public string $uuid = 'admin-user-uuid';
-
-                    public function __construct(private bool $admin)
-                    {
-                    }
-
-                    public function isAdmin(): bool
-                    {
-                        return $this->admin;
-                    }
-                };
-            }
-
-            public function ip()
-            {
-                return $this->input('ip', '127.0.0.1');
-            }
-
-            public function userAgent()
-            {
-                return $this->input('user_agent', 'Fleetbase AI test browser');
-            }
-        };
-    }
-}
-
-if (!function_exists('aiAdminFilterBuilder')) {
-    function aiAdminFilterBuilder(): Builder
-    {
-        return new class extends Builder {
-            public array $calls = [];
-
-            public function __construct()
-            {
-            }
-
-            public function where($column, $operator = null, $value = null, $boolean = 'and')
-            {
-                if (is_callable($column)) {
-                    $nested = aiAdminFilterBuilder();
-                    $column($nested);
-                    $this->calls[] = ['where_nested', $nested->calls];
-
-                    return $this;
-                }
-
-                $this->calls[] = ['where', $column, $operator, $value, $boolean];
-
-                return $this;
-            }
-
-            public function orWhere($column, $operator = null, $value = null)
-            {
-                $this->calls[] = ['orWhere', $column, $operator, $value];
-
-                return $this;
-            }
-
-            public function whereHas($relation, $callback = null, $operator = '>=', $count = 1)
-            {
-                $nested = aiAdminFilterBuilder();
-
-                if (is_callable($callback)) {
-                    $callback($nested);
-                }
-
-                $this->calls[] = ['whereHas', $relation, $nested->calls, $operator, $count];
-
-                return $this;
-            }
-
-            public function orWhereHas($relation, $callback = null, $operator = '>=', $count = 1)
-            {
-                $nested = aiAdminFilterBuilder();
-
-                if (is_callable($callback)) {
-                    $callback($nested);
-                }
-
-                $this->calls[] = ['orWhereHas', $relation, $nested->calls, $operator, $count];
-
-                return $this;
-            }
-        };
-    }
-}
-
 if (!function_exists('aiAdminUsageBuilder')) {
     function aiAdminUsageBuilder(array $rows): Builder
     {
@@ -475,6 +356,13 @@ if (!function_exists('aiAdminEndpointBuilder')) {
                 return $this;
             }
 
+            public function offset($value)
+            {
+                $this->calls[] = ['offset', $value];
+
+                return $this;
+            }
+
             public function limit($value)
             {
                 $this->calls[] = ['limit', $value];
@@ -598,9 +486,31 @@ test('ai service provider registers bindings and boots package resources', funct
             $this->registered[] = $provider;
         }
 
-        public function singleton(string $abstract, ?string $concrete = null): void
+        public function singleton(string $abstract, $concrete = null): void
         {
             $this->singletons[$abstract] = $concrete ?? $abstract;
+        }
+
+        public function make(string $abstract)
+        {
+            $concrete = $this->singletons[$abstract] ?? $abstract;
+
+            if ($concrete instanceof Closure) {
+                return $concrete($this);
+            }
+
+            return match ($concrete) {
+                Fleetbase\Ai\Support\Capabilities\SearchDocsTool::class   => new Fleetbase\Ai\Support\Capabilities\SearchDocsTool($this->make(Fleetbase\Ai\Services\Knowledge\KnowledgeSearch::class)),
+                Fleetbase\Ai\Support\Capabilities\ReadDocTool::class      => new Fleetbase\Ai\Support\Capabilities\ReadDocTool($this->make(Fleetbase\Ai\Services\Knowledge\KnowledgeSearch::class)),
+                Fleetbase\Ai\Services\Knowledge\KnowledgeSearch::class    => new Fleetbase\Ai\Services\Knowledge\KnowledgeSearch($this->make(Fleetbase\Ai\Support\Knowledge\KnowledgeAudienceClassifier::class)),
+                Fleetbase\Ai\Services\Knowledge\KnowledgeIndexer::class   => new Fleetbase\Ai\Services\Knowledge\KnowledgeIndexer($this->make(Fleetbase\Ai\Support\Knowledge\KnowledgeAudienceClassifier::class)),
+                Fleetbase\Ai\Support\Capabilities\Query\CountRecordsTool::class,
+                Fleetbase\Ai\Support\Capabilities\Query\GroupCountTool::class,
+                Fleetbase\Ai\Support\Capabilities\Query\ListRecordsTool::class => new $concrete(new AiQueryRegistry(), new AiQueryExecutor(new AiQueryRegistry())),
+                Fleetbase\Ai\Support\Capabilities\FindConsoleCommandsTool::class,
+                Fleetbase\Ai\Support\Capabilities\ProposeConsoleCommandTool::class => new $concrete(new Fleetbase\Ai\Support\Commands\AiCommandRegistry()),
+                default                                                            => new $concrete(),
+            };
         }
     };
 
@@ -613,10 +523,49 @@ test('ai service provider registers bindings and boots package resources', funct
             $this->booted[] = 'observers';
         }
 
+        protected function mergeConfigFrom($path, $key)
+        {
+            $this->booted[] = ['config', $key];
+        }
+
+        public function registerCommands(): void
+        {
+            $this->booted[] = ['commands', $this->commands];
+        }
+
+        public function scheduleCommands(?callable $callback = null): void
+        {
+            $schedule = new class {
+                public array $commands = [];
+
+                public function command(string $command): self
+                {
+                    $this->commands[] = $command;
+
+                    return $this;
+                }
+
+                public function __call($method, $arguments): self
+                {
+                    return $this;
+                }
+            };
+
+            $callback($schedule);
+            $this->booted[] = ['schedule', $schedule->commands];
+        }
+
+        public ?Fleetbase\Ai\Support\Commands\AiCommandRegistry $commandRegistry = null;
+
         public function callAfterResolving($name, $callback)
         {
-            $this->registry = new AiCapabilityRegistry();
-            $callback($this->registry);
+            if ($name === Fleetbase\Ai\Support\Commands\AiCommandRegistry::class) {
+                $this->commandRegistry = new Fleetbase\Ai\Support\Commands\AiCommandRegistry();
+                $callback($this->commandRegistry);
+            } else {
+                $this->registry = new AiCapabilityRegistry();
+                $callback($this->registry);
+            }
             $this->booted[] = ['after_resolving', $name];
         }
 
@@ -641,18 +590,39 @@ test('ai service provider registers bindings and boots package resources', funct
 
     expect($app->registered)->toBe([CoreServiceProvider::class])
         ->and($app->singletons)->toMatchArray([
-            Fleetbase\Ai\Contracts\AIProviderInterface::class   => AiProviderManager::class,
-            AiCapabilityRegistry::class                         => AiCapabilityRegistry::class,
-            AiQueryRegistry::class                              => AiQueryRegistry::class,
-            AiQueryExecutor::class                              => AiQueryExecutor::class,
-            AiTemporalContext::class                            => AiTemporalContext::class,
+            Fleetbase\Ai\Contracts\AIProviderInterface::class      => AiProviderManager::class,
+            AiCapabilityRegistry::class                            => AiCapabilityRegistry::class,
+            AiQueryRegistry::class                                 => AiQueryRegistry::class,
+            AiQueryExecutor::class                                 => AiQueryExecutor::class,
+            AiTemporalContext::class                               => AiTemporalContext::class,
+            Fleetbase\Ai\Support\Commands\AiCommandRegistry::class => Fleetbase\Ai\Support\Commands\AiCommandRegistry::class,
         ])
+        ->and($app->singletons)->toHaveKeys([
+            Fleetbase\Ai\Support\Knowledge\KnowledgeAudienceClassifier::class,
+            Fleetbase\Ai\Services\Knowledge\DocsSiteSource::class,
+            Fleetbase\Ai\Services\Knowledge\KnowledgeIndexer::class,
+            Fleetbase\Ai\Services\Knowledge\KnowledgeSearch::class,
+            Fleetbase\Ai\Services\Knowledge\KnowledgeBootstrapper::class,
+        ])
+        ->and($app->make(Fleetbase\Ai\Services\Knowledge\DocsSiteSource::class))->toBeInstanceOf(Fleetbase\Ai\Services\Knowledge\DocsSiteSource::class)
+        ->and($app->make(Fleetbase\Ai\Services\Knowledge\KnowledgeBootstrapper::class))->toBeInstanceOf(Fleetbase\Ai\Services\Knowledge\KnowledgeBootstrapper::class)
         ->and($provider->registry->get('core.current_page_context'))->toBeInstanceOf(CurrentPageContextCapability::class)
-        ->and($provider->booted[0])->toBe('observers')
-        ->and($provider->booted[1])->toBe(['after_resolving', AiCapabilityRegistry::class])
-        ->and($provider->booted[2][0])->toBe('expansions')
-        ->and($provider->booted[3][0])->toBe('routes')
-        ->and($provider->booted[4][0])->toBe('migrations');
+        ->and($provider->registry->get('core.search_docs'))->toBeInstanceOf(Fleetbase\Ai\Support\Capabilities\SearchDocsTool::class)
+        ->and($provider->registry->get('core.read_doc'))->toBeInstanceOf(Fleetbase\Ai\Support\Capabilities\ReadDocTool::class)
+        ->and($provider->registry->get('core.count_records'))->toBeInstanceOf(Fleetbase\Ai\Support\Capabilities\Query\CountRecordsTool::class)
+        ->and($provider->registry->get('core.group_count'))->toBeInstanceOf(Fleetbase\Ai\Support\Capabilities\Query\GroupCountTool::class)
+        ->and($provider->registry->get('core.list_records'))->toBeInstanceOf(Fleetbase\Ai\Support\Capabilities\Query\ListRecordsTool::class)
+        ->and($provider->booted[0])->toBe(['config', 'ai'])
+        ->and($provider->booted[1])->toBe('observers')
+        ->and($provider->booted[2])->toBe(['after_resolving', AiCapabilityRegistry::class])
+        ->and($provider->registry->get('core.propose_console_command'))->toBeInstanceOf(Fleetbase\Ai\Support\Capabilities\ProposeConsoleCommandTool::class)
+        ->and($provider->booted[3])->toBe(['after_resolving', Fleetbase\Ai\Support\Commands\AiCommandRegistry::class])
+        ->and($provider->commandRegistry->get('iam.users.create'))->not->toBeNull()
+        ->and($provider->booted[4])->toBe(['commands', [Fleetbase\Ai\Console\Commands\SyncAiDocs::class, Fleetbase\Ai\Console\Commands\ExportAiLogs::class, Fleetbase\Ai\Console\Commands\EvaluateAi::class, Fleetbase\Ai\Console\Commands\ReplayAiTask::class]])
+        ->and($provider->booted[5])->toBe(['schedule', ['ai:sync-docs']])
+        ->and($provider->booted[6][0])->toBe('expansions')
+        ->and($provider->booted[7][0])->toBe('routes')
+        ->and($provider->booted[8][0])->toBe('migrations');
 });
 
 test('config controller masks and preserves provider secrets', function () {
@@ -794,6 +764,12 @@ test('admin controller serializes redacted steps and metadata summaries', functi
             'action_results_count'  => 1,
             'action_errors_count'   => 1,
             'attachments_count'     => 1,
+            'ui_actions_count'      => 0,
+            'mode'                  => null,
+            'tool_calls'            => 0,
+            'degraded'              => false,
+            'truncated'             => false,
+            'refused'               => false,
         ]);
 });
 
@@ -1269,6 +1245,12 @@ test('admin controller summarizes metadata and nullable related records', functi
         'action_results_count'  => 0,
         'action_errors_count'   => 0,
         'attachments_count'     => 0,
+        'ui_actions_count'      => 0,
+        'mode'                  => null,
+        'tool_calls'            => 0,
+        'degraded'              => false,
+        'truncated'             => false,
+        'refused'               => false,
     ])
         ->and(aiInvokeProtected($controller, 'serializeCompany', null))->toBeNull()
         ->and(aiInvokeProtected($controller, 'serializeUser', null))->toBeNull()
@@ -1574,7 +1556,8 @@ test('admin controller lists sessions and returns session and task detail payloa
         ->and($list['meta']['can_reveal_content'])->toBeTrue()
         ->and($sessionsQuery->calls)->toContain(['withCount', 'tasks'])
         ->and($sessionsQuery->calls)->toContain(['withSum', 'tasks as total_tokens_sum', 'total_tokens'])
-        ->and($sessionsQuery->calls)->toContain(['limit', 100])
+        ->and($sessionsQuery->calls)->toContain(['offset', 0], ['limit', 101])
+        ->and($list['meta'])->toMatchArray(['page' => 1, 'limit' => 100, 'has_more' => false])
         ->and($detail['session']['tasks'][0]['uuid'])->toBe('task-uuid')
         ->and($detail['meta']['can_reveal_content'])->toBeTrue()
         ->and($session->loaded[0][0])->toBe('load')

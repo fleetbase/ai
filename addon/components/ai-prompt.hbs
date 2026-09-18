@@ -82,6 +82,28 @@
                                 <div class="fleetbase-ai-answer">
                                     <div class="fleetbase-ai-answer-body">{{task.formattedResponse}}</div>
                                 </div>
+                                {{#if task.canRate}}
+                                    <div class="fleetbase-ai-feedback" role="group" aria-label="Rate this answer">
+                                        <button
+                                            type="button"
+                                            class="fleetbase-ai-feedback-button {{if (eq task.feedback_rating 1) 'is-selected'}}"
+                                            aria-pressed={{if (eq task.feedback_rating 1) "true" "false"}}
+                                            title="Helpful"
+                                            {{on "click" (fn this.rateTask task 1)}}
+                                        >
+                                            <FaIcon @icon="thumbs-up" />
+                                        </button>
+                                        <button
+                                            type="button"
+                                            class="fleetbase-ai-feedback-button {{if (eq task.feedback_rating -1) 'is-selected'}}"
+                                            aria-pressed={{if (eq task.feedback_rating -1) "true" "false"}}
+                                            title="Not helpful"
+                                            {{on "click" (fn this.rateTask task -1)}}
+                                        >
+                                            <FaIcon @icon="thumbs-down" />
+                                        </button>
+                                    </div>
+                                {{/if}}
                             </div>
                         {{/if}}
                         {{#each task.actionPreviews as |preview|}}
@@ -95,6 +117,9 @@
                                 @isCancelling={{this.ai.cancelTask.isRunning}}
                                 @isRefreshing={{this.ai.refreshTaskPreview.isRunning}}
                             />
+                        {{/each}}
+                        {{#each task.uiActions as |uiAction|}}
+                            <AiUiActionConfirmation @task={{task}} @action={{uiAction}} @onConfirm={{this.confirmUiAction}} @onDismiss={{this.dismissUiAction}} />
                         {{/each}}
                     {{/if}}
                 {{/each}}

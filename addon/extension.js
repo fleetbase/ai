@@ -22,6 +22,11 @@ export default {
                     component: new ExtensionComponent('@fleetbase/ai-engine', 'admin/ai-audit-logs'),
                 }),
                 new MenuItem({
+                    title: 'Knowledge Base',
+                    icon: 'book-open',
+                    component: new ExtensionComponent('@fleetbase/ai-engine', 'admin/ai-knowledge'),
+                }),
+                new MenuItem({
                     title: 'Usage Analytics',
                     icon: 'chart-column',
                     component: new ExtensionComponent('@fleetbase/ai-engine', 'admin/ai-usage-analytics'),

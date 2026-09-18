@@ -25,18 +25,22 @@ class AiContextResolver
                 continue;
             }
 
+            $failure = null;
+
             try {
                 $result = $capability->resolve($task);
             } catch (\Throwable $e) {
-                $result = [
-                    'error' => [
-                        'message' => $e->getMessage(),
-                        'type'    => get_class($e),
-                    ],
+                // The provider only learns that the capability was unavailable. Exception details
+                // (which can include SQL and tenant identifiers) stay in the audit trail.
+                $result  = ['error' => 'capability_unavailable'];
+                $failure = [
+                    'message' => $e->getMessage(),
+                    'type'    => get_class($e),
                 ];
+                $this->reportFailure($e);
             }
 
-            $context[] = [
+            $entry = [
                 'key'          => $capability->key(),
                 'label'        => $capability->label(),
                 'module'       => $capability->module(),
@@ -45,8 +49,53 @@ class AiContextResolver
                 'preview_only' => $capability->previewOnly(),
                 'result'       => $result,
             ];
+
+            if ($failure) {
+                $entry['failure'] = $failure;
+            }
+
+            $context[] = $entry;
         }
 
         return $context;
+    }
+
+    /**
+     * Remove internal failure details so resolved context can be sent to a provider.
+     */
+    public static function forProvider(array $context): array
+    {
+        return array_map(function ($entry) {
+            unset($entry['failure']);
+
+            return $entry;
+        }, $context);
+    }
+
+    /**
+     * Whether any capability failed while resolving context.
+     */
+    public static function hasFailures(array $context): bool
+    {
+        foreach ($context as $entry) {
+            if (!empty($entry['failure'])) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @codeCoverageIgnore
+     */
+    protected function reportFailure(\Throwable $e): void
+    {
+        if (function_exists('report')) {
+            try {
+                report($e);
+            } catch (\Throwable) {
+            }
+        }
     }
 }
