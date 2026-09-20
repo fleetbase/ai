@@ -2,6 +2,7 @@
 
 namespace Fleetbase\Ai\Services;
 
+use Fleetbase\Ai\Contracts\AICapabilityInterface;
 use Fleetbase\Ai\Contracts\AIConversationalProviderInterface;
 use Fleetbase\Ai\Contracts\AIToolCapabilityInterface;
 use Fleetbase\Ai\Models\AiTask;
@@ -37,6 +38,7 @@ class AiAgentRunner
     public function run(AiTask $task, AiToolContext $context, string $system, array $history, string $userMessage, array $config, callable $recordStep): array
     {
         $tools         = $this->toolsFor($context);
+        $unreachable   = $this->unreachableCapabilities();
         $definitions   = array_values(array_map(fn (AIToolCapabilityInterface $tool) => [
             'name'        => $tool->toolName(),
             'description' => $tool->toolDescription(),
@@ -47,6 +49,15 @@ class AiAgentRunner
         $usage         = [];
         $toolCallCount = 0;
         $turn          = null;
+
+        if (!empty($unreachable)) {
+            $recordStep([
+                'type'         => 'capabilities_unreachable',
+                'status'       => 'completed',
+                'output'       => ['capabilities' => $unreachable],
+                'completed_at' => now(),
+            ]);
+        }
 
         for ($iteration = 1; $iteration <= $maxIterations; $iteration++) {
             // On the last iteration the model must answer with what it has gathered.
@@ -84,7 +95,7 @@ class AiAgentRunner
                 'stop_reason' => $turn->stopReason,
                 'truncated'   => $turn->stopReason === AiProviderTurn::STOP_TRUNCATED,
                 'refused'     => $turn->stopReason === AiProviderTurn::STOP_REFUSAL,
-            ]),
+            ], $unreachable ? ['unreachable_capabilities' => $unreachable] : []),
         ];
     }
 
@@ -99,6 +110,27 @@ class AiAgentRunner
             ->filter(fn ($capability) => $capability instanceof AIToolCapabilityInterface && $capability->availableFor($context))
             ->mapWithKeys(fn (AIToolCapabilityInterface $tool) => [$tool->toolName() => $tool])
             ->all();
+    }
+
+    /**
+     * Capabilities the registry holds that this mode cannot reach, because they were never given a
+     * tool definition. Nothing offers them to the model, so an engine or extension that registers a
+     * plain capability loses it here. Reporting them keeps that visible in the audit trail instead of
+     * letting a shipped feature disappear without a trace.
+     *
+     * @return string[] capability keys, sorted
+     */
+    public function unreachableCapabilities(): array
+    {
+        $keys = $this->registry->all()
+            ->reject(fn ($capability) => $capability instanceof AIToolCapabilityInterface)
+            ->map(fn (AICapabilityInterface $capability) => $capability->key())
+            ->values()
+            ->all();
+
+        sort($keys);
+
+        return $keys;
     }
 
     protected function runTool(AiTask $task, AiToolContext $context, array $tools, array $call, int $iteration, callable $recordStep): array

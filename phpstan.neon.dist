@@ -1,3 +1,9 @@
+includes:
+    # Errors that predate static analysis being wired into this package. New code must stay clean;
+    # regenerate with `phpstan analyse --generate-baseline=phpstan-baseline.neon` only when an entry
+    # is genuinely fixed.
+    - phpstan-baseline.neon
+
 parameters:
     level: max
     paths:
@@ -6,3 +12,8 @@ parameters:
     checkMissingIterableValueType: true
     checkGenericClassInNonGenericObjectType: false
     reportUnmatchedIgnoredErrors: true
+
+    # Illuminate\Foundation ships only in laravel/framework, which this package does not depend on
+    # but the host application always provides. The stub lets analysis resolve it.
+    scanFiles:
+        - phpstan/laravel-foundation.php

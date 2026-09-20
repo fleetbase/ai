@@ -387,3 +387,70 @@ test('task service marks tool mode turns failed when the provider errors', funct
         ->and($task->error['message'])->toContain('529')
         ->and(collect($steps)->firstWhere('type', 'provider_call')->status)->toBe('failed');
 });
+
+test('agent runner reports capabilities that no tool definition can reach', function () {
+    // A capability registered without a tool definition: nothing offers it to the model, so a shipped
+    // feature would otherwise disappear silently.
+    $legacy = new class extends Fleetbase\Ai\Support\Capabilities\AbstractAICapability {
+        public function key(): string
+        {
+            return 'fleet-ops.import_orders_preview';
+        }
+
+        public function label(): string
+        {
+            return 'Import orders';
+        }
+
+        public function description(): string
+        {
+            return 'Legacy capability without a tool definition.';
+        }
+
+        public function module(): string
+        {
+            return 'fleet-ops';
+        }
+    };
+
+    $registry = (new AiCapabilityRegistry())
+        ->register(aiTestTool('search_docs', fn () => ['results' => []]))
+        ->register($legacy);
+
+    $provider = aiScriptedProvider([
+        new AiProviderTurn(text: 'Done.', provider: 'anthropic', model: 'claude-haiku-4-5'),
+    ]);
+
+    $steps   = [];
+    $task    = new AiTask(['prompt' => 'Import my orders']);
+    $runner  = new AiAgentRunner($provider, $registry);
+    $result  = $runner->run($task, new AiToolContext($task, aiToolUser()), 'System', [], 'Import my orders', [], function ($attributes) use (&$steps) {
+        $steps[] = $attributes;
+    });
+
+    $reported = array_values(array_filter($steps, fn ($step) => $step['type'] === 'capabilities_unreachable'));
+
+    expect($runner->unreachableCapabilities())->toBe(['fleet-ops.import_orders_preview'])
+        ->and($reported)->toHaveCount(1)
+        ->and($reported[0]['output'])->toBe(['capabilities' => ['fleet-ops.import_orders_preview']])
+        ->and($reported[0]['status'])->toBe('completed')
+        ->and($result['metadata']['unreachable_capabilities'])->toBe(['fleet-ops.import_orders_preview']);
+});
+
+test('agent runner omits the unreachable report when every capability is tool callable', function () {
+    $registry = (new AiCapabilityRegistry())->register(aiTestTool('search_docs', fn () => ['results' => []]));
+    $provider = aiScriptedProvider([
+        new AiProviderTurn(text: 'Done.', provider: 'anthropic', model: 'claude-haiku-4-5'),
+    ]);
+
+    $steps  = [];
+    $task   = new AiTask(['prompt' => 'Hello']);
+    $runner = new AiAgentRunner($provider, $registry);
+    $result = $runner->run($task, new AiToolContext($task, aiToolUser()), 'System', [], 'Hello', [], function ($attributes) use (&$steps) {
+        $steps[] = $attributes;
+    });
+
+    expect($runner->unreachableCapabilities())->toBe([])
+        ->and(array_filter($steps, fn ($step) => $step['type'] === 'capabilities_unreachable'))->toBe([])
+        ->and($result['metadata'])->not->toHaveKey('unreachable_capabilities');
+});

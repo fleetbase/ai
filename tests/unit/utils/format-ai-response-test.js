@@ -1,5 +1,5 @@
 import { module, test } from 'qunit';
-import formatAiResponse from '@fleetbase/ai-engine/utils/format-ai-response';
+import formatAiResponse from 'dummy/utils/format-ai-response';
 
 module('Unit | Utility | format-ai-response', function () {
     test('inline code survives the emphasis pass', function (assert) {

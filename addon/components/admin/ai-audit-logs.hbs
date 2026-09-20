@@ -180,6 +180,12 @@
                     <div><label>Tool calls</label><span>{{or this.selectedTaskSummary.tool_calls 0}}</span></div>
                     <div><label>Feedback</label><span>{{if (eq this.selectedTask.feedback_rating 1) "Helpful" (if (eq this.selectedTask.feedback_rating -1) "Not helpful" "None")}}</span></div>
                     <div><label>Flags</label><span>{{if this.selectedTaskSummary.degraded "Degraded "}}{{if this.selectedTaskSummary.truncated "Cut off "}}{{if this.selectedTaskSummary.refused "Refused"}}</span></div>
+                    {{#if this.selectedTaskUnreachableCapabilities}}
+                        <div>
+                            <label>Unreachable capabilities</label>
+                            <span title="Registered by an engine but never given a tool definition, so the model could not use them.">{{this.selectedTaskUnreachableCapabilities}}</span>
+                        </div>
+                    {{/if}}
                 </div>
 
                 {{#if this.hasSelectedTaskContent}}

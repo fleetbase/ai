@@ -105,6 +105,15 @@ export default class AdminAiAuditLogsComponent extends Component {
         return this.selectedTask?.metadata ?? {};
     }
 
+    /**
+     * Capabilities an engine registered without a tool definition, so the model never saw them.
+     */
+    get selectedTaskUnreachableCapabilities() {
+        const capabilities = this.selectedTaskSummary.unreachable_capabilities ?? [];
+
+        return capabilities.length > 0 ? capabilities.join(', ') : null;
+    }
+
     @task *loadSessions(page = 1) {
         try {
             const response = yield this.fetch.get('admin/sessions', this.cleanFilters({ ...this.filters, limit: 50, page }), { namespace: 'ai/int/v1' });
