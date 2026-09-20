@@ -27,14 +27,16 @@ class CoreConsoleCommands
     public static function iam(): array
     {
         $commands  = [];
+        // The fifth element is the dialog's own title in the console, so the confirmation card
+        // and the answer quote the label the user actually sees.
         $resources = [
-            'users'    => ['user', 'Users', 'user-actions', 'identity-and-access/users', ['member', 'team member', 'staff', 'account', 'login']],
-            'groups'   => ['group', 'Groups', 'group-actions', 'identity-and-access/groups', ['team']],
-            'roles'    => ['role', 'Roles', 'role-actions', 'identity-and-access/roles-and-permissions', ['permission', 'access']],
-            'policies' => ['policy', 'Policies', 'policy-actions', 'identity-and-access/policies', ['permission', 'access']],
+            'users'    => ['user', 'Users', 'New User', 'user-actions', 'identity-and-access/users', ['member', 'team member', 'staff', 'account', 'login']],
+            'groups'   => ['group', 'Groups', 'New Group', 'group-actions', 'identity-and-access/groups', ['team']],
+            'roles'    => ['role', 'Roles', 'New Role', 'role-actions', 'identity-and-access/roles-and-permissions', ['permission', 'access']],
+            'policies' => ['policy', 'Policies', 'New Policy', 'policy-actions', 'identity-and-access/policies', ['permission', 'access']],
         ];
 
-        foreach ($resources as $route => [$resource, $plural, $service, $docs, $keywords]) {
+        foreach ($resources as $route => [$resource, $plural, $dialog, $service, $docs, $keywords]) {
             $commands[] = AiConsoleCommand::navigate("iam.{$route}.open", "Open {$plural}", "IAM › {$plural}", "Go to the {$plural} list in IAM.", "console.iam.{$route}.index", [
                 'permissions' => ["iam list {$resource}"],
                 'keywords'    => array_merge(['iam', 'view', 'list', 'manage'], $keywords),
@@ -42,7 +44,7 @@ class CoreConsoleCommands
                 'module'      => 'iam',
             ]);
 
-            $commands[] = AiConsoleCommand::dialog("iam.{$route}.create", "Create {$resource}", "IAM › {$plural}", "Go to {$plural} in IAM and open the new {$resource} form.", "console.iam.{$route}.index", static::IAM_ENGINE, $service, 'modal.create', [
+            $commands[] = AiConsoleCommand::dialog("iam.{$route}.create", $dialog, "IAM › {$plural}", "Go to {$plural} in IAM and click New to open the {$dialog} form.", "console.iam.{$route}.index", static::IAM_ENGINE, $service, 'modal.create', [
                 'permissions' => ["iam create {$resource}"],
                 'keywords'    => array_merge(['add', 'new', 'create'], $keywords),
                 'docs_url'    => static::DOCS . "/{$docs}",
@@ -50,7 +52,7 @@ class CoreConsoleCommands
             ]);
         }
 
-        $commands[] = AiConsoleCommand::dialog('iam.users.invite', 'Invite user', 'IAM › Users', 'Go to Users in IAM and open the invite user form, which emails an invitation.', 'console.iam.users.index', static::IAM_ENGINE, 'user-actions', 'modal.invite', [
+        $commands[] = AiConsoleCommand::dialog('iam.users.invite', 'Invite User', 'IAM › Users', 'Go to Users in IAM and click Invite User, which emails an invitation.', 'console.iam.users.index', static::IAM_ENGINE, 'user-actions', 'modal.invite', [
             'permissions' => ['iam create user'],
             'keywords'    => ['invite', 'invitation', 'email', 'add', 'team member'],
             'docs_url'    => static::DOCS . '/identity-and-access/users#inviting-a-user',
@@ -69,7 +71,7 @@ class CoreConsoleCommands
                 'docs_url'    => static::DOCS . '/developer-console/api-keys',
                 'module'      => 'developers',
             ]),
-            AiConsoleCommand::dialog('developers.api_keys.create', 'Create API key', 'Developers › API Keys', 'Go to API Keys in the Developers console and open the new API key form.', 'console.developers.api-keys.index', static::DEV_ENGINE, 'api-key-actions', 'modal.create', [
+            AiConsoleCommand::dialog('developers.api_keys.create', 'New API Key', 'Developers › API Keys', 'Go to API Keys in the Developers console and click New to open the New API Key form.', 'console.developers.api-keys.index', static::DEV_ENGINE, 'api-key-actions', 'modal.create', [
                 'permissions' => ['developers create api-key'],
                 'keywords'    => ['api', 'key', 'new', 'generate', 'integration'],
                 'docs_url'    => static::DOCS . '/developer-console/api-keys',
@@ -81,7 +83,7 @@ class CoreConsoleCommands
                 'docs_url'    => static::DOCS . '/developer-console/webhooks',
                 'module'      => 'developers',
             ]),
-            AiConsoleCommand::dialog('developers.webhooks.create', 'Create webhook', 'Developers › Webhooks', 'Go to Webhooks in the Developers console and open the new webhook endpoint form.', 'console.developers.webhooks.index', static::DEV_ENGINE, 'webhook-actions', 'modal.create', [
+            AiConsoleCommand::dialog('developers.webhooks.create', 'New Webhook', 'Developers › Webhooks', 'Go to Webhooks in the Developers console and click New to open the New Webhook form.', 'console.developers.webhooks.index', static::DEV_ENGINE, 'webhook-actions', 'modal.create', [
                 'permissions' => ['developers create webhook'],
                 'keywords'    => ['webhook', 'endpoint', 'new', 'add', 'callback', 'integration'],
                 'docs_url'    => static::DOCS . '/developer-console/webhooks',

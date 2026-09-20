@@ -232,7 +232,7 @@ export default class AiService extends Service {
 
     @task *applyTask(task, actionKey = null, input = {}) {
         const response = yield this.fetch.post(
-            `tasks/${task.id ?? task.uuid}/apply`,
+            `tasks/${task.uuid ?? task.id}/apply`,
             {
                 action_key: actionKey,
                 input,
@@ -249,7 +249,7 @@ export default class AiService extends Service {
 
     @task *refreshTaskPreview(task, actionKey = null, input = {}) {
         const response = yield this.fetch.post(
-            `tasks/${task.id ?? task.uuid}/preview`,
+            `tasks/${task.uuid ?? task.id}/preview`,
             {
                 action_key: actionKey,
                 input,
@@ -268,7 +268,7 @@ export default class AiService extends Service {
      * Confirm a console action. The server re-authorizes it and returns the steps to run.
      */
     @task *confirmUiAction(task, action) {
-        const taskId = task.id ?? task.uuid;
+        const taskId = task.uuid ?? task.id;
         let response;
 
         try {
@@ -293,7 +293,7 @@ export default class AiService extends Service {
 
     @task *rateTask(task, rating = null, comment = null) {
         try {
-            const response = yield this.fetch.post(`tasks/${task.id ?? task.uuid}/feedback`, { rating, comment }, { namespace: 'ai/int/v1' });
+            const response = yield this.fetch.post(`tasks/${task.uuid ?? task.id}/feedback`, { rating, comment }, { namespace: 'ai/int/v1' });
             this.applyTaskToSession(response.task);
 
             return response.task;
@@ -304,14 +304,14 @@ export default class AiService extends Service {
     }
 
     @task *dismissUiAction(task, action) {
-        const response = yield this.fetch.post(`tasks/${task.id ?? task.uuid}/ui-actions/${action.id}/dismiss`, {}, { namespace: 'ai/int/v1' });
+        const response = yield this.fetch.post(`tasks/${task.uuid ?? task.id}/ui-actions/${action.id}/dismiss`, {}, { namespace: 'ai/int/v1' });
         this.applyTaskToSession(response.task);
 
         return response.action;
     }
 
     @task *cancelTask(task) {
-        const response = yield this.fetch.post(`tasks/${task.id ?? task.uuid}/cancel`, {}, { namespace: 'ai/int/v1' });
+        const response = yield this.fetch.post(`tasks/${task.uuid ?? task.id}/cancel`, {}, { namespace: 'ai/int/v1' });
 
         this.activeTask = response.task;
         this.applyTaskToSession(response.task);

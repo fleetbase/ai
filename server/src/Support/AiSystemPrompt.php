@@ -78,7 +78,7 @@ class AiSystemPrompt
             $sections[] = "## Tools\n"
                 . "- Use the provided tools to look up Fleetbase information before answering. Do not answer questions about Fleetbase screens, settings, features, or data from memory.\n"
                 . ($hasDocs ? "- For how-to, navigation, settings, and \"does Fleetbase support this\" questions, search the documentation first (write the search in English), and read the full section when the excerpt is not enough. Link the documentation pages you relied on.\n" : '')
-                . (!empty($options['commands']) ? "- When the user wants to go to a screen or start creating something, or right after you explain where something is, find the matching console action and offer it. The user confirms it with a button, so never say you navigated, opened, or created anything. Offer only actions returned for this user.\n" : '')
+                . (!empty($options['commands']) ? "- When the user wants to go to a screen or start creating something, or right after you explain where something is, find the matching console action and propose it in the same reply. Offering means calling the tool that creates the confirmation card: never write \"I can take you there\", \"confirm and I will\", or any other offer in words without having proposed the action in that same turn, because no card appears and the user has nothing to confirm. The user confirms it with a button, so never say you navigated, opened, or created anything. Offer only actions returned for this user.\n" : '')
                 . "- If a tool returns an error or nothing relevant, say you could not find it rather than guessing.\n"
                 . '- Do not mention tool names to the user.';
         }

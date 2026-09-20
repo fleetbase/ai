@@ -11,7 +11,7 @@ test('action previews are found by preview id first and by action key for older 
         ['preview_id' => 'p1', 'key' => 'fleet-ops.create_order', 'draft' => ['n' => 1]],
         'not-a-preview',
         ['preview_id' => 'p2', 'key' => 'fleet-ops.create_order', 'draft' => ['n' => 2]],
-        ['action' => 'legacy.action'],
+        ['action'     => 'legacy.action'],
     ];
 
     expect(AiActionPreview::find($previews, 'p2')['draft'])->toBe(['n' => 2])

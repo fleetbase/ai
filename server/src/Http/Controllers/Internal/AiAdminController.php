@@ -401,14 +401,18 @@ class AiAdminController extends Controller
     protected function findSession(string $id): AiSession
     {
         return $this->sessionsQuery()->where(function (Builder $query) use ($id) {
-            $query->where('uuid', $id)->orWhere('id', $id);
+            // A UUID beginning with digits is cast to an integer by MySQL, so it would
+            // otherwise match an unrelated row by its numeric key.
+            $query->where('uuid', $id)->when(ctype_digit($id), fn (Builder $query) => $query->orWhere('id', (int) $id));
         })->firstOrFail();
     }
 
     protected function findTask(string $id): AiTask
     {
         return $this->tasksQuery()->where(function (Builder $query) use ($id) {
-            $query->where('uuid', $id)->orWhere('id', $id);
+            // A UUID beginning with digits is cast to an integer by MySQL, so it would
+            // otherwise match an unrelated row by its numeric key.
+            $query->where('uuid', $id)->when(ctype_digit($id), fn (Builder $query) => $query->orWhere('id', (int) $id));
         })->firstOrFail();
     }
 

@@ -149,7 +149,9 @@ class AiTaskController extends Controller
         return $this->tasksForCurrentCompany()
             ->where('created_by_uuid', optional(request()->user())->uuid)
             ->where(function ($query) use ($id) {
-                $query->where('uuid', $id)->orWhere('id', $id);
+                // Only compare against the numeric key when the value really is a number: MySQL
+                // casts a UUID like `4dcd1b1f-...` to the integer 4 and would match the wrong row.
+                $query->where('uuid', $id)->when(ctype_digit($id), fn ($query) => $query->orWhere('id', (int) $id));
             })
             ->firstOrFail();
     }

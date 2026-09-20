@@ -96,7 +96,11 @@ function loadCommands() {
         const [autoload, className] = [source.slice(0, separator), source.slice(separator + 1)];
         const php = `require ${JSON.stringify(resolve(autoload))}; echo json_encode(array_map(fn ($c) => is_array($c) ? $c : ['id' => $c->id, 'steps' => $c->steps], ${className}::all()));`;
 
-        return JSON.parse(execFileSync('php', ['-r', php], { encoding: 'utf8' }));
+        // Diagnostics from anything the autoload pulls in would otherwise land on stdout and
+        // corrupt the JSON, so silence them for this one-off process.
+        const args = ['-d', 'error_reporting=0', '-d', 'display_errors=0', '-r', php];
+
+        return JSON.parse(execFileSync('php', args, { encoding: 'utf8' }));
     });
 }
 

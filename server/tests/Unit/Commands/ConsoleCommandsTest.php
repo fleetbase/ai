@@ -118,7 +118,7 @@ test('find and propose tools only offer commands the user may run and never run 
         ->and($proposed['message'])->toContain('runs only if they confirm')
         ->and($again['action_id'])->toBe($proposed['action_id'])
         ->and($context->uiActions)->toHaveCount(1)
-        ->and($context->uiActions[0])->toMatchArray(['command_id' => 'iam.users.create', 'label' => 'Create user', 'breadcrumb' => 'IAM › Users', 'params' => [], 'status' => 'pending'])
+        ->and($context->uiActions[0])->toMatchArray(['command_id' => 'iam.users.create', 'label' => 'New User', 'breadcrumb' => 'IAM › Users', 'params' => [], 'status' => 'pending'])
         ->and($context->uiActions[0])->not->toHaveKey('steps')
         ->and($propose->invoke($task, ['command_id' => 'admin.config.services.open'], $context)['error'])->toContain('is not available')
         ->and($propose->invoke($task, ['command_id' => 'made.up'], $context)['error'])->toContain('is not available')

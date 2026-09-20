@@ -469,7 +469,9 @@ class AiTaskService
             $session = $this->sessionsForCurrentCompany()
                 ->where('created_by_uuid', $userUuid)
                 ->where(function ($query) use ($sessionUuid) {
-                    $query->where('uuid', $sessionUuid)->orWhere('id', $sessionUuid);
+                    // A UUID beginning with digits is cast to an integer by MySQL, so it would
+                    // otherwise match an unrelated row by its numeric key.
+                    $query->where('uuid', $sessionUuid)->when(ctype_digit($sessionUuid), fn ($query) => $query->orWhere('id', (int) $sessionUuid));
                 })
                 ->first();
 

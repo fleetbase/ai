@@ -865,7 +865,6 @@ test('session controller protected lookup and default query helper build scoped 
         ->and($query->calls[0])->toBe(['where', 'created_by_uuid', null, null, 'and'])
         ->and($query->calls[1])->toBe(['where_nested', [
             ['where', 'uuid', 'session-uuid', null, 'and'],
-            ['orWhere', 'id', 'session-uuid', null],
         ]]);
 });
 
@@ -1225,15 +1224,44 @@ test('task controller find task builds scoped lookup query', function () {
 
     $found = aiInvokeProtected($controller, 'findTask', 'task-uuid');
 
+    // A UUID must never be compared against the numeric key: MySQL casts `4dcd1b1f-...` to 4 and
+    // would match an unrelated task.
     expect($found->uuid)->toBe('task-uuid')
         ->and($query->calls)->toBe([
             ['where', 'created_by_uuid', null, null, 'and'],
             ['where_nested', [
                 ['where', 'uuid', 'task-uuid', null, 'and'],
-                ['orWhere', 'id', 'task-uuid', null],
             ]],
             ['firstOrFail', ['*']],
         ]);
+});
+
+test('task controller find task still accepts a numeric id', function () {
+    $task = new AiTask();
+    $task->setRawAttributes(['uuid' => 'task-uuid'], true);
+    $query = aiSessionControllerBuilder([$task]);
+
+    $controller = new class($query) extends AiTaskController {
+        public function __construct(private Builder $query)
+        {
+        }
+
+        protected function tasksForCurrentCompany(): Builder
+        {
+            return $this->query;
+        }
+    };
+
+    aiInvokeProtected($controller, 'findTask', '51');
+
+    expect($query->calls)->toBe([
+        ['where', 'created_by_uuid', null, null, 'and'],
+        ['where_nested', [
+            ['where', 'uuid', '51', null, 'and'],
+            ['orWhere', 'id', 51, null],
+        ]],
+        ['firstOrFail', ['*']],
+    ]);
 });
 
 test('admin controller summarizes metadata and nullable related records', function () {
@@ -1598,12 +1626,10 @@ test('admin controller protected lookup and query helpers build expected queries
     expect(aiInvokeProtected($controller, 'findSession', 'session-uuid'))->toBe($session)
         ->and($sessionQuery->calls[0])->toBe(['where_nested', [
             ['where', 'uuid', 'session-uuid', null, 'and'],
-            ['orWhere', 'id', 'session-uuid', null],
         ]])
         ->and(aiInvokeProtected($controller, 'findTask', 'task-uuid'))->toBe($task)
         ->and($taskQuery->calls[0])->toBe(['where_nested', [
             ['where', 'uuid', 'task-uuid', null, 'and'],
-            ['orWhere', 'id', 'task-uuid', null],
         ]]);
 });
 
