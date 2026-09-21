@@ -362,7 +362,7 @@ parameters:
 
 		-
 			message: "#^Access to an undefined property Fleetbase\\\\Ai\\\\Models\\\\AiTask\\:\\:\\$ai_session_uuid\\.$#"
-			count: 2
+			count: 1
 			path: server/src/Http/Controllers/Internal/AiAdminController.php
 
 		-
@@ -372,7 +372,7 @@ parameters:
 
 		-
 			message: "#^Access to an undefined property Fleetbase\\\\Ai\\\\Models\\\\AiTask\\:\\:\\$company_uuid\\.$#"
-			count: 2
+			count: 1
 			path: server/src/Http/Controllers/Internal/AiAdminController.php
 
 		-
@@ -422,12 +422,12 @@ parameters:
 
 		-
 			message: "#^Access to an undefined property Fleetbase\\\\Ai\\\\Models\\\\AiTask\\:\\:\\$metadata\\.$#"
-			count: 2
+			count: 1
 			path: server/src/Http/Controllers/Internal/AiAdminController.php
 
 		-
 			message: "#^Access to an undefined property Fleetbase\\\\Ai\\\\Models\\\\AiTask\\:\\:\\$model\\.$#"
-			count: 2
+			count: 1
 			path: server/src/Http/Controllers/Internal/AiAdminController.php
 
 		-
@@ -437,7 +437,7 @@ parameters:
 
 		-
 			message: "#^Access to an undefined property Fleetbase\\\\Ai\\\\Models\\\\AiTask\\:\\:\\$provider\\.$#"
-			count: 2
+			count: 1
 			path: server/src/Http/Controllers/Internal/AiAdminController.php
 
 		-
@@ -462,12 +462,12 @@ parameters:
 
 		-
 			message: "#^Access to an undefined property Fleetbase\\\\Ai\\\\Models\\\\AiTask\\:\\:\\$status\\.$#"
-			count: 2
+			count: 1
 			path: server/src/Http/Controllers/Internal/AiAdminController.php
 
 		-
 			message: "#^Access to an undefined property Fleetbase\\\\Ai\\\\Models\\\\AiTask\\:\\:\\$steps\\.$#"
-			count: 1
+			count: 2
 			path: server/src/Http/Controllers/Internal/AiAdminController.php
 
 		-
@@ -487,7 +487,7 @@ parameters:
 
 		-
 			message: "#^Access to an undefined property Fleetbase\\\\Ai\\\\Models\\\\AiTask\\:\\:\\$uuid\\.$#"
-			count: 2
+			count: 1
 			path: server/src/Http/Controllers/Internal/AiAdminController.php
 
 		-
@@ -567,17 +567,17 @@ parameters:
 
 		-
 			message: "#^Call to an undefined method Fleetbase\\\\Http\\\\Requests\\\\AdminRequest\\:\\:filled\\(\\)\\.$#"
-			count: 17
+			count: 24
 			path: server/src/Http/Controllers/Internal/AiAdminController.php
 
 		-
 			message: "#^Call to an undefined method Fleetbase\\\\Http\\\\Requests\\\\AdminRequest\\:\\:input\\(\\)\\.$#"
-			count: 25
+			count: 34
 			path: server/src/Http/Controllers/Internal/AiAdminController.php
 
 		-
 			message: "#^Call to an undefined method Fleetbase\\\\Http\\\\Requests\\\\AdminRequest\\:\\:ip\\(\\)\\.$#"
-			count: 3
+			count: 2
 			path: server/src/Http/Controllers/Internal/AiAdminController.php
 
 		-
@@ -587,12 +587,12 @@ parameters:
 
 		-
 			message: "#^Call to an undefined method Fleetbase\\\\Http\\\\Requests\\\\AdminRequest\\:\\:user\\(\\)\\.$#"
-			count: 6
+			count: 5
 			path: server/src/Http/Controllers/Internal/AiAdminController.php
 
 		-
 			message: "#^Call to an undefined method Fleetbase\\\\Http\\\\Requests\\\\AdminRequest\\:\\:userAgent\\(\\)\\.$#"
-			count: 3
+			count: 2
 			path: server/src/Http/Controllers/Internal/AiAdminController.php
 
 		-
@@ -677,7 +677,7 @@ parameters:
 
 		-
 			message: "#^Cannot access property \\$uuid on mixed\\.$#"
-			count: 3
+			count: 2
 			path: server/src/Http/Controllers/Internal/AiAdminController.php
 
 		-
@@ -701,13 +701,8 @@ parameters:
 			path: server/src/Http/Controllers/Internal/AiAdminController.php
 
 		-
-			message: "#^Cannot cast mixed to int\\.$#"
-			count: 1
-			path: server/src/Http/Controllers/Internal/AiAdminController.php
-
-		-
 			message: "#^Function abort_unless not found\\.$#"
-			count: 10
+			count: 9
 			path: server/src/Http/Controllers/Internal/AiAdminController.php
 
 		-
@@ -722,7 +717,7 @@ parameters:
 
 		-
 			message: "#^Function response not found\\.$#"
-			count: 11
+			count: 10
 			path: server/src/Http/Controllers/Internal/AiAdminController.php
 
 		-
@@ -772,21 +767,6 @@ parameters:
 
 		-
 			message: "#^Method Fleetbase\\\\Ai\\\\Http\\\\Controllers\\\\Internal\\\\AiAdminController\\:\\:knowledgeStats\\(\\) return type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: server/src/Http/Controllers/Internal/AiAdminController.php
-
-		-
-			message: "#^Method Fleetbase\\\\Ai\\\\Http\\\\Controllers\\\\Internal\\\\AiAdminController\\:\\:metadataSummary\\(\\) has parameter \\$metadata with no type specified\\.$#"
-			count: 1
-			path: server/src/Http/Controllers/Internal/AiAdminController.php
-
-		-
-			message: "#^Method Fleetbase\\\\Ai\\\\Http\\\\Controllers\\\\Internal\\\\AiAdminController\\:\\:metadataSummary\\(\\) return type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: server/src/Http/Controllers/Internal/AiAdminController.php
-
-		-
-			message: "#^Method Fleetbase\\\\Ai\\\\Http\\\\Controllers\\\\Internal\\\\AiAdminController\\:\\:revealTaskContent\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: server/src/Http/Controllers/Internal/AiAdminController.php
 

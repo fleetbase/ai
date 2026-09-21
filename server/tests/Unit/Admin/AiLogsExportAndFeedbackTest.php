@@ -176,7 +176,7 @@ test('export command filters by date and company and rejects unknown formats', f
         ->and($withDeleted)->toBe(0);
 });
 
-test('admin export requires content permission, logs access, and streams the chosen format', function () {
+test('admin export requires the audit log permission, logs access, and streams the chosen format', function () {
     $controller = new class extends AiAdminController {
         public array $logs     = [];
         public ?Builder $query = null;
@@ -184,7 +184,7 @@ test('admin export requires content permission, logs access, and streams the cho
 
         protected function can(Fleetbase\Http\Requests\AdminRequest $request, string $permission): bool
         {
-            return $this->allowed && $permission === 'ai view task content';
+            return $this->allowed && $permission === 'ai view audit logs';
         }
 
         protected function tasksQuery(): Builder
@@ -235,6 +235,64 @@ test('admin export requires content permission, logs access, and streams the cho
         ->and($controller->logs[0]['metadata']['filters'])->toMatchArray(['feedback' => 'negative'])
         ->and($controller->query->calls)->toContain(['where', 'feedback_rating', '>', 0, 'and'])
         ->and(fn () => tap($controller, fn ($c) => $c->allowed = false)->export(aiAdminRequestDouble([], true), $exporter))->toThrow(RuntimeException::class);
+});
+
+test('admin export applies the same filters as the log view', function () {
+    $controller = new class extends AiAdminController {
+        public array $logs     = [];
+        public ?Builder $query = null;
+
+        protected function can(Fleetbase\Http\Requests\AdminRequest $request, string $permission): bool
+        {
+            return true;
+        }
+
+        protected function tasksQuery(): Builder
+        {
+            return $this->query = aiAdminFilterBuilder();
+        }
+
+        protected function createAccessLog(array $attributes): AiAdminAccessLog
+        {
+            $this->logs[] = $attributes;
+
+            return new AiAdminAccessLog();
+        }
+
+        protected function download(callable $callback, string $filename, string $contentType)
+        {
+            return compact('filename');
+        }
+    };
+
+    $controller->export(aiAdminRequestDouble([
+        'ai_session_uuid' => 'session-1',
+        'status'          => 'answered',
+        'task_status'     => 'failed',
+        'session_status'  => 'ended',
+        'search'          => ' dispatch ',
+        'provider'        => 'openai',
+        'from'            => '2026-07-01',
+        'to'              => '2026-07-02',
+    ], true), new AiLogExporter());
+
+    $calls    = $controller->query->calls;
+    $statuses = array_values(array_filter($calls, fn ($call) => $call[0] === 'where' && $call[1] === 'status'));
+    $search   = array_values(array_filter($calls, fn ($call) => $call[0] === 'where_nested'))[0][1];
+
+    // task_status wins over the legacy status parameter, so an export matches the answer-status filter.
+    expect($statuses)->toBe([['where', 'status', 'failed', null, 'and']])
+        ->and($calls)->toContain(['where', 'ai_session_uuid', 'session-1', null, 'and'])
+        ->and($calls)->toContain(['where', 'provider', 'openai', null, 'and'])
+        ->and($calls)->toContain(['whereHas', 'session', [['where', 'status', 'ended', null, 'and']], '>=', 1])
+        ->and($search[0])->toBe(['where', 'prompt', 'like', '%dispatch%', 'and'])
+        ->and($search)->toContain(['orWhere', 'ai_session_uuid', 'dispatch', null])
+        ->and($controller->logs[0]['metadata']['filters'])->toMatchArray([
+            'ai_session_uuid' => 'session-1',
+            'task_status'     => 'failed',
+            'session_status'  => 'ended',
+            'search'          => ' dispatch ',
+        ]);
 });
 
 test('session filters find sessions with rated, degraded, or truncated answers', function () {

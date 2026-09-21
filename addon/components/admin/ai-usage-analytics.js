@@ -1,93 +1,92 @@
 import Component from '@glimmer/component';
 import { inject as service } from '@ember/service';
 import { tracked } from '@glimmer/tracking';
-import { task } from 'ember-concurrency';
 import { action } from '@ember/object';
+import { task } from 'ember-concurrency';
+import AiAdminFilters, { adminSources, compactQuery } from '../../utils/ai-admin-filters';
 
+export const RANGE_PRESETS = [
+    { key: '7d', label: '7 days', days: 7 },
+    { key: '30d', label: '30 days', days: 30 },
+    { key: '90d', label: '90 days', days: 90 },
+    { key: 'all', label: 'All time', days: null },
+];
+
+function isoDate(date) {
+    const pad = (value) => String(value).padStart(2, '0');
+
+    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+}
+
+/**
+ * The range covering the last `days` days, today included.
+ */
+export function presetRange(days, today = new Date()) {
+    if (!days) {
+        return { from: '', to: '' };
+    }
+
+    const start = new Date(today);
+    start.setDate(start.getDate() - (days - 1));
+
+    return { from: isoDate(start), to: isoDate(today) };
+}
+
+/**
+ * AI usage for a period: headline numbers, activity per day, and rankings by who and what used it.
+ * Opens on the last 30 days; filters apply as they change.
+ */
 export default class AdminAiUsageAnalyticsComponent extends Component {
     @service fetch;
     @service notifications;
 
-    @tracked filters = {
-        status: '',
-        provider: '',
-        model: '',
-        company_uuid: '',
-        created_by_uuid: '',
-        from: '',
-        to: '',
-    };
-    @tracked usage = {
-        summary: {},
-        by_company: [],
-        by_user: [],
-        by_provider: [],
-        by_model: [],
-        by_status: [],
-        by_day: [],
-    };
-    @tracked metadata = { providers: [] };
-    @tracked selectedCompany = null;
-    @tracked selectedUser = null;
-    @tracked dateRange = null;
+    filters = new AiAdminFilters();
+    presets = RANGE_PRESETS;
+    toolbarFilters = ['task_status', 'provider', 'model', 'company', 'user', 'date'];
 
-    statusOptions = [
-        { label: 'Any status', value: '' },
-        { label: 'Answered', value: 'answered' },
-        { label: 'Applied', value: 'applied' },
-        { label: 'Failed', value: 'failed' },
-        { label: 'Apply failed', value: 'apply_failed' },
-        { label: 'Cancelled', value: 'cancelled' },
-        { label: 'Running', value: 'running' },
-    ];
+    @tracked usage = null;
+    @tracked metadata = { providers: [] };
 
     constructor() {
         super(...arguments);
+        this.sources = adminSources(this.fetch);
+        const { from, to } = presetRange(30);
+        this.filters.setRange(from, to);
         this.loadConfigMetadata.perform();
         this.loadUsage.perform();
     }
 
     get summary() {
-        return this.usage.summary ?? {};
+        return this.usage?.summary ?? {};
     }
 
-    get usageCards() {
+    get activePreset() {
+        return this.presets.find((preset) => {
+            const { from, to } = presetRange(preset.days);
+
+            return from === this.filters.from && to === this.filters.to;
+        })?.key;
+    }
+
+    get whoTabs() {
         return [
-            { label: 'Tasks', value: this.summary.task_count ?? 0, icon: 'list-check' },
-            { label: 'Total tokens', value: this.summary.total_tokens ?? 0, icon: 'coins' },
-            { label: 'Input tokens', value: this.summary.input_tokens ?? 0, icon: 'arrow-right-to-bracket' },
-            { label: 'Output tokens', value: this.summary.output_tokens ?? 0, icon: 'arrow-right-from-bracket' },
-            { label: 'Completed', value: this.summary.completed_count ?? 0, icon: 'circle-check' },
-            { label: 'Failed', value: this.summary.failed_count ?? 0, icon: 'triangle-exclamation' },
+            { key: 'company', label: 'Organization', rows: this.usage?.by_company ?? [] },
+            { key: 'user', label: 'User', rows: this.usage?.by_user ?? [] },
         ];
     }
 
-    get providerOptions() {
-        return [{ label: 'Any provider', value: '' }, ...(this.metadata.providers ?? [])];
+    get whatTabs() {
+        return [
+            { key: 'provider', label: 'Provider', rows: this.usage?.by_provider ?? [] },
+            { key: 'model', label: 'Model', rows: this.usage?.by_model ?? [] },
+            { key: 'status', label: 'Status', rows: this.usage?.by_status ?? [] },
+        ];
     }
 
-    get selectedProviderMetadata() {
-        return (this.metadata.providers ?? []).find((provider) => provider.value === this.filters.provider);
-    }
+    get query() {
+        const f = this.filters;
 
-    get modelOptions() {
-        return [{ label: 'Any model', value: '' }, ...(this.selectedProviderMetadata?.models ?? [])];
-    }
-
-    get userQuery() {
-        return this.filters.company_uuid ? { company_uuid: this.filters.company_uuid } : {};
-    }
-
-    get companySource() {
-        return {
-            query: (modelName, query = {}) => this.fetch.get('admin/companies', query, { namespace: 'ai/int/v1' }),
-        };
-    }
-
-    get userSource() {
-        return {
-            query: (modelName, query = {}) => this.fetch.get('admin/users', query, { namespace: 'ai/int/v1' }),
-        };
+        return compactQuery({ status: f.task_status, provider: f.provider, model: f.model, company_uuid: f.company_uuid, created_by_uuid: f.created_by_uuid, from: f.from, to: f.to });
     }
 
     @task *loadConfigMetadata() {
@@ -99,116 +98,46 @@ export default class AdminAiUsageAnalyticsComponent extends Component {
         }
     }
 
-    @task *loadUsage() {
+    @task({ restartable: true }) *loadUsage() {
         try {
-            this.usage = yield this.fetch.get('admin/usage', this.cleanFilters(this.filters), { namespace: 'ai/int/v1' });
+            this.usage = yield this.fetch.get('admin/usage', this.query, { namespace: 'ai/int/v1' });
         } catch (error) {
             this.notifications.serverError(error);
         }
     }
 
-    @action setFilter(field, value) {
-        this.filters = {
-            ...this.filters,
-            [field]: this.normalizeValue(value),
-        };
-    }
-
-    @action setFilterFromInput(field, event) {
-        this.setFilter(field, event.target.value);
-    }
-
-    @action setProvider(value) {
-        const provider = this.normalizeValue(value);
-        this.filters = {
-            ...this.filters,
-            provider,
-            model: '',
-        };
-    }
-
-    @action setCompany(company) {
-        this.selectedCompany = company ?? null;
-        this.selectedUser = null;
-        this.filters = {
-            ...this.filters,
-            company_uuid: company?.uuid ?? company?.id ?? '',
-            created_by_uuid: '',
-        };
-    }
-
-    @action setUser(user) {
-        this.selectedUser = user ?? null;
-        this.filters = {
-            ...this.filters,
-            created_by_uuid: user?.uuid ?? user?.id ?? '',
-        };
-    }
-
-    @action setDateRange({ formattedDate } = {}) {
-        this.dateRange = formattedDate;
-
-        if (Array.isArray(formattedDate) && formattedDate.length >= 2) {
-            this.filters = {
-                ...this.filters,
-                from: formattedDate[0],
-                to: formattedDate[1],
-            };
-            return;
+    @action filtersChanged(field) {
+        // Clearing returns to the default period rather than all time.
+        if (field === 'clear') {
+            const { from, to } = presetRange(30);
+            this.filters.setRange(from, to);
         }
 
-        if (Array.isArray(formattedDate) && formattedDate.length === 1) {
-            this.filters = {
-                ...this.filters,
-                from: formattedDate[0],
-                to: formattedDate[0],
-            };
-            return;
-        }
-
-        if (typeof formattedDate === 'string' && formattedDate) {
-            this.filters = {
-                ...this.filters,
-                from: formattedDate,
-                to: formattedDate,
-            };
-            return;
-        }
-
-        this.filters = {
-            ...this.filters,
-            from: '',
-            to: '',
-        };
-    }
-
-    @action clearFilters() {
-        this.filters = {
-            status: '',
-            provider: '',
-            model: '',
-            company_uuid: '',
-            created_by_uuid: '',
-            from: '',
-            to: '',
-        };
-        this.selectedCompany = null;
-        this.selectedUser = null;
-        this.dateRange = null;
         this.loadUsage.perform();
     }
 
-    cleanFilters(filters) {
-        return Object.entries(filters).reduce((params, [key, value]) => {
-            if (value !== null && value !== undefined && value !== '') {
-                params[key] = value;
-            }
-
-            return params;
-        }, {});
+    @action selectPreset(preset) {
+        const { from, to } = presetRange(preset.days);
+        this.filters.setRange(from, to);
+        this.loadUsage.perform();
     }
 
-    normalizeValue(value) {
-        return value?.value ?? value?.target?.value ?? value;
+    /**
+     * Narrows the view to the clicked row of a ranking.
+     */
+    @action drill(dimension, row) {
+        if (dimension === 'company') {
+            this.filters.setCompany({ uuid: row.key, name: row.label });
+        } else if (dimension === 'user') {
+            this.filters.setUser({ uuid: row.key, name: row.label });
+        } else if (dimension === 'provider') {
+            this.filters.setProvider(row.key);
+        } else if (dimension === 'status') {
+            this.filters.set('task_status', row.key);
+        } else {
+            this.filters.set(dimension, row.key);
+        }
+
+        this.loadUsage.perform();
     }
 }

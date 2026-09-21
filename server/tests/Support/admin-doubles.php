@@ -103,6 +103,13 @@ if (!function_exists('aiAdminFilterBuilder')) {
                 return $this;
             }
 
+            public function whereIn($column, $values, $boolean = 'and', $not = false)
+            {
+                $this->calls[] = ['whereIn', $column, $values];
+
+                return $this;
+            }
+
             public function whereHas($relation, $callback = null, $operator = '>=', $count = 1)
             {
                 $nested = aiAdminFilterBuilder();

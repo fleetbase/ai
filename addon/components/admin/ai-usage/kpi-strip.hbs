@@ -1,0 +1,9 @@
+<div class="fleetbase-ai-usage-kpis" ...attributes>
+    {{#each this.tiles as |tile|}}
+        <div class="fleetbase-ai-usage-kpi {{tile.tone}}" data-test-kpi={{tile.key}}>
+            <span class="fleetbase-ai-usage-kpi-label"><FaIcon @icon={{tile.icon}} /> {{tile.label}}</span>
+            <strong class="fleetbase-ai-usage-kpi-value" title={{tile.title}}>{{tile.value}}</strong>
+            {{#if tile.sub}}<span class="fleetbase-ai-usage-kpi-sub">{{tile.sub}}</span>{{/if}}
+        </div>
+    {{/each}}
+</div>

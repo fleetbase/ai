@@ -153,8 +153,8 @@ node scripts/verify-ai-commands.mjs --console ../../console --packages ..
 ## Logs, Feedback, and Evaluation
 
 - Users rate answers with thumbs up or down. Ratings are filterable in **Admin → AI Config → Task & Chat Logs**, alongside degraded answers (a capability failed) and cut-off answers.
-- After revealing content, the log view shows every step, including each tool call's arguments and results and the exact system prompt and messages sent to the model.
-- Export logs from the admin view, or with `php artisan ai:export-logs --from=2026-09-01 --format=jsonl`. Exports contain user content and are recorded in the access log.
+- The log view shows each conversation in full: every prompt and answer, and, per answer, every step including each tool call's arguments and results and the exact system prompt and messages sent to the model. It requires the `ai view audit logs` permission.
+- Export logs from the admin view, or with `php artisan ai:export-logs --from=2026-09-01 --format=jsonl`. Exports use the same filters as the log view, contain user content, require `ai view audit logs`, and are recorded in the access log.
 - `php artisan ai:eval` runs the golden cases in `server/resources/ai-eval/cases.json` (drawn from real conversations) against the configured provider and reports a pass rate. It calls the provider, so it asks for confirmation; use `--model` to compare models.
 - `php artisan ai:replay <task-uuid>` re-runs a recorded turn through the current runtime and prints both answers.
 

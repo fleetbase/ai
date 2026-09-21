@@ -6,6 +6,8 @@ module.exports = {
     launch_in_ci: ['Chrome'],
     launch_in_dev: ['Chrome'],
     browser_start_timeout: 120,
+    // Booting the dummy app can hold the browser longer than testem's 10 second default on slow machines.
+    browser_disconnect_timeout: 60,
     browser_args: {
         Chrome: {
             ci: [

@@ -54,7 +54,6 @@ Route::prefix(config('ai.api.routing.prefix', 'ai'))->namespace('Fleetbase\Ai\Ht
                             $router->get('sessions', 'Internal\AiAdminController@sessions');
                             $router->get('sessions/{id}', 'Internal\AiAdminController@session');
                             $router->get('tasks/{id}', 'Internal\AiAdminController@task');
-                            $router->post('tasks/{id}/reveal-content', 'Internal\AiAdminController@revealTaskContent');
                             $router->get('usage', 'Internal\AiAdminController@usage');
                             $router->get('export', 'Internal\AiAdminController@export');
                             $router->get('knowledge', 'Internal\AiAdminController@knowledge');

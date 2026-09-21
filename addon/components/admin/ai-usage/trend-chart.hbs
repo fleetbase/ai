@@ -1,0 +1,14 @@
+<div class="fleetbase-ai-usage-card" ...attributes>
+    <div class="fleetbase-ai-usage-card-header">
+        <h4>Activity over time</h4>
+    </div>
+    <div class="fleetbase-ai-usage-chart">
+        {{#if @isLoading}}
+            <div class="fleetbase-ai-usage-chart-placeholder"><Spinner /></div>
+        {{else if this.days.length}}
+            <Chart @type="bar" @labels={{this.labels}} @datasets={{this.datasets}} @options={{this.options}} />
+        {{else}}
+            <div class="fleetbase-ai-usage-chart-placeholder">No activity in this period.</div>
+        {{/if}}
+    </div>
+</div>

@@ -1,0 +1,52 @@
+<section class="fleetbase-ai-logs-pane" aria-label="Conversation" ...attributes>
+    {{#if this.session}}
+        <header class="fleetbase-ai-logs-pane-header">
+            <div class="fleetbase-ai-logs-pane-heading">
+                {{#if @onClose}}
+                    <button type="button" class="fleetbase-ai-logs-back" aria-label="Back to conversations" {{on "click" @onClose}}>
+                        <FaIcon @icon="arrow-left" />
+                    </button>
+                {{/if}}
+                <h3 class="fleetbase-ai-logs-pane-title">{{this.title}}</h3>
+                <Badge @status={{this.statusType}} @text={{this.session.status}} />
+                <div class="fleetbase-ai-logs-pane-actions">
+                    <Button @size="xs" @icon="copy" @text="Copy ID" @onClick={{this.copyId}} />
+                    {{#if @onExport}}
+                        <DropdownButton @icon="download" @text="Export" @size="xs" @renderInPlace={{true}} @contentClass="dropdown-menu" as |dd|>
+                            <div class="next-dd-menu mt-1 mx-0">
+                                <button type="button" class="next-dd-item w-full" {{on "click" (fn @onExport "jsonl" this.session.uuid dd)}}>JSON Lines</button>
+                                <button type="button" class="next-dd-item w-full" {{on "click" (fn @onExport "csv" this.session.uuid dd)}}>CSV</button>
+                            </div>
+                        </DropdownButton>
+                    {{/if}}
+                </div>
+            </div>
+            <div class="fleetbase-ai-logs-pane-meta">
+                {{#if this.owner}}<span title={{this.ownerTitle}}>{{this.owner}}</span>{{/if}}
+                {{#if this.session.created_at}}<span>Started {{format-date-fns this.session.created_at "dd MMM yyyy HH:mm"}}</span>{{/if}}
+                <span>{{this.turns}}</span>
+                <span title={{this.tokenSplit}}>{{this.totalTokens}} tokens</span>
+            </div>
+        </header>
+
+        <div class="fleetbase-ai-logs-transcript">
+            {{#if @isLoading}}
+                <div class="fleetbase-ai-logs-empty"><Spinner @loadingMessage="Loading conversation..." /></div>
+            {{else}}
+                {{#each this.tasks as |task|}}
+                    <Admin::AiLogs::Turn @task={{task}} />
+                {{else}}
+                    <div class="fleetbase-ai-logs-empty"><span>This conversation has no messages.</span></div>
+                {{/each}}
+            {{/if}}
+        </div>
+    {{else if @isLoading}}
+        <div class="fleetbase-ai-logs-empty"><Spinner @loadingMessage="Loading conversation..." /></div>
+    {{else}}
+        <div class="fleetbase-ai-logs-empty">
+            <FaIcon @icon="comments" @size="2x" />
+            <strong>Select a conversation to read it</strong>
+            <span>Every prompt, answer and tool call is shown in full.</span>
+        </div>
+    {{/if}}
+</section>

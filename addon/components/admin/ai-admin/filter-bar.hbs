@@ -1,0 +1,45 @@
+<div class="fleetbase-ai-admin-toolbar" ...attributes>
+    <div class="fleetbase-ai-admin-toolbar-row">
+        {{yield to="before"}}
+        {{#each @primary as |field|}}
+            <Admin::AiAdmin::FilterField
+                @field={{field}}
+                @filters={{@filters}}
+                @metadata={{@metadata}}
+                @companySource={{@companySource}}
+                @userSource={{@userSource}}
+                @searchPlaceholder={{@searchPlaceholder}}
+                @onChange={{@onChange}}
+            />
+        {{/each}}
+        {{#if this.secondary.length}}
+            <button type="button" class="fleetbase-ai-admin-toolbar-more {{if this.showMore 'is-open'}}" aria-expanded={{if this.showMore "true" "false"}} {{on "click" this.toggleMore}}>
+                <FaIcon @icon="sliders" />
+                More filters
+                {{#if this.secondaryActiveCount}}
+                    <span class="fleetbase-ai-admin-toolbar-count">{{this.secondaryActiveCount}}</span>
+                {{/if}}
+            </button>
+        {{/if}}
+        {{#if this.canClear}}
+            <button type="button" class="fleetbase-ai-admin-toolbar-clear" {{on "click" this.clear}}>Clear</button>
+        {{/if}}
+        <div class="fleetbase-ai-admin-toolbar-actions">
+            {{yield to="actions"}}
+        </div>
+    </div>
+    {{#if this.showMore}}
+        <div class="fleetbase-ai-admin-toolbar-row fleetbase-ai-admin-toolbar-secondary">
+            {{#each this.secondary as |field|}}
+                <Admin::AiAdmin::FilterField
+                    @field={{field}}
+                    @filters={{@filters}}
+                    @metadata={{@metadata}}
+                    @companySource={{@companySource}}
+                    @userSource={{@userSource}}
+                    @onChange={{@onChange}}
+                />
+            {{/each}}
+        </div>
+    {{/if}}
+</div>
