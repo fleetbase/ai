@@ -32,6 +32,9 @@ importers:
       broccoli-funnel:
         specifier: ^3.0.8
         version: 3.0.8
+      date-fns:
+        specifier: ^2.30.0
+        version: 2.30.0
       ember-auto-import:
         specifier: ^2.7.4
         version: 2.13.1(webpack@5.105.4)

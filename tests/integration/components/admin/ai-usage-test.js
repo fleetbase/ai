@@ -75,19 +75,22 @@ module('Integration | Component | admin/ai-usage', function (hooks) {
             hbs`<Admin::AiAdmin::FilterBar @filters={{this.filters}} @primary={{array "session_status" "review"}} @secondary={{array "feedback" "task_status"}} @onChange={{this.onChange}} />`
         );
 
-        assert.dom('.fleetbase-ai-admin-toolbar-count').hasText('1');
+        assert.dom('[data-test-more-filters]').hasText('More filters (1)');
         assert.dom('.fleetbase-ai-admin-toolbar-secondary').doesNotExist();
 
-        await click('.fleetbase-ai-admin-toolbar-more');
+        await click('[data-test-more-filters]');
         assert.dom('.fleetbase-ai-admin-toolbar-secondary').exists();
+        assert.dom('[data-test-more-filters]').hasClass('btn-primary');
 
-        await click('.fleetbase-ai-admin-toolbar-pill');
+        await click('[data-test-filter-degraded]');
         assert.strictEqual(filters.degraded, '1');
         assert.deepEqual(changes, ['degraded']);
+        assert.dom('[data-test-filter-degraded]').hasClass('btn-primary');
+        assert.dom('[data-test-filter-degraded]').hasAttribute('aria-pressed', 'true');
 
-        await click('.fleetbase-ai-admin-toolbar-clear');
+        await click('[data-test-clear-filters]');
         assert.false(filters.hasAny);
         assert.deepEqual(changes, ['degraded', 'clear']);
-        assert.dom('.fleetbase-ai-admin-toolbar-clear').doesNotExist();
+        assert.dom('[data-test-clear-filters]').doesNotExist();
     });
 });

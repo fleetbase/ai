@@ -3,16 +3,20 @@
         @filters={{this.filters}}
         @metadata={{this.metadata}}
         @primary={{this.toolbarFilters}}
+        @secondary={{this.moreFilters}}
         @companySource={{this.sources.companies}}
         @userSource={{this.sources.users}}
         @onChange={{this.filtersChanged}}
     >
         <:before>
-            <div class="fleetbase-ai-admin-toolbar-pills" role="group" aria-label="Period">
+            <div class="fleetbase-ai-admin-toolbar-group" role="group" aria-label="Period">
                 {{#each this.presets as |preset|}}
-                    <button type="button" class="fleetbase-ai-admin-toolbar-pill {{if (eq preset.key this.activePreset) 'is-active'}}" aria-pressed={{if (eq preset.key this.activePreset) "true" "false"}} {{on "click" (fn this.selectPreset preset)}}>
-                        {{preset.label}}
-                    </button>
+                    <Button
+                        @type={{if (eq preset.key this.activePreset) "primary" "default"}}
+                        @text={{preset.label}}
+                        aria-pressed={{if (eq preset.key this.activePreset) "true" "false"}}
+                        @onClick={{fn this.selectPreset preset}}
+                    />
                 {{/each}}
             </div>
         </:before>

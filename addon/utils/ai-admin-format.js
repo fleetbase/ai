@@ -1,15 +1,21 @@
-const numberFormat = new Intl.NumberFormat();
-const compactFormat = new Intl.NumberFormat(undefined, { notation: 'compact', maximumFractionDigits: 1 });
-const relativeFormat = new Intl.RelativeTimeFormat(undefined, { numeric: 'auto', style: 'narrow' });
+import { format, formatDistanceStrict, isValid, parseISO } from 'date-fns';
 
-const RELATIVE_UNITS = [
-    ['year', 31536000],
-    ['month', 2592000],
-    ['week', 604800],
-    ['day', 86400],
-    ['hour', 3600],
-    ['minute', 60],
-];
+// The browser's language, passed explicitly: consoles that force-load the formatjs Intl polyfills
+// otherwise default to whichever locale's data registered first, which formats everything in Arabic.
+export const LOCALE = (typeof navigator !== 'undefined' && navigator.language) || 'en-US';
+
+const numberFormat = new Intl.NumberFormat(LOCALE);
+const compactFormat = new Intl.NumberFormat(LOCALE, { notation: 'compact', maximumFractionDigits: 1 });
+
+function toDate(value) {
+    if (value instanceof Date) {
+        return value;
+    }
+
+    const date = typeof value === 'string' ? parseISO(value) : new Date(value);
+
+    return value !== null && value !== undefined && value !== '' && isValid(date) ? date : null;
+}
 
 function toNumber(value) {
     const number = Number(value);
@@ -46,22 +52,24 @@ export function formatPercent(part, total) {
 }
 
 /**
- * "3 min ago", "yesterday", or "now" for anything under a minute.
+ * "3 hours ago", or "just now" for anything under a minute.
  */
 export function formatRelative(value, now = Date.now()) {
-    const time = value ? new Date(value).getTime() : NaN;
-    if (Number.isNaN(time)) {
+    const date = toDate(value);
+    if (!date) {
         return '';
     }
 
-    const seconds = Math.round((time - now) / 1000);
-    for (const [unit, size] of RELATIVE_UNITS) {
-        if (Math.abs(seconds) >= size) {
-            return relativeFormat.format(Math.round(seconds / size), unit);
-        }
-    }
+    return Math.abs(now - date.getTime()) < 60000 ? 'just now' : formatDistanceStrict(date, now, { addSuffix: true });
+}
 
-    return 'now';
+/**
+ * A calendar day such as "18 Sep", for chart labels.
+ */
+export function formatDay(value) {
+    const date = toDate(typeof value === 'string' ? value.slice(0, 10) : value);
+
+    return date ? format(date, 'd MMM') : '';
 }
 
 /**

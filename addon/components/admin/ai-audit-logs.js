@@ -18,8 +18,8 @@ export default class AdminAiAuditLogsComponent extends Component {
     @service notifications;
 
     filters = new AiAdminFilters();
-    primaryFilters = ['search', 'session_status', 'feedback', 'review', 'date'];
-    secondaryFilters = ['task_status', 'provider', 'model', 'company', 'user'];
+    primaryFilters = ['search', 'feedback', 'review', 'date'];
+    secondaryFilters = ['session_status', 'task_status', 'provider', 'model', 'company', 'user'];
 
     @tracked sessions = [];
     @tracked page = 1;

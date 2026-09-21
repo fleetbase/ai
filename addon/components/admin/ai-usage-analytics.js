@@ -3,6 +3,7 @@ import { inject as service } from '@ember/service';
 import { tracked } from '@glimmer/tracking';
 import { action } from '@ember/object';
 import { task } from 'ember-concurrency';
+import { format, subDays } from 'date-fns';
 import AiAdminFilters, { adminSources, compactQuery } from '../../utils/ai-admin-filters';
 
 export const RANGE_PRESETS = [
@@ -12,12 +13,6 @@ export const RANGE_PRESETS = [
     { key: 'all', label: 'All time', days: null },
 ];
 
-function isoDate(date) {
-    const pad = (value) => String(value).padStart(2, '0');
-
-    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
-}
-
 /**
  * The range covering the last `days` days, today included.
  */
@@ -26,10 +21,7 @@ export function presetRange(days, today = new Date()) {
         return { from: '', to: '' };
     }
 
-    const start = new Date(today);
-    start.setDate(start.getDate() - (days - 1));
-
-    return { from: isoDate(start), to: isoDate(today) };
+    return { from: format(subDays(today, days - 1), 'yyyy-MM-dd'), to: format(today, 'yyyy-MM-dd') };
 }
 
 /**
@@ -42,7 +34,8 @@ export default class AdminAiUsageAnalyticsComponent extends Component {
 
     filters = new AiAdminFilters();
     presets = RANGE_PRESETS;
-    toolbarFilters = ['task_status', 'provider', 'model', 'company', 'user', 'date'];
+    toolbarFilters = ['date', 'provider', 'model'];
+    moreFilters = ['task_status', 'company', 'user'];
 
     @tracked usage = null;
     @tracked metadata = { providers: [] };

@@ -13,16 +13,17 @@
             />
         {{/each}}
         {{#if this.secondary.length}}
-            <button type="button" class="fleetbase-ai-admin-toolbar-more {{if this.showMore 'is-open'}}" aria-expanded={{if this.showMore "true" "false"}} {{on "click" this.toggleMore}}>
-                <FaIcon @icon="sliders" />
-                More filters
-                {{#if this.secondaryActiveCount}}
-                    <span class="fleetbase-ai-admin-toolbar-count">{{this.secondaryActiveCount}}</span>
-                {{/if}}
-            </button>
+            <Button
+                @icon="sliders"
+                @text={{if this.secondaryActiveCount (concat "More filters (" this.secondaryActiveCount ")") "More filters"}}
+                @type={{if this.showMore "primary" "default"}}
+                aria-expanded={{if this.showMore "true" "false"}}
+                data-test-more-filters
+                @onClick={{this.toggleMore}}
+            />
         {{/if}}
         {{#if this.canClear}}
-            <button type="button" class="fleetbase-ai-admin-toolbar-clear" {{on "click" this.clear}}>Clear</button>
+            <Button @type="link" @text="Clear" data-test-clear-filters @onClick={{this.clear}} />
         {{/if}}
         <div class="fleetbase-ai-admin-toolbar-actions">
             {{yield to="actions"}}

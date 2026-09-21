@@ -1,5 +1,5 @@
 import { module, test } from 'qunit';
-import { formatCompact, formatDuration, formatJson, formatNumber, formatPercent, formatRelative, statusType, stepLabel } from 'dummy/utils/ai-admin-format';
+import { formatCompact, formatDay, formatDuration, formatJson, formatNumber, formatPercent, formatRelative, statusType, stepLabel } from 'dummy/utils/ai-admin-format';
 
 module('Unit | Utility | ai-admin-format', function () {
     test('numbers read with separators, compact notation, and percentages', function (assert) {
@@ -22,9 +22,15 @@ module('Unit | Utility | ai-admin-format', function () {
         assert.strictEqual(formatDuration('2026-09-20T11:00:00Z', start), null);
 
         const now = new Date('2026-09-20T12:00:00Z').getTime();
-        assert.strictEqual(formatRelative('2026-09-20T11:59:40Z', now), 'now');
-        assert.true(formatRelative('2026-09-20T10:00:00Z', now).length > 0);
+        assert.strictEqual(formatRelative('2026-09-20T11:59:40Z', now), 'just now');
+        assert.strictEqual(formatRelative('2026-09-20T09:00:00Z', now), '3 hours ago');
         assert.strictEqual(formatRelative(null, now), '');
+        assert.strictEqual(formatRelative('not a date', now), '');
+
+        // Dates come from date-fns, so they never pick up a polyfilled Intl default locale.
+        assert.strictEqual(formatDay('2026-09-18'), '18 Sep');
+        assert.strictEqual(formatDay('2026-09-18 00:00:00'), '18 Sep');
+        assert.strictEqual(formatDay(null), '');
     });
 
     test('step labels, JSON, and badge statuses', function (assert) {

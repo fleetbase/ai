@@ -1091,19 +1091,20 @@ body[data-theme='dark'] .fleetbase-ai-admin-toolbar-secondary {
 
 .fleetbase-ai-admin-toolbar-search {
     position: relative;
-    flex: 1 1 260px;
-    max-width: 360px;
+    flex: 1 1 220px;
+    max-width: 340px;
 }
 
-.fleetbase-ai-admin-toolbar-search input {
-    width: 100%;
-    padding-left: 28px;
+/* Outranks Fleetbase's input.form-input.form-input-sm padding so text clears the icon. */
+.fleetbase-ai-admin-toolbar-search input.form-input.form-input-sm {
+    padding-left: 1.875rem;
 }
 
 .fleetbase-ai-admin-toolbar-search-icon {
     position: absolute;
     top: 50%;
-    left: 9px;
+    left: 0.625rem;
+    z-index: 1;
     transform: translateY(-50%);
     color: #9ca3af;
     font-size: 12px;
@@ -1111,92 +1112,29 @@ body[data-theme='dark'] .fleetbase-ai-admin-toolbar-secondary {
 }
 
 .fleetbase-ai-admin-toolbar-select,
-.fleetbase-ai-admin-toolbar-model,
-.fleetbase-ai-admin-toolbar-date {
-    width: 170px;
+.fleetbase-ai-admin-toolbar-model {
+    width: 150px;
     min-width: 0;
 }
 
+.fleetbase-ai-admin-toolbar-model {
+    width: 180px;
+}
+
+/* The DatePicker renders its own input; make it fill the field instead of leaving a gap. */
 .fleetbase-ai-admin-toolbar-date {
-    width: 210px;
+    width: 200px;
 }
 
-.fleetbase-ai-admin-toolbar-pills {
-    display: inline-flex;
-    gap: 4px;
+.fleetbase-ai-admin-toolbar-date > *,
+.fleetbase-ai-admin-toolbar-date input {
+    width: 100%;
 }
 
-.fleetbase-ai-admin-toolbar-pill,
-.fleetbase-ai-admin-toolbar-more,
-.fleetbase-ai-admin-toolbar-clear {
+.fleetbase-ai-admin-toolbar-group {
     display: inline-flex;
     align-items: center;
-    gap: 5px;
-    height: 30px;
-    padding: 0 10px;
-    border: 1px solid #d1d5db;
-    border-radius: 6px;
-    background: #fff;
-    color: #374151;
-    font-size: 12px;
-    font-weight: 500;
-    white-space: nowrap;
-}
-
-.fleetbase-ai-admin-toolbar-pill:hover,
-.fleetbase-ai-admin-toolbar-more:hover {
-    border-color: #9ca3af;
-}
-
-.fleetbase-ai-admin-toolbar-pill.is-active,
-.fleetbase-ai-admin-toolbar-more.is-open {
-    border-color: #3b82f6;
-    background: #eff6ff;
-    color: #1d4ed8;
-}
-
-.fleetbase-ai-admin-toolbar-clear {
-    border-color: transparent;
-    background: transparent;
-    color: #6b7280;
-}
-
-.fleetbase-ai-admin-toolbar-clear:hover {
-    color: #111827;
-    text-decoration: underline;
-}
-
-body[data-theme='dark'] .fleetbase-ai-admin-toolbar-pill,
-body[data-theme='dark'] .fleetbase-ai-admin-toolbar-more {
-    border-color: #4b5563;
-    background: #111827;
-    color: #d1d5db;
-}
-
-body[data-theme='dark'] .fleetbase-ai-admin-toolbar-pill.is-active,
-body[data-theme='dark'] .fleetbase-ai-admin-toolbar-more.is-open {
-    border-color: #3b82f6;
-    background: rgb(59 130 246 / 18%);
-    color: #93c5fd;
-}
-
-body[data-theme='dark'] .fleetbase-ai-admin-toolbar-clear {
-    color: #9ca3af;
-}
-
-body[data-theme='dark'] .fleetbase-ai-admin-toolbar-clear:hover {
-    color: #f3f4f6;
-}
-
-.fleetbase-ai-admin-toolbar-count {
-    min-width: 18px;
-    padding: 0 5px;
-    border-radius: 9px;
-    background: #3b82f6;
-    color: #fff;
-    font-size: 11px;
-    line-height: 18px;
-    text-align: center;
+    gap: 6px;
 }
 
 .fleetbase-ai-admin-toolbar-actions {

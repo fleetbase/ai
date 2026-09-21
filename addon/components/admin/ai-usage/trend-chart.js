@@ -1,7 +1,5 @@
 import Component from '@glimmer/component';
-import { formatCompact } from '../../../utils/ai-admin-format';
-
-const dayFormat = new Intl.DateTimeFormat(undefined, { day: 'numeric', month: 'short', timeZone: 'UTC' });
+import { LOCALE, formatCompact, formatDay, formatNumber } from '../../../utils/ai-admin-format';
 
 /**
  * Answers and tokens per day. `<Chart>` draws once when inserted, so the parent re-renders this
@@ -13,7 +11,7 @@ export default class AdminAiUsageTrendChartComponent extends Component {
     }
 
     get labels() {
-        return this.days.map((row) => dayFormat.format(new Date(`${String(row.day).slice(0, 10)}T00:00:00Z`)));
+        return this.days.map((row) => formatDay(row.day));
     }
 
     get datasets() {
@@ -49,12 +47,14 @@ export default class AdminAiUsageTrendChartComponent extends Component {
         const grid = dark ? 'rgba(75, 85, 99, 0.35)' : 'rgba(229, 231, 235, 0.9)';
 
         return {
+            // chart.js formats ticks with Intl; give it the browser's language explicitly.
+            locale: LOCALE,
             responsive: true,
             maintainAspectRatio: false,
             interaction: { mode: 'index', intersect: false },
             plugins: {
                 legend: { position: 'top', align: 'end', labels: { color: text, boxWidth: 10, boxHeight: 10 } },
-                tooltip: { callbacks: { label: (item) => `${item.dataset.label}: ${Number(item.raw).toLocaleString()}` } },
+                tooltip: { callbacks: { label: (item) => `${item.dataset.label}: ${formatNumber(item.raw)}` } },
             },
             scales: {
                 x: { grid: { display: false }, ticks: { color: text, maxRotation: 0, autoSkip: true, maxTicksLimit: 12 } },
