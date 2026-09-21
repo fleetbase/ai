@@ -4,6 +4,10 @@
     </InputGroup>
 
     {{#if this.isEnabled}}
+        <InputGroup class="mb-2" @helpText="Lets the model search the Fleetbase documentation, look up company data, and offer console actions before answering. Recommended.">
+            <Toggle @isToggled={{this.config.tool_calling}} @onToggle={{fn this.setValue "tool_calling"}} @label="Look up answers with tools" />
+        </InputGroup>
+
         <InputGroup @name="Provider">
             <Select
                 class="w-full"

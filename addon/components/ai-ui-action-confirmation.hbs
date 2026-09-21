@@ -1,0 +1,22 @@
+<div class="fleetbase-ai-response-region fleetbase-ai-action-card fleetbase-ai-ui-action" data-status={{@action.status}}>
+    <div class="fleetbase-ai-action-header">
+        <div>
+            <div class="fleetbase-ai-action-title">{{@action.label}}</div>
+            <div class="fleetbase-ai-action-message">{{@action.breadcrumb}}</div>
+        </div>
+        {{#if this.statusLabel}}
+            <span class="fleetbase-ai-action-status">{{this.statusLabel}}</span>
+        {{/if}}
+    </div>
+
+    {{#if this.isFailed}}
+        <div class="fleetbase-ai-action-error">This action could not be completed.</div>
+    {{/if}}
+
+    {{#if this.isPending}}
+        <div class="fleetbase-ai-action-controls">
+            <Button @type="primary" @size="sm" @icon="arrow-right" @text="Go" @isLoading={{this.confirm.isRunning}} @disabled={{this.isBusy}} @onClick={{perform this.confirm}} />
+            <Button @size="sm" @icon="xmark" @text="Dismiss" @isLoading={{this.dismiss.isRunning}} @disabled={{this.isBusy}} @onClick={{perform this.dismiss}} />
+        </div>
+    {{/if}}
+</div>

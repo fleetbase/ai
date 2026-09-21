@@ -1,0 +1,86 @@
+<article class="fleetbase-ai-logs-turn" data-test-turn={{or @task.uuid @task.id}} ...attributes>
+    <div class="fleetbase-ai-logs-turn-question">
+        <div class="fleetbase-ai-logs-turn-label">
+            <span>{{or @task.created_by.name "User"}}</span>
+            {{#if @task.created_at}}
+                <time datetime={{@task.created_at}}>{{format-date-fns @task.created_at "dd MMM yyyy HH:mm"}}</time>
+            {{/if}}
+        </div>
+        <div class="fleetbase-ai-user-message-body fleetbase-ai-logs-prompt">{{or @task.prompt @task.prompt_excerpt}}</div>
+    </div>
+
+    <div class="fleetbase-ai-logs-turn-answer">
+        <div class="fleetbase-ai-logs-turn-label">
+            <span>Fleetbase AI</span>
+            <Badge @status={{this.statusType}} @text={{@task.status}} />
+            {{#if this.model}}<span class="fleetbase-ai-logs-chip">{{this.model}}</span>{{/if}}
+            <span class="fleetbase-ai-logs-chip" title={{this.tokensTitle}}>{{this.tokens}}</span>
+            {{#if this.duration}}<span class="fleetbase-ai-logs-chip">{{this.duration}}</span>{{/if}}
+            {{#if this.mode}}<span class="fleetbase-ai-logs-chip">{{this.mode}}</span>{{/if}}
+        </div>
+
+        {{#if this.formattedResponse}}
+            <div class="fleetbase-ai-answer-body fleetbase-ai-logs-answer">{{this.formattedResponse}}</div>
+        {{else}}
+            <div class="fleetbase-ai-logs-answer is-empty">No answer was recorded.</div>
+        {{/if}}
+
+        {{#if (or this.flags.length this.feedback)}}
+            <div class="fleetbase-ai-logs-flags">
+                {{#if this.feedback}}
+                    <span class="fleetbase-ai-logs-flag {{this.feedback.tone}}"><FaIcon @icon={{this.feedback.icon}} /> {{this.feedback.label}}</span>
+                {{/if}}
+                {{#each this.flags as |flag|}}
+                    <span class="fleetbase-ai-logs-flag {{flag.tone}}" title={{flag.title}}><FaIcon @icon={{flag.icon}} /> {{flag.label}}</span>
+                {{/each}}
+            </div>
+        {{/if}}
+
+        {{#if @task.feedback_comment}}
+            <blockquote class="fleetbase-ai-logs-callout is-danger"><strong>Feedback:</strong> {{@task.feedback_comment}}</blockquote>
+        {{/if}}
+        {{#if this.errorMessage}}
+            <div class="fleetbase-ai-logs-callout is-danger"><strong>Error:</strong> {{this.errorMessage}}</div>
+        {{/if}}
+        {{#if this.unreachableCapabilities}}
+            <div class="fleetbase-ai-logs-callout is-warning" title="Registered by an engine but never given a tool definition, so the model could not use them.">
+                <strong>Unreachable capabilities:</strong> {{this.unreachableCapabilities}}
+            </div>
+        {{/if}}
+
+        {{#if this.stepsCount}}
+            <div class="fleetbase-ai-logs-steps">
+                <button type="button" class="fleetbase-ai-logs-steps-toggle" aria-expanded={{if this.stepsOpen "true" "false"}} {{on "click" this.toggleSteps}}>
+                    <FaIcon @icon={{if this.stepsOpen "chevron-down" "chevron-right"}} />
+                    {{this.stepsCount}} step{{if (eq this.stepsCount 1) "" "s"}}
+                </button>
+                {{#if this.stepsOpen}}
+                    {{#if this.loadSteps.isRunning}}
+                        <Spinner @loadingMessage="Loading steps..." @wrapperClass="fleetbase-ai-logs-steps-loading" />
+                    {{else}}
+                        <ol class="fleetbase-ai-logs-step-list">
+                            {{#each this.stepRows as |step|}}
+                                <li class="fleetbase-ai-logs-step {{if step.isOpen 'is-open'}}" data-test-step={{step.id}}>
+                                    <button type="button" class="fleetbase-ai-logs-step-summary" aria-expanded={{if step.isOpen "true" "false"}} {{on "click" (fn this.toggleStep step.id)}}>
+                                        <span class="fleetbase-ai-logs-step-name">{{step.label}}</span>
+                                        <Badge @status={{step.statusType}} @text={{step.status}} />
+                                        {{#if step.tokens}}<span class="fleetbase-ai-logs-chip">{{step.tokens}} tokens</span>{{/if}}
+                                        {{#if step.duration}}<span class="fleetbase-ai-logs-chip">{{step.duration}}</span>{{/if}}
+                                    </button>
+                                    {{#if step.isOpen}}
+                                        <div class="fleetbase-ai-logs-step-detail">
+                                            {{#if step.input}}<h5>Input</h5><pre class="fleetbase-ai-logs-json">{{step.input}}</pre>{{/if}}
+                                            {{#if step.output}}<h5>Output</h5><pre class="fleetbase-ai-logs-json">{{step.output}}</pre>{{/if}}
+                                            {{#if step.error}}<h5>Error</h5><pre class="fleetbase-ai-logs-json is-error">{{step.error}}</pre>{{/if}}
+                                            {{#unless (or step.input step.output step.error)}}<p class="fleetbase-ai-logs-muted">Nothing was recorded for this step.</p>{{/unless}}
+                                        </div>
+                                    {{/if}}
+                                </li>
+                            {{/each}}
+                        </ol>
+                    {{/if}}
+                {{/if}}
+            </div>
+        {{/if}}
+    </div>
+</article>

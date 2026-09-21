@@ -4,6 +4,8 @@ namespace Fleetbase\Ai\Http\Controllers\Internal;
 
 use Fleetbase\Ai\Models\AiTask;
 use Fleetbase\Ai\Services\AiTaskService;
+use Fleetbase\Ai\Services\AiUiActionService;
+use Fleetbase\Ai\Support\AiAudience;
 use Fleetbase\Http\Controllers\Controller;
 use Fleetbase\Models\Setting;
 use Illuminate\Database\Eloquent\Builder;
@@ -86,12 +88,70 @@ class AiTaskController extends Controller
         return response()->json(['task' => $task->fresh(['steps', 'session'])]);
     }
 
+    /**
+     * Record the user's rating of an answer: 1 (helpful), -1 (not helpful), or null to clear it.
+     */
+    public function feedback(string $id, Request $request)
+    {
+        $request->validate([
+            'rating'  => ['nullable', 'integer', 'in:-1,1'],
+            'comment' => ['nullable', 'string', 'max:2000'],
+        ]);
+
+        $task   = $this->findTask($id);
+        $rating = $request->input('rating');
+
+        $task->update([
+            'feedback_rating'  => $rating === null ? null : (int) $rating,
+            'feedback_comment' => $rating === null ? null : $request->input('comment'),
+            'feedback_at'      => $rating === null ? null : now(),
+        ]);
+
+        return response()->json(['task' => $task->fresh(['steps', 'session']) ?? $task]);
+    }
+
+    public function confirmUiAction(string $id, string $actionId, Request $request, AiUiActionService $actions)
+    {
+        $this->abortIfAiDisabled();
+
+        $task   = $this->findTask($id);
+        $result = $actions->confirm($task, $actionId, AiAudience::forUser($request->user()));
+
+        return $this->uiActionResponse($task, $result);
+    }
+
+    public function dismissUiAction(string $id, string $actionId, AiUiActionService $actions)
+    {
+        $task = $this->findTask($id);
+
+        return $this->uiActionResponse($task, $actions->dismiss($task, $actionId));
+    }
+
+    public function failUiAction(string $id, string $actionId, Request $request, AiUiActionService $actions)
+    {
+        $task = $this->findTask($id);
+
+        return $this->uiActionResponse($task, $actions->fail($task, $actionId, $request->input('error')));
+    }
+
+    protected function uiActionResponse(AiTask $task, array $result)
+    {
+        $payload = array_filter([
+            'message' => $result['message'] ?? null,
+            'action'  => $result['action'] ?? null,
+        ]);
+
+        return response()->json(array_merge($payload, ['task' => $task->fresh(['steps', 'session']) ?? $task]), $result['status']);
+    }
+
     protected function findTask(string $id): AiTask
     {
         return $this->tasksForCurrentCompany()
             ->where('created_by_uuid', optional(request()->user())->uuid)
             ->where(function ($query) use ($id) {
-                $query->where('uuid', $id)->orWhere('id', $id);
+                // Only compare against the numeric key when the value really is a number: MySQL
+                // casts a UUID like `4dcd1b1f-...` to the integer 4 and would match the wrong row.
+                $query->where('uuid', $id)->when(ctype_digit($id), fn ($query) => $query->orWhere('id', (int) $id));
             })
             ->firstOrFail();
     }

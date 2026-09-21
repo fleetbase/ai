@@ -1,0 +1,46 @@
+<ContentPanel @title="AI Knowledge Base" @open={{true}} @wrapperClass="bordered-classic">
+    <div class="fleetbase-ai-admin-panel">
+        <p class="fleetbase-ai-admin-help">
+            Fleetbase AI answers how-to and navigation questions from the official Fleetbase documentation. Pages meant for system administrators or developers are only used when the person asking has that access.
+        </p>
+
+        {{#if this.knowledge}}
+            <div class="fleetbase-ai-admin-detail-grid">
+                <div><label>Pages</label><span>{{this.knowledge.documents}}</span></div>
+                <div><label>Sections</label><span>{{this.knowledge.chunks}}</span></div>
+                <div><label>Last synced</label><span>{{n-a (format-date-fns this.knowledge.last_synced "dd MMM yyyy HH:mm")}}</span></div>
+                <div><label>Packaged snapshot</label><span>{{if this.knowledge.snapshot_available "Available" "Missing"}}</span></div>
+            </div>
+
+            {{#if this.audiences}}
+                <div class="fleetbase-ai-admin-card">
+                    <div class="fleetbase-ai-admin-card-header"><span>Pages by audience</span></div>
+                    <div class="fleetbase-ai-admin-detail-grid">
+                        {{#each this.audiences as |audience|}}
+                            <div><label>{{audience.label}}</label><span>{{audience.total}}</span></div>
+                        {{/each}}
+                    </div>
+                </div>
+            {{/if}}
+
+            {{#if this.modules}}
+                <div class="fleetbase-ai-admin-card">
+                    <div class="fleetbase-ai-admin-card-header"><span>Pages by module</span></div>
+                    <div class="fleetbase-ai-admin-detail-grid">
+                        {{#each this.modules as |row|}}
+                            <div><label>{{row.module}}</label><span>{{row.total}}</span></div>
+                        {{/each}}
+                    </div>
+                </div>
+            {{/if}}
+        {{else}}
+            <div class="fleetbase-ai-admin-empty">{{if this.load.isRunning "Loading..." "Knowledge base status is unavailable."}}</div>
+        {{/if}}
+
+        <div class="fleetbase-ai-admin-actions">
+            <Button @type="primary" @icon="rotate" @text="Sync from fleetbase.io/docs" @isLoading={{this.sync.isRunning}} @onClick={{perform this.sync "site"}} />
+            <Button @icon="box-archive" @text="Load packaged snapshot" @isLoading={{this.sync.isRunning}} @disabled={{not this.knowledge.snapshot_available}} @onClick={{perform this.sync "snapshot"}} />
+            <Button @icon="refresh" @text="Refresh status" @isLoading={{this.load.isRunning}} @onClick={{perform this.load}} />
+        </div>
+    </div>
+</ContentPanel>

@@ -71,7 +71,9 @@ class AiSessionController extends Controller
         return $this->sessionsForCurrentCompany()
             ->where('created_by_uuid', optional(request()->user())->uuid)
             ->where(function ($query) use ($id) {
-                $query->where('uuid', $id)->orWhere('id', $id);
+                // A UUID beginning with digits is cast to an integer by MySQL, so it would
+                // otherwise match an unrelated row by its numeric key.
+                $query->where('uuid', $id)->when(ctype_digit($id), fn ($query) => $query->orWhere('id', (int) $id));
             })
             ->firstOrFail();
     }

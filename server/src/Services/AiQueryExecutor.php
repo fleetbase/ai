@@ -93,6 +93,36 @@ class AiQueryExecutor
         ];
     }
 
+    /**
+     * Newest matching records with the total number of matches, so callers know when a list is partial.
+     */
+    public function listRecords(string $resourceKey, array $filters = [], int $limit = 10): array
+    {
+        $resource = $this->resource($resourceKey);
+        if (!$resource) {
+            return ['authorized' => false, 'error' => 'Unknown query resource.'];
+        }
+
+        if (!$this->can($resource)) {
+            return ['authorized' => false, 'resource' => $resource->key];
+        }
+
+        $limit   = min(max($limit, 1), $resource->maxLimit);
+        $query   = $this->applyFilters($resource, $resource->query(), $filters);
+        $total   = (clone $query)->count();
+        $records = $query->latest()->limit($limit)->get();
+
+        return [
+            'authorized'     => true,
+            'resource'       => $resource->key,
+            'filters'        => $filters,
+            'total_matching' => $total,
+            'returned'       => $records->count(),
+            'truncated'      => $total > $records->count(),
+            'records'        => $records->map(fn ($record) => $this->sanitizeRecord($resource, $record))->values()->all(),
+        ];
+    }
+
     public function locationSummary(string $resourceKey, array $filters = [], int $limit = 100): array
     {
         $resource = $this->resource($resourceKey);

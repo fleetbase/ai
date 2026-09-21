@@ -1,0 +1,227 @@
+{
+    "description": "Golden cases for Fleetbase AI, drawn from production conversations (Aug-Sep 2026) and facts verified against the console code and fleetbase.io/docs. Run with: php artisan ai:eval",
+    "cases": [
+        {
+            "id": "add-user-where",
+            "prompt": "Where do I add a user?",
+            "route": "console.fleet-ops.operations.orders.index",
+            "audience": "end_user",
+            "permissions": ["iam list user", "iam create user"],
+            "expect": {
+                "required_tools": ["search_docs"],
+                "required_ui_commands_any": ["iam.users.create", "iam.users.open", "iam.users.invite"],
+                "must_contain_all_of_any": [["IAM"], ["Users"]],
+                "must_not_contain": ["Admin >"]
+            }
+        },
+        {
+            "id": "add-user-for-me",
+            "prompt": "Add a new user for me",
+            "route": "console.home",
+            "audience": "end_user",
+            "permissions": ["iam list user", "iam create user"],
+            "expect": {
+                "required_ui_commands_any": ["iam.users.create", "iam.users.invite"],
+                "must_not_contain": ["I have created", "I've created", "I opened", "I've opened", "I have opened", "user has been created"]
+            }
+        },
+        {
+            "id": "view-maps-api-key-end-user",
+            "prompt": "how do i view maps? i see there is an api key required?",
+            "route": "console.fleet-ops.operations.orders.index",
+            "audience": "end_user",
+            "permissions": ["fleet-ops view map-settings", "fleet-ops list order"],
+            "expect": {
+                "required_tools": ["search_docs"],
+                "must_contain_all_of_any": [["Settings > Map", "Map settings", "Map Settings"]],
+                "must_not_contain": ["Admin >", "Config > Services", "System Settings", "GOOGLE_MAPS_API_KEY", ".env", "Google Cloud Console"],
+                "forbidden_ui_commands": ["admin.config.services.open"]
+            }
+        },
+        {
+            "id": "view-maps-api-key-system-admin",
+            "prompt": "how do i view maps? i see there is an api key required?",
+            "route": "console.fleet-ops.operations.orders.index",
+            "audience": "system_admin",
+            "expect": {
+                "required_tools": ["search_docs"],
+                "must_contain_all_of_any": [["Services"], ["Map"]]
+            }
+        },
+        {
+            "id": "google-maps-key-end-user-ru",
+            "prompt": "где вводить GOOGLE_MAPS_API_KEY",
+            "route": "console.fleet-ops.settings.map",
+            "audience": "end_user",
+            "permissions": ["fleet-ops view map-settings"],
+            "expect": {
+                "must_contain_all_of_any": [["администратор", "administrator"]],
+                "must_not_contain": ["Admin >", "Config > Services", "System Settings", ".env"],
+                "forbidden_ui_commands": ["admin.config.services.open"]
+            }
+        },
+        {
+            "id": "google-maps-key-system-admin-ru",
+            "prompt": "где вводить GOOGLE_MAPS_API_KEY",
+            "route": "console.fleet-ops.settings.map",
+            "audience": "system_admin",
+            "expect": {
+                "required_tools": ["search_docs"],
+                "must_contain_all_of_any": [["Services"]]
+            }
+        },
+        {
+            "id": "navigator-connection-th",
+            "prompt": "connection config host key socket cluster port เอาจากไหนในหน้าเว็บ",
+            "route": "console.fleet-ops.settings.navigator-app",
+            "audience": "end_user",
+            "permissions": ["fleet-ops view navigator-settings"],
+            "expect": {
+                "required_tools": ["search_docs"],
+                "must_not_contain": ["SOCKETCLUSTER_PORT", "FLEETBASE_KEY", "FLEETBASE_HOST", "Admin >", ".env"]
+            }
+        },
+        {
+            "id": "currency-nio-es",
+            "prompt": "AGREGAR LA MONEDA NIO",
+            "route": "console.settings.virtual",
+            "audience": "end_user",
+            "permissions": [],
+            "expect": {
+                "required_tools": ["search_docs"],
+                "must_not_contain": ["Add Currency", "Agregar moneda", "Monedas activas"]
+            }
+        },
+        {
+            "id": "create-customers",
+            "prompt": "how can i create new costumers names",
+            "route": "console.fleet-ops.operations.orders.index",
+            "audience": "end_user",
+            "permissions": ["fleet-ops list contact", "fleet-ops create contact"],
+            "expect": {
+                "required_tools": ["search_docs"],
+                "must_contain_all_of_any": [["Customer"]]
+            }
+        },
+        {
+            "id": "bulk-import-customers",
+            "prompt": "how to add customers in bulk",
+            "route": "console.fleet-ops.operations.orders.index",
+            "audience": "end_user",
+            "permissions": ["fleet-ops list contact", "fleet-ops import contact"],
+            "expect": {
+                "required_tools": ["search_docs"],
+                "must_contain_all_of_any": [["import"]]
+            }
+        },
+        {
+            "id": "create-dashboard",
+            "prompt": "how can create my dashboard",
+            "route": "console.fleet-ops.management.issues.index",
+            "audience": "end_user",
+            "permissions": [],
+            "expect": {
+                "required_tools": ["search_docs"],
+                "must_contain_all_of_any": [["dashboard"]]
+            }
+        },
+        {
+            "id": "activate-driver-es",
+            "prompt": "como activar un conductor",
+            "route": "console.settings.index",
+            "audience": "end_user",
+            "permissions": ["fleet-ops list driver", "fleet-ops update driver"],
+            "expect": {
+                "required_tools": ["search_docs"],
+                "must_not_contain": ["Active / Activo", "estado a Active", "status to Active"]
+            }
+        },
+        {
+            "id": "order-import-template",
+            "prompt": "download order import template",
+            "route": "console.storefront.catalogs.index.index",
+            "audience": "end_user",
+            "permissions": ["fleet-ops list order", "fleet-ops import order"],
+            "expect": {
+                "required_tools": ["search_docs"],
+                "must_contain_all_of_any": [["template"]],
+                "must_not_contain": ["I can't generate or attach"]
+            }
+        },
+        {
+            "id": "pallet-extension",
+            "prompt": "where do i get pallet extention",
+            "route": "console.fleet-ops.operations.orders.index",
+            "audience": "end_user",
+            "permissions": [],
+            "expect": {
+                "required_tools": ["search_docs"],
+                "must_contain_all_of_any": [["Extensions", "marketplace"]],
+                "must_not_contain": ["Fleet-Ops > settings"]
+            }
+        },
+        {
+            "id": "recurring-routes-ru",
+            "prompt": "просмотри документацию и сообщи как создать повторяющиеся маршруты",
+            "route": "console.fleet-ops.operations.orders.index",
+            "audience": "end_user",
+            "permissions": ["fleet-ops list order"],
+            "expect": {
+                "required_tools": ["search_docs"]
+            }
+        },
+        {
+            "id": "follow-up-yes-es",
+            "history": [
+                {"role": "user", "content": "como agregar un conductor"},
+                {"role": "assistant", "content": "Puedes agregar conductores en Fleet-Ops › Conductores. ¿Quieres que te indique paso a paso cómo hacerlo?"}
+            ],
+            "prompt": "SI",
+            "route": "console.fleet-ops.management.drivers.index",
+            "audience": "end_user",
+            "permissions": ["fleet-ops list driver", "fleet-ops create driver"],
+            "expect": {
+                "must_contain_all_of_any": [["1.", "1)"]],
+                "must_not_contain": ["Si quieres, te indico", "¿Quieres que te indique"]
+            }
+        },
+        {
+            "id": "numbered-choice",
+            "history": [
+                {"role": "user", "content": "I want to build a cistern delivery platform on Fleetbase. What could we do?"},
+                {"role": "assistant", "content": "I can help with one of these next steps:\n1. Define the cisterns page fields\n2. Define the business orders page flow\n3. Map the delivery workflow in Fleetbase\n\nReply with a number."}
+            ],
+            "prompt": "2",
+            "route": "console.developers.logs.index",
+            "audience": "end_user",
+            "permissions": [],
+            "expect": {
+                "must_contain_all_of_any": [["order"]],
+                "must_not_contain": ["don't yet have any action request", "Reply with a number"]
+            }
+        },
+        {
+            "id": "dummy-orders",
+            "prompt": "Create 3 dummy transport orders with made up pickup and dropoff addresses in Amsterdam",
+            "route": "console.fleet-ops.operations.orders.index",
+            "audience": "end_user",
+            "permissions": ["fleet-ops create order", "fleet-ops list order"],
+            "expect": {
+                "min_tool_calls": {"propose_create_order": 3},
+                "must_not_contain": ["order_config_uuid", "```json", "orders have been created", "I created the orders"]
+            }
+        },
+        {
+            "id": "infor-m3-integration",
+            "prompt": "how do I integrate Infor M3 with Fleetbase",
+            "route": "console.iam.home",
+            "audience": "end_user",
+            "permissions": ["developers list api-key", "developers see api-key"],
+            "expect": {
+                "required_tools": ["search_docs"],
+                "must_contain_all_of_any": [["API", "webhook"]],
+                "must_not_contain": ["Infor connector", "native Infor integration", "built-in Infor"]
+            }
+        }
+    ]
+}

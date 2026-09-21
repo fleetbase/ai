@@ -102,179 +102,6 @@ function aiActionCapability(array $overrides = []): AIActionCapabilityInterface
     };
 }
 
-function aiTaskDouble(array $attributes = []): AiTask
-{
-    return new class($attributes) extends AiTask {
-        protected $attributes = [];
-
-        public array $updates = [];
-
-        public function __construct(array $attributes = [])
-        {
-            $this->attributes = array_merge(['uuid' => 'task-uuid'], $attributes);
-        }
-
-        public function __get($key)
-        {
-            return $this->attributes[$key] ?? null;
-        }
-
-        public function __set($key, $value): void
-        {
-            $this->attributes[$key] = $value;
-        }
-
-        public function update(array $attributes = [], array $options = [])
-        {
-            $this->updates[]  = $attributes;
-            $this->attributes = array_merge($this->attributes, $attributes);
-
-            return true;
-        }
-
-        public function fresh($with = [])
-        {
-            return $this;
-        }
-    };
-}
-
-function aiStepDouble(array $attributes = []): AiTaskStep
-{
-    return new class($attributes) extends AiTaskStep {
-        protected $attributes = [];
-
-        public array $updates = [];
-
-        public function __construct(array $attributes = [])
-        {
-            $this->attributes = $attributes;
-        }
-
-        public function __get($key)
-        {
-            return $this->attributes[$key] ?? null;
-        }
-
-        public function __set($key, $value): void
-        {
-            $this->attributes[$key] = $value;
-        }
-
-        public function update(array $attributes = [], array $options = [])
-        {
-            $this->updates[]  = $attributes;
-            $this->attributes = array_merge($this->attributes, $attributes);
-
-            return true;
-        }
-    };
-}
-
-function aiSessionDouble(array $attributes = []): AiSession
-{
-    return new class($attributes) extends AiSession {
-        protected $attributes = [];
-
-        public array $updates = [];
-
-        public function __construct(array $attributes = [])
-        {
-            $this->attributes = array_merge(['uuid' => 'session-uuid'], $attributes);
-        }
-
-        public function __get($key)
-        {
-            return $this->attributes[$key] ?? null;
-        }
-
-        public function __set($key, $value): void
-        {
-            $this->attributes[$key] = $value;
-        }
-
-        public function update(array $attributes = [], array $options = [])
-        {
-            $this->updates[]  = $attributes;
-            $this->attributes = array_merge($this->attributes, $attributes);
-
-            return true;
-        }
-    };
-}
-
-function aiTaskServiceQueryBuilder(array &$firstRows = [], array $getRows = []): Builder
-{
-    return new class($firstRows, $getRows) extends Builder {
-        public array $calls = [];
-
-        public function __construct(private array &$firstRows, private array $getRows)
-        {
-        }
-
-        public function __clone()
-        {
-        }
-
-        public function where($column, $operator = null, $value = null, $boolean = 'and')
-        {
-            if (is_callable($column)) {
-                $nested = aiTaskServiceQueryBuilder($this->firstRows);
-                $column($nested);
-                $this->calls[] = ['where_nested', $nested->calls];
-
-                return $this;
-            }
-
-            $this->calls[] = ['where', $column, $operator, $value, $boolean];
-
-            return $this;
-        }
-
-        public function orWhere($column, $operator = null, $value = null)
-        {
-            $this->calls[] = ['orWhere', $column, $operator, $value];
-
-            return $this;
-        }
-
-        public function whereNotNull($columns, $boolean = 'and', $not = false)
-        {
-            $this->calls[] = ['whereNotNull', $columns, $boolean, $not];
-
-            return $this;
-        }
-
-        public function latest($column = null)
-        {
-            $this->calls[] = ['latest', $column];
-
-            return $this;
-        }
-
-        public function limit($value)
-        {
-            $this->calls[] = ['limit', $value];
-
-            return $this;
-        }
-
-        public function first($columns = ['*'])
-        {
-            $this->calls[] = ['first', $columns];
-
-            return array_shift($this->firstRows);
-        }
-
-        public function get($columns = ['*'])
-        {
-            $this->calls[] = ['get', $columns];
-
-            return collect($this->getRows);
-        }
-    };
-}
-
 function aiProviderDouble(array $result = [], ?Throwable $throwable = null): AIProviderInterface
 {
     return new class($result, $throwable) implements AIProviderInterface {
@@ -334,16 +161,6 @@ function aiTaskServiceDouble(AiCapabilityRegistry $registry, array &$steps): AiT
     };
 }
 
-function aiCreateRequest(array $input): Request
-{
-    $request = Request::create('/ai/tasks', 'POST', $input);
-    $request->setUserResolver(fn () => new class {
-        public string $uuid = 'user-uuid';
-    });
-
-    return $request;
-}
-
 test('task service creates tasks from requests with provider context attachments and action previews', function () {
     session(['company' => 'company-uuid']);
 
@@ -373,7 +190,10 @@ test('task service creates tasks from requests with provider context attachments
                 new class($registry) extends AiContextResolver {
                     public function resolve(AiTask $task): array
                     {
-                        return [['capability' => 'fleetbase.ai.context', 'result' => ['screen' => 'orders']]];
+                        return [
+                            ['capability' => 'fleetbase.ai.context', 'result' => ['screen' => 'orders']],
+                            ['capability' => 'fleetbase.ai.broken', 'result' => ['error' => 'capability_unavailable'], 'failure' => ['message' => "SQLSTATE[42S22]: Unknown column 'sensor_type'", 'type' => 'QueryException']],
+                        ];
                     }
                 },
                 $registry,
@@ -438,9 +258,11 @@ test('task service creates tasks from requests with provider context attachments
         'session_uuid' => 'ended-session',
         'task_type'    => 'dispatch',
         'prompt'       => 'Create order from attachment',
-        'context'      => ['route' => 'orders.index'],
+        'context'      => ['route' => 'console.fleet-ops.operations.orders.index'],
         'attachments'  => ['file-1'],
     ]));
+
+    $providerCall = $service->providerDouble->calls[0];
 
     expect($createdSessions[0])->toMatchArray([
         'company_uuid'    => 'company-uuid',
@@ -468,8 +290,16 @@ test('task service creates tasks from requests with provider context attachments
         ->and($steps)->toHaveCount(5)
         ->and(array_map(fn ($step) => $step->type, $steps))->toBe(['temporal_context', 'attachment_context', 'action_preview', 'capability_context', 'provider_call'])
         ->and($steps[4]->status)->toBe('completed')
-        ->and($steps[4]->input['capability_context'])->toHaveCount(4)
-        ->and($service->providerDouble->calls[0][3]['config'])->toBe(['enabled' => true, 'provider' => 'local']);
+        ->and($steps[4]->input['capability_context'])->toHaveCount(5)
+        ->and($steps[4]->input['system_prompt'])->toBe($providerCall[3]['system_prompt'])
+        ->and($providerCall[3]['config'])->toBe(['enabled' => true, 'provider' => 'local'])
+        ->and($providerCall[3]['system_prompt'])->toContain('The user is currently on: Fleet-Ops › Operations › Orders')
+        ->and($providerCall[3]['system_prompt'])->toContain('not a Fleetbase system administrator')
+        ->and(json_encode($providerCall[2]))->not->toContain('SQLSTATE')
+        ->and(json_encode($providerCall[2]))->toContain('capability_unavailable')
+        ->and($task->metadata['degraded'])->toBeTrue()
+        ->and($task->metadata['audience'])->toBe(['is_system_admin' => false])
+        ->and($task->metadata['capability_context'][1]['failure']['type'])->toBe('QueryException');
 });
 
 test('task service marks created task failed when provider completion throws', function () {
@@ -865,7 +695,7 @@ test('task service builds bounded session context from previous turns', function
         aiTaskDouble([
             'prompt'           => 'First prompt',
             'response_summary' => 'Short response',
-            'response'         => 'Long response ignored',
+            'response'         => 'Full response is preferred over the summary',
             'status'           => 'answered',
         ]),
         aiTaskDouble([
@@ -909,12 +739,12 @@ test('task service builds bounded session context from previous turns', function
         ->and($context['data']['turns'])->toHaveCount(2)
         ->and($context['data']['turns'][0])->toBe([
             'prompt'   => 'Second prompt',
-            'response' => str_repeat('R', 600),
+            'response' => str_repeat('R', 700),
             'status'   => 'failed',
         ])
         ->and($context['data']['turns'][1])->toBe([
             'prompt'   => 'First prompt',
-            'response' => 'Short response',
+            'response' => 'Full response is preferred over the summary',
             'status'   => 'answered',
         ]);
 });

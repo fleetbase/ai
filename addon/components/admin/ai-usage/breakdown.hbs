@@ -1,0 +1,45 @@
+<div class="fleetbase-ai-usage-card" ...attributes>
+    <div class="fleetbase-ai-usage-card-header">
+        <h4>{{@title}}</h4>
+        <div class="fleetbase-ai-usage-tabs" role="tablist">
+            {{#each this.tabs as |tab|}}
+                <button type="button" role="tab" class="fleetbase-ai-usage-tab {{if (eq tab.key this.activeTab.key) 'is-active'}}" aria-selected={{if (eq tab.key this.activeTab.key) "true" "false"}} {{on "click" (fn this.selectTab tab.key)}}>
+                    {{tab.label}}
+                </button>
+            {{/each}}
+        </div>
+    </div>
+    {{#if this.rows.length}}
+        <table class="fleetbase-ai-usage-table">
+            <thead>
+                <tr>
+                    <th>{{this.activeTab.label}}</th>
+                    <th class="is-numeric">Answers</th>
+                    <th class="is-numeric">Tokens</th>
+                    <th class="fleetbase-ai-usage-share-heading">Share of tokens</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{#each this.rows as |item|}}
+                    <tr class={{if item.canDrill "is-clickable"}} title={{if item.canDrill "Filter by this"}} data-test-breakdown-row={{item.row.key}} {{on "click" (fn this.drill item)}}>
+                        <td>
+                            <span class="fleetbase-ai-usage-row-label">{{item.label}}</span>
+                            {{#if item.detail}}<small>{{item.detail}}</small>{{/if}}
+                        </td>
+                        <td class="is-numeric">{{item.tasks}}</td>
+                        <td class="is-numeric" title={{item.tokensTitle}}>{{item.tokens}}</td>
+                        <td>
+                            <div class="fleetbase-ai-usage-share">
+                                <div class="fleetbase-ai-usage-share-bar"><span style={{item.barStyle}}></span></div>
+                                <span class="fleetbase-ai-usage-share-value">{{item.percent}}</span>
+                            </div>
+                        </td>
+                    </tr>
+                {{/each}}
+            </tbody>
+        </table>
+        <div class="fleetbase-ai-usage-card-footer">Top 50 by tokens</div>
+    {{else}}
+        <div class="fleetbase-ai-usage-chart-placeholder">No usage in this period.</div>
+    {{/if}}
+</div>

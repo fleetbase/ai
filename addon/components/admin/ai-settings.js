@@ -10,6 +10,7 @@ export default class AdminAiSettingsComponent extends Component {
     @service notifications;
     @tracked config = {
         enabled: false,
+        tool_calling: true,
         provider: 'local',
         default_model: 'fleetbase-local-preview',
         providers: {

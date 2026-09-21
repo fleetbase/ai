@@ -32,7 +32,7 @@ export default class AiPromptComponent extends Component {
     get responseScrollSignature() {
         return this.turns
             .map((task) => {
-                const previewSignature = (task.actionPreviews ?? []).map((preview) => `${preview.key ?? preview.action}:${preview.ready}:${preview.isDisabled}`).join(',');
+                const previewSignature = (task.actionPreviews ?? []).map((preview) => `${this.previewKey(preview)}:${preview.ready}:${preview.isDisabled}`).join(',');
 
                 return [task.uuid ?? task.id, task.status, task.isPending, task.response?.length ?? 0, previewSignature].join(':');
             })
@@ -74,7 +74,8 @@ export default class AiPromptComponent extends Component {
         const response = typeof task?.response === 'string' ? task.response.trim() : task?.response;
         const actionPreviews = this.normalizedActionPreviewsFor(task);
         const actionResults = this.actionResultsFor(task);
-        const visibleResponse = actionPreviews.length > 0 ? null : response;
+        // Tool-calling answers describe the previews they prepared, so the text is shown with the cards.
+        const visibleResponse = actionPreviews.length > 0 && task?.metadata?.mode !== 'tool_calling' ? null : response;
 
         return {
             ...task,
@@ -82,6 +83,8 @@ export default class AiPromptComponent extends Component {
             formattedResponse: visibleResponse ? formatAiResponse(visibleResponse) : null,
             actionPreviews,
             actionResults,
+            uiActions: task?.metadata?.ui_actions ?? [],
+            canRate: !task?.isPending && ['answered', 'applied', 'apply_failed', 'previewed'].includes(task?.status) && Boolean(task?.uuid ?? task?.id),
         };
     }
 
@@ -115,12 +118,27 @@ export default class AiPromptComponent extends Component {
         return task?.metadata?.action_errors ?? [];
     }
 
+    previewKey(preview) {
+        return preview?.preview_id ?? preview?.key ?? preview?.action;
+    }
+
+    matchesPreview(entry, preview) {
+        if (entry?.preview_id && preview?.preview_id) {
+            return entry.preview_id === preview.preview_id;
+        }
+
+        return entry?.action === preview?.key || entry?.action === preview?.action;
+    }
+
     actionResultFor(task, preview) {
-        return this.actionResultsFor(task).find((result) => result.action === preview.key || result.action === preview.action);
+        return this.actionResultsFor(task).find((result) => this.matchesPreview(result, preview));
     }
 
     actionErrorFor(task, preview) {
-        return this.actionErrorsFor(task).find((error) => error.action === preview.key || error.action === preview.action) ?? this.actionErrorsFor(task)[0];
+        const errors = this.actionErrorsFor(task);
+
+        // Errors without a preview id (such as cancelling the task) apply to every preview on it.
+        return errors.find((error) => this.matchesPreview(error, preview)) ?? errors.find((error) => !error.preview_id);
     }
 
     @action focusPromptInput(inputEl) {
@@ -213,17 +231,34 @@ export default class AiPromptComponent extends Component {
     }
 
     @action async applyAction(task, preview, input = {}) {
-        const updatedTask = await this.ai.applyTask.perform(task, preview.key ?? preview.action, input);
+        const updatedTask = await this.ai.applyTask.perform(task, preview.key ?? preview.action, this.inputForPreview(preview, input));
         this.replaceResponse(updatedTask);
         this.scheduleResponseScroll();
     }
 
     @action async refreshAction(task, preview, input = {}) {
-        const updatedTask = await this.ai.refreshTaskPreview.perform(task, preview.key ?? preview.action, input);
+        const updatedTask = await this.ai.refreshTaskPreview.perform(task, preview.key ?? preview.action, this.inputForPreview(preview, input));
         this.replaceResponse(updatedTask);
         this.scheduleResponseScroll();
 
-        return this.normalizedActionPreviewsFor(updatedTask).find((updatedPreview) => updatedPreview.key === preview.key || updatedPreview.action === preview.action);
+        return this.normalizedActionPreviewsFor(updatedTask).find((updatedPreview) => this.previewKey(updatedPreview) === this.previewKey(preview));
+    }
+
+    inputForPreview(preview, input = {}) {
+        return preview?.preview_id ? { ...input, preview_id: preview.preview_id } : input;
+    }
+
+    @action async rateTask(task, rating) {
+        // Clicking the selected rating again clears it.
+        await this.ai.rateTask.perform(task, task.feedback_rating === rating ? null : rating);
+    }
+
+    @action async confirmUiAction(task, uiAction) {
+        await this.ai.confirmUiAction.perform(task, uiAction);
+    }
+
+    @action async dismissUiAction(task, uiAction) {
+        await this.ai.dismissUiAction.perform(task, uiAction);
     }
 
     @action async cancelAction(task) {

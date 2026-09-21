@@ -1,10 +1,13 @@
 import Service, { inject as service } from '@ember/service';
 import { tracked } from '@glimmer/tracking';
 import { task } from 'ember-concurrency';
+import { getOwner } from '@ember/application';
 
 export default class AiService extends Service {
     @service fetch;
     @service router;
+    @service aiCommands;
+    @service notifications;
     @tracked isOpen = false;
     @tracked activeTask = null;
     @tracked tasks = [];
@@ -13,6 +16,13 @@ export default class AiService extends Service {
     @tracked sessionTasks = [];
     @tracked config = { enabled: false };
     @tracked metadata = { providers: [] };
+
+    /**
+     * The console router, so the current page is reported by its full console route name.
+     */
+    get hostRouter() {
+        return getOwner(this).lookup('service:host-router') ?? this.router;
+    }
 
     get isEnabled() {
         return this.config?.enabled === true;
@@ -109,8 +119,8 @@ export default class AiService extends Service {
                     attachments: attachments.map((attachment) => attachment.id ?? attachment.uuid ?? attachment.public_id).filter(Boolean),
                     task_type: 'prompt',
                     context: {
-                        route: this.router.currentRouteName,
-                        url: window.location.href,
+                        route: this.hostRouter.currentRouteName,
+                        route_params: this.hostRouter.currentRoute?.params ?? {},
                     },
                 },
                 { namespace: 'ai/int/v1' }
@@ -222,7 +232,7 @@ export default class AiService extends Service {
 
     @task *applyTask(task, actionKey = null, input = {}) {
         const response = yield this.fetch.post(
-            `tasks/${task.id ?? task.uuid}/apply`,
+            `tasks/${task.uuid ?? task.id}/apply`,
             {
                 action_key: actionKey,
                 input,
@@ -239,7 +249,7 @@ export default class AiService extends Service {
 
     @task *refreshTaskPreview(task, actionKey = null, input = {}) {
         const response = yield this.fetch.post(
-            `tasks/${task.id ?? task.uuid}/preview`,
+            `tasks/${task.uuid ?? task.id}/preview`,
             {
                 action_key: actionKey,
                 input,
@@ -254,8 +264,54 @@ export default class AiService extends Service {
         return this.activeTask;
     }
 
+    /**
+     * Confirm a console action. The server re-authorizes it and returns the steps to run.
+     */
+    @task *confirmUiAction(task, action) {
+        const taskId = task.uuid ?? task.id;
+        let response;
+
+        try {
+            response = yield this.fetch.post(`tasks/${taskId}/ui-actions/${action.id}/confirm`, {}, { namespace: 'ai/int/v1' });
+        } catch (error) {
+            this.notifications.serverError(error);
+            return null;
+        }
+
+        this.applyTaskToSession(response.task);
+
+        try {
+            yield this.aiCommands.run(response.action);
+        } catch (error) {
+            this.notifications.error(error.message ?? 'This action could not be completed.');
+            const failure = yield this.fetch.post(`tasks/${taskId}/ui-actions/${action.id}/failed`, { error: error.message }, { namespace: 'ai/int/v1' });
+            this.applyTaskToSession(failure.task);
+        }
+
+        return response.action;
+    }
+
+    @task *rateTask(task, rating = null, comment = null) {
+        try {
+            const response = yield this.fetch.post(`tasks/${task.uuid ?? task.id}/feedback`, { rating, comment }, { namespace: 'ai/int/v1' });
+            this.applyTaskToSession(response.task);
+
+            return response.task;
+        } catch (error) {
+            this.notifications.serverError(error);
+            return null;
+        }
+    }
+
+    @task *dismissUiAction(task, action) {
+        const response = yield this.fetch.post(`tasks/${task.uuid ?? task.id}/ui-actions/${action.id}/dismiss`, {}, { namespace: 'ai/int/v1' });
+        this.applyTaskToSession(response.task);
+
+        return response.action;
+    }
+
     @task *cancelTask(task) {
-        const response = yield this.fetch.post(`tasks/${task.id ?? task.uuid}/cancel`, {}, { namespace: 'ai/int/v1' });
+        const response = yield this.fetch.post(`tasks/${task.uuid ?? task.id}/cancel`, {}, { namespace: 'ai/int/v1' });
 
         this.activeTask = response.task;
         this.applyTaskToSession(response.task);
