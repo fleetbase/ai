@@ -22,3 +22,6 @@ if (!function_exists('aiJsonPayload')) {
         return is_object($response) && property_exists($response, 'data') ? $response->data : [];
     }
 }
+
+require_once __DIR__ . '/task-doubles.php';
+require_once __DIR__ . '/admin-doubles.php';

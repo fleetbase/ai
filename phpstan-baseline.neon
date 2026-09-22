@@ -1,0 +1,3666 @@
+parameters:
+	ignoreErrors:
+		-
+			message: "#^Function session not found\\.$#"
+			count: 1
+			path: server/src/Console/Commands/EvaluateAi.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Console\\\\Commands\\\\EvaluateAi\\:\\:config\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Console/Commands/EvaluateAi.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Console\\\\Commands\\\\EvaluateAi\\:\\:systemConfig\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Console/Commands/EvaluateAi.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Console\\\\Commands\\\\EvaluateAi\\:\\:systemConfig\\(\\) should return array but returns mixed\\.$#"
+			count: 1
+			path: server/src/Console/Commands/EvaluateAi.php
+
+		-
+			message: "#^Parameter \\#1 \\$filename of function file_put_contents expects string, array\\|string\\|true given\\.$#"
+			count: 1
+			path: server/src/Console/Commands/EvaluateAi.php
+
+		-
+			message: "#^Parameter \\#1 \\$path of static method Fleetbase\\\\Ai\\\\Support\\\\Eval\\\\AiEvalRunner\\:\\:loadCases\\(\\) expects string, array\\|string\\|true given\\.$#"
+			count: 1
+			path: server/src/Console/Commands/EvaluateAi.php
+
+		-
+			message: "#^Parameter \\#1 \\$provider of class Fleetbase\\\\Ai\\\\Support\\\\Eval\\\\AiEvalRunner constructor expects Fleetbase\\\\Ai\\\\Contracts\\\\AIConversationalProviderInterface, Fleetbase\\\\Ai\\\\Contracts\\\\AIProviderInterface given\\.$#"
+			count: 1
+			path: server/src/Console/Commands/EvaluateAi.php
+
+		-
+			message: "#^Call to an undefined method Illuminate\\\\Database\\\\Eloquent\\\\Builder\\:\\:withTrashed\\(\\)\\.$#"
+			count: 1
+			path: server/src/Console/Commands/ExportAiLogs.php
+
+		-
+			message: "#^Cannot cast array\\|bool\\|string\\|null to string\\.$#"
+			count: 1
+			path: server/src/Console/Commands/ExportAiLogs.php
+
+		-
+			message: "#^Function now not found\\.$#"
+			count: 1
+			path: server/src/Console/Commands/ExportAiLogs.php
+
+		-
+			message: "#^Function storage_path not found\\.$#"
+			count: 1
+			path: server/src/Console/Commands/ExportAiLogs.php
+
+		-
+			message: "#^Parameter \\#1 \\$filename of function fopen expects string, array\\|string\\|true given\\.$#"
+			count: 1
+			path: server/src/Console/Commands/ExportAiLogs.php
+
+		-
+			message: "#^Parameter \\#1 \\$time of static method Carbon\\\\Carbon\\:\\:parse\\(\\) expects DateTimeInterface\\|string\\|null, array\\|string\\|true given\\.$#"
+			count: 2
+			path: server/src/Console/Commands/ExportAiLogs.php
+
+		-
+			message: "#^Part \\$path \\(non\\-empty\\-array\\|string\\|true\\) of encapsed string cannot be cast to string\\.$#"
+			count: 2
+			path: server/src/Console/Commands/ExportAiLogs.php
+
+		-
+			message: "#^Access to an undefined property Fleetbase\\\\Ai\\\\Models\\\\AiTask\\:\\:\\$ai_session_uuid\\.$#"
+			count: 1
+			path: server/src/Console/Commands/ReplayAiTask.php
+
+		-
+			message: "#^Access to an undefined property Fleetbase\\\\Ai\\\\Models\\\\AiTask\\:\\:\\$company_uuid\\.$#"
+			count: 1
+			path: server/src/Console/Commands/ReplayAiTask.php
+
+		-
+			message: "#^Access to an undefined property Fleetbase\\\\Ai\\\\Models\\\\AiTask\\:\\:\\$context\\.$#"
+			count: 1
+			path: server/src/Console/Commands/ReplayAiTask.php
+
+		-
+			message: "#^Access to an undefined property Fleetbase\\\\Ai\\\\Models\\\\AiTask\\:\\:\\$createdBy\\.$#"
+			count: 1
+			path: server/src/Console/Commands/ReplayAiTask.php
+
+		-
+			message: "#^Access to an undefined property Fleetbase\\\\Ai\\\\Models\\\\AiTask\\:\\:\\$id\\.$#"
+			count: 1
+			path: server/src/Console/Commands/ReplayAiTask.php
+
+		-
+			message: "#^Access to an undefined property Fleetbase\\\\Ai\\\\Models\\\\AiTask\\:\\:\\$model\\.$#"
+			count: 1
+			path: server/src/Console/Commands/ReplayAiTask.php
+
+		-
+			message: "#^Access to an undefined property Fleetbase\\\\Ai\\\\Models\\\\AiTask\\:\\:\\$prompt\\.$#"
+			count: 2
+			path: server/src/Console/Commands/ReplayAiTask.php
+
+		-
+			message: "#^Access to an undefined property Fleetbase\\\\Ai\\\\Models\\\\AiTask\\:\\:\\$provider\\.$#"
+			count: 1
+			path: server/src/Console/Commands/ReplayAiTask.php
+
+		-
+			message: "#^Access to an undefined property Fleetbase\\\\Ai\\\\Models\\\\AiTask\\:\\:\\$response\\.$#"
+			count: 2
+			path: server/src/Console/Commands/ReplayAiTask.php
+
+		-
+			message: "#^Access to an undefined property Fleetbase\\\\Ai\\\\Models\\\\AiTask\\:\\:\\$uuid\\.$#"
+			count: 1
+			path: server/src/Console/Commands/ReplayAiTask.php
+
+		-
+			message: "#^Call to an undefined method Illuminate\\\\Database\\\\Eloquent\\\\Builder\\|Illuminate\\\\Database\\\\Query\\\\Builder\\:\\:with\\(\\)\\.$#"
+			count: 1
+			path: server/src/Console/Commands/ReplayAiTask.php
+
+		-
+			message: "#^Cannot call method reverse\\(\\) on array\\<Illuminate\\\\Database\\\\Eloquent\\\\Builder\\|Illuminate\\\\Database\\\\Query\\\\Builder\\>\\|Illuminate\\\\Support\\\\Collection\\.$#"
+			count: 1
+			path: server/src/Console/Commands/ReplayAiTask.php
+
+		-
+			message: "#^Function session not found\\.$#"
+			count: 1
+			path: server/src/Console/Commands/ReplayAiTask.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Console\\\\Commands\\\\ReplayAiTask\\:\\:findTask\\(\\) should return Fleetbase\\\\Ai\\\\Models\\\\AiTask\\|null but returns object\\|null\\.$#"
+			count: 1
+			path: server/src/Console/Commands/ReplayAiTask.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Console\\\\Commands\\\\ReplayAiTask\\:\\:history\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Console/Commands/ReplayAiTask.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Console\\\\Commands\\\\ReplayAiTask\\:\\:previousTurns\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: server/src/Console/Commands/ReplayAiTask.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Console\\\\Commands\\\\ReplayAiTask\\:\\:systemConfig\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Console/Commands/ReplayAiTask.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Console\\\\Commands\\\\ReplayAiTask\\:\\:systemConfig\\(\\) should return array but returns mixed\\.$#"
+			count: 1
+			path: server/src/Console/Commands/ReplayAiTask.php
+
+		-
+			message: "#^Parameter \\#1 \\$provider of class Fleetbase\\\\Ai\\\\Support\\\\Eval\\\\AiEvalRunner constructor expects Fleetbase\\\\Ai\\\\Contracts\\\\AIConversationalProviderInterface, Fleetbase\\\\Ai\\\\Contracts\\\\AIProviderInterface given\\.$#"
+			count: 1
+			path: server/src/Console/Commands/ReplayAiTask.php
+
+		-
+			message: "#^Parameter \\#1 \\$uuid of method Fleetbase\\\\Ai\\\\Console\\\\Commands\\\\ReplayAiTask\\:\\:findTask\\(\\) expects string, array\\|bool\\|string\\|null given\\.$#"
+			count: 1
+			path: server/src/Console/Commands/ReplayAiTask.php
+
+		-
+			message: "#^Parameter \\#1 \\$path of method Fleetbase\\\\Ai\\\\Services\\\\Knowledge\\\\KnowledgeIndexer\\:\\:importSnapshot\\(\\) expects string, array\\|string\\|true given\\.$#"
+			count: 1
+			path: server/src/Console/Commands/SyncAiDocs.php
+
+		-
+			message: "#^Parameter \\#2 \\$path of method Fleetbase\\\\Ai\\\\Services\\\\Knowledge\\\\KnowledgeIndexer\\:\\:writeSnapshot\\(\\) expects string, array\\|string\\|true given\\.$#"
+			count: 1
+			path: server/src/Console/Commands/SyncAiDocs.php
+
+		-
+			message: "#^Part \\$path \\(non\\-empty\\-array\\|non\\-falsy\\-string\\|true\\) of encapsed string cannot be cast to string\\.$#"
+			count: 1
+			path: server/src/Console/Commands/SyncAiDocs.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Contracts\\\\AIActionCapabilityInterface\\:\\:apply\\(\\) has parameter \\$input with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Contracts/AIActionCapabilityInterface.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Contracts\\\\AIActionCapabilityInterface\\:\\:apply\\(\\) has parameter \\$preview with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Contracts/AIActionCapabilityInterface.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Contracts\\\\AIActionCapabilityInterface\\:\\:apply\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Contracts/AIActionCapabilityInterface.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Contracts\\\\AIActionCapabilityInterface\\:\\:inputSchema\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Contracts/AIActionCapabilityInterface.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Contracts\\\\AIActionCapabilityInterface\\:\\:preview\\(\\) has parameter \\$input with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Contracts/AIActionCapabilityInterface.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Contracts\\\\AIActionCapabilityInterface\\:\\:preview\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Contracts/AIActionCapabilityInterface.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Contracts\\\\AICapabilityInterface\\:\\:permissions\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Contracts/AICapabilityInterface.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Contracts\\\\AICapabilityInterface\\:\\:toArray\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Contracts/AICapabilityInterface.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Contracts\\\\AIContextCapabilityInterface\\:\\:resolve\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Contracts/AIContextCapabilityInterface.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Contracts\\\\AIConversationalProviderInterface\\:\\:converse\\(\\) has parameter \\$messages with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Contracts/AIConversationalProviderInterface.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Contracts\\\\AIConversationalProviderInterface\\:\\:converse\\(\\) has parameter \\$options with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Contracts/AIConversationalProviderInterface.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Contracts\\\\AIConversationalProviderInterface\\:\\:converse\\(\\) has parameter \\$tools with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Contracts/AIConversationalProviderInterface.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Contracts\\\\AIConversationalProviderInterface\\:\\:supportsTools\\(\\) has parameter \\$config with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Contracts/AIConversationalProviderInterface.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Contracts\\\\AIProviderInterface\\:\\:complete\\(\\) has parameter \\$messages with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Contracts/AIProviderInterface.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Contracts\\\\AIProviderInterface\\:\\:complete\\(\\) has parameter \\$options with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Contracts/AIProviderInterface.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Contracts\\\\AIProviderInterface\\:\\:complete\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Contracts/AIProviderInterface.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Contracts\\\\AIProviderInterface\\:\\:test\\(\\) has parameter \\$config with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Contracts/AIProviderInterface.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Contracts\\\\AIProviderInterface\\:\\:test\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Contracts/AIProviderInterface.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Contracts\\\\AIToolCapabilityInterface\\:\\:invoke\\(\\) has parameter \\$arguments with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Contracts/AIToolCapabilityInterface.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Contracts\\\\AIToolCapabilityInterface\\:\\:invoke\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Contracts/AIToolCapabilityInterface.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Contracts\\\\AIToolCapabilityInterface\\:\\:toolParameters\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Contracts/AIToolCapabilityInterface.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Contracts\\\\KnowledgeSourceInterface\\:\\:documents\\(\\) return type has no value type specified in iterable type iterable\\.$#"
+			count: 1
+			path: server/src/Contracts/KnowledgeSourceInterface.php
+
+		-
+			message: "#^Access to an undefined property Fleetbase\\\\Ai\\\\Models\\\\AiSession\\:\\:\\$company\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiAdminController.php
+
+		-
+			message: "#^Access to an undefined property Fleetbase\\\\Ai\\\\Models\\\\AiSession\\:\\:\\$company_uuid\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiAdminController.php
+
+		-
+			message: "#^Access to an undefined property Fleetbase\\\\Ai\\\\Models\\\\AiSession\\:\\:\\$createdBy\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiAdminController.php
+
+		-
+			message: "#^Access to an undefined property Fleetbase\\\\Ai\\\\Models\\\\AiSession\\:\\:\\$created_at\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiAdminController.php
+
+		-
+			message: "#^Access to an undefined property Fleetbase\\\\Ai\\\\Models\\\\AiSession\\:\\:\\$created_by_uuid\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiAdminController.php
+
+		-
+			message: "#^Access to an undefined property Fleetbase\\\\Ai\\\\Models\\\\AiSession\\:\\:\\$ended_at\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiAdminController.php
+
+		-
+			message: "#^Access to an undefined property Fleetbase\\\\Ai\\\\Models\\\\AiSession\\:\\:\\$id\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiAdminController.php
+
+		-
+			message: "#^Access to an undefined property Fleetbase\\\\Ai\\\\Models\\\\AiSession\\:\\:\\$last_message_at\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiAdminController.php
+
+		-
+			message: "#^Access to an undefined property Fleetbase\\\\Ai\\\\Models\\\\AiSession\\:\\:\\$status\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiAdminController.php
+
+		-
+			message: "#^Access to an undefined property Fleetbase\\\\Ai\\\\Models\\\\AiSession\\:\\:\\$tasks\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiAdminController.php
+
+		-
+			message: "#^Access to an undefined property Fleetbase\\\\Ai\\\\Models\\\\AiSession\\:\\:\\$title\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiAdminController.php
+
+		-
+			message: "#^Access to an undefined property Fleetbase\\\\Ai\\\\Models\\\\AiSession\\:\\:\\$updated_at\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiAdminController.php
+
+		-
+			message: "#^Access to an undefined property Fleetbase\\\\Ai\\\\Models\\\\AiSession\\:\\:\\$uuid\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiAdminController.php
+
+		-
+			message: "#^Access to an undefined property Fleetbase\\\\Ai\\\\Models\\\\AiTask\\:\\:\\$ai_session_uuid\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiAdminController.php
+
+		-
+			message: "#^Access to an undefined property Fleetbase\\\\Ai\\\\Models\\\\AiTask\\:\\:\\$company\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiAdminController.php
+
+		-
+			message: "#^Access to an undefined property Fleetbase\\\\Ai\\\\Models\\\\AiTask\\:\\:\\$company_uuid\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiAdminController.php
+
+		-
+			message: "#^Access to an undefined property Fleetbase\\\\Ai\\\\Models\\\\AiTask\\:\\:\\$completed_at\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiAdminController.php
+
+		-
+			message: "#^Access to an undefined property Fleetbase\\\\Ai\\\\Models\\\\AiTask\\:\\:\\$context\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiAdminController.php
+
+		-
+			message: "#^Access to an undefined property Fleetbase\\\\Ai\\\\Models\\\\AiTask\\:\\:\\$createdBy\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiAdminController.php
+
+		-
+			message: "#^Access to an undefined property Fleetbase\\\\Ai\\\\Models\\\\AiTask\\:\\:\\$created_at\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiAdminController.php
+
+		-
+			message: "#^Access to an undefined property Fleetbase\\\\Ai\\\\Models\\\\AiTask\\:\\:\\$created_by_uuid\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiAdminController.php
+
+		-
+			message: "#^Access to an undefined property Fleetbase\\\\Ai\\\\Models\\\\AiTask\\:\\:\\$error\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiAdminController.php
+
+		-
+			message: "#^Access to an undefined property Fleetbase\\\\Ai\\\\Models\\\\AiTask\\:\\:\\$feedback_comment\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiAdminController.php
+
+		-
+			message: "#^Access to an undefined property Fleetbase\\\\Ai\\\\Models\\\\AiTask\\:\\:\\$feedback_rating\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiAdminController.php
+
+		-
+			message: "#^Access to an undefined property Fleetbase\\\\Ai\\\\Models\\\\AiTask\\:\\:\\$id\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiAdminController.php
+
+		-
+			message: "#^Access to an undefined property Fleetbase\\\\Ai\\\\Models\\\\AiTask\\:\\:\\$metadata\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiAdminController.php
+
+		-
+			message: "#^Access to an undefined property Fleetbase\\\\Ai\\\\Models\\\\AiTask\\:\\:\\$model\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiAdminController.php
+
+		-
+			message: "#^Access to an undefined property Fleetbase\\\\Ai\\\\Models\\\\AiTask\\:\\:\\$prompt\\.$#"
+			count: 2
+			path: server/src/Http/Controllers/Internal/AiAdminController.php
+
+		-
+			message: "#^Access to an undefined property Fleetbase\\\\Ai\\\\Models\\\\AiTask\\:\\:\\$provider\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiAdminController.php
+
+		-
+			message: "#^Access to an undefined property Fleetbase\\\\Ai\\\\Models\\\\AiTask\\:\\:\\$response\\.$#"
+			count: 2
+			path: server/src/Http/Controllers/Internal/AiAdminController.php
+
+		-
+			message: "#^Access to an undefined property Fleetbase\\\\Ai\\\\Models\\\\AiTask\\:\\:\\$response_summary\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiAdminController.php
+
+		-
+			message: "#^Access to an undefined property Fleetbase\\\\Ai\\\\Models\\\\AiTask\\:\\:\\$session\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiAdminController.php
+
+		-
+			message: "#^Access to an undefined property Fleetbase\\\\Ai\\\\Models\\\\AiTask\\:\\:\\$started_at\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiAdminController.php
+
+		-
+			message: "#^Access to an undefined property Fleetbase\\\\Ai\\\\Models\\\\AiTask\\:\\:\\$status\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiAdminController.php
+
+		-
+			message: "#^Access to an undefined property Fleetbase\\\\Ai\\\\Models\\\\AiTask\\:\\:\\$steps\\.$#"
+			count: 2
+			path: server/src/Http/Controllers/Internal/AiAdminController.php
+
+		-
+			message: "#^Access to an undefined property Fleetbase\\\\Ai\\\\Models\\\\AiTask\\:\\:\\$task_type\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiAdminController.php
+
+		-
+			message: "#^Access to an undefined property Fleetbase\\\\Ai\\\\Models\\\\AiTask\\:\\:\\$updated_at\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiAdminController.php
+
+		-
+			message: "#^Access to an undefined property Fleetbase\\\\Ai\\\\Models\\\\AiTask\\:\\:\\$usage\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiAdminController.php
+
+		-
+			message: "#^Access to an undefined property Fleetbase\\\\Ai\\\\Models\\\\AiTask\\:\\:\\$uuid\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiAdminController.php
+
+		-
+			message: "#^Access to an undefined property Fleetbase\\\\Models\\\\Company\\:\\:\\$name\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiAdminController.php
+
+		-
+			message: "#^Access to an undefined property Fleetbase\\\\Models\\\\Company\\:\\:\\$public_id\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiAdminController.php
+
+		-
+			message: "#^Access to an undefined property Fleetbase\\\\Models\\\\Company\\:\\:\\$status\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiAdminController.php
+
+		-
+			message: "#^Access to an undefined property Fleetbase\\\\Models\\\\Company\\:\\:\\$uuid\\.$#"
+			count: 2
+			path: server/src/Http/Controllers/Internal/AiAdminController.php
+
+		-
+			message: "#^Access to an undefined property Fleetbase\\\\Models\\\\User\\:\\:\\$company_uuid\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiAdminController.php
+
+		-
+			message: "#^Access to an undefined property Fleetbase\\\\Models\\\\User\\:\\:\\$email\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiAdminController.php
+
+		-
+			message: "#^Access to an undefined property Fleetbase\\\\Models\\\\User\\:\\:\\$name\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiAdminController.php
+
+		-
+			message: "#^Access to an undefined property Fleetbase\\\\Models\\\\User\\:\\:\\$public_id\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiAdminController.php
+
+		-
+			message: "#^Access to an undefined property Fleetbase\\\\Models\\\\User\\:\\:\\$status\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiAdminController.php
+
+		-
+			message: "#^Access to an undefined property Fleetbase\\\\Models\\\\User\\:\\:\\$uuid\\.$#"
+			count: 2
+			path: server/src/Http/Controllers/Internal/AiAdminController.php
+
+		-
+			message: "#^Access to an undefined property Illuminate\\\\Database\\\\Eloquent\\\\Model\\:\\:\\$email\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiAdminController.php
+
+		-
+			message: "#^Access to an undefined property Illuminate\\\\Database\\\\Eloquent\\\\Model\\:\\:\\$name\\.$#"
+			count: 2
+			path: server/src/Http/Controllers/Internal/AiAdminController.php
+
+		-
+			message: "#^Access to an undefined property Illuminate\\\\Database\\\\Eloquent\\\\Model\\:\\:\\$public_id\\.$#"
+			count: 2
+			path: server/src/Http/Controllers/Internal/AiAdminController.php
+
+		-
+			message: "#^Access to an undefined property Illuminate\\\\Database\\\\Eloquent\\\\Model\\:\\:\\$uuid\\.$#"
+			count: 4
+			path: server/src/Http/Controllers/Internal/AiAdminController.php
+
+		-
+			message: "#^Call to an undefined method Fleetbase\\\\Http\\\\Requests\\\\AdminRequest\\:\\:boolean\\(\\)\\.$#"
+			count: 4
+			path: server/src/Http/Controllers/Internal/AiAdminController.php
+
+		-
+			message: "#^Call to an undefined method Fleetbase\\\\Http\\\\Requests\\\\AdminRequest\\:\\:filled\\(\\)\\.$#"
+			count: 24
+			path: server/src/Http/Controllers/Internal/AiAdminController.php
+
+		-
+			message: "#^Call to an undefined method Fleetbase\\\\Http\\\\Requests\\\\AdminRequest\\:\\:input\\(\\)\\.$#"
+			count: 34
+			path: server/src/Http/Controllers/Internal/AiAdminController.php
+
+		-
+			message: "#^Call to an undefined method Fleetbase\\\\Http\\\\Requests\\\\AdminRequest\\:\\:ip\\(\\)\\.$#"
+			count: 2
+			path: server/src/Http/Controllers/Internal/AiAdminController.php
+
+		-
+			message: "#^Call to an undefined method Fleetbase\\\\Http\\\\Requests\\\\AdminRequest\\:\\:searchQuery\\(\\)\\.$#"
+			count: 2
+			path: server/src/Http/Controllers/Internal/AiAdminController.php
+
+		-
+			message: "#^Call to an undefined method Fleetbase\\\\Http\\\\Requests\\\\AdminRequest\\:\\:user\\(\\)\\.$#"
+			count: 5
+			path: server/src/Http/Controllers/Internal/AiAdminController.php
+
+		-
+			message: "#^Call to an undefined method Fleetbase\\\\Http\\\\Requests\\\\AdminRequest\\:\\:userAgent\\(\\)\\.$#"
+			count: 2
+			path: server/src/Http/Controllers/Internal/AiAdminController.php
+
+		-
+			message: "#^Call to an undefined static method Fleetbase\\\\Ai\\\\Jobs\\\\SyncAiKnowledge\\:\\:dispatch\\(\\)\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiAdminController.php
+
+		-
+			message: "#^Call to an undefined static method Fleetbase\\\\Ai\\\\Models\\\\AiAdminAccessLog\\:\\:create\\(\\)\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiAdminController.php
+
+		-
+			message: "#^Call to an undefined static method Fleetbase\\\\Ai\\\\Models\\\\AiKnowledgeChunk\\:\\:count\\(\\)\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiAdminController.php
+
+		-
+			message: "#^Call to an undefined static method Fleetbase\\\\Ai\\\\Models\\\\AiKnowledgeDocument\\:\\:count\\(\\)\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiAdminController.php
+
+		-
+			message: "#^Call to an undefined static method Fleetbase\\\\Ai\\\\Models\\\\AiKnowledgeDocument\\:\\:max\\(\\)\\.$#"
+			count: 2
+			path: server/src/Http/Controllers/Internal/AiAdminController.php
+
+		-
+			message: "#^Call to an undefined static method Fleetbase\\\\Models\\\\Company\\:\\:whereIn\\(\\)\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiAdminController.php
+
+		-
+			message: "#^Call to an undefined static method Fleetbase\\\\Models\\\\CompanyUser\\:\\:where\\(\\)\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiAdminController.php
+
+		-
+			message: "#^Call to an undefined static method Fleetbase\\\\Models\\\\User\\:\\:query\\(\\)\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiAdminController.php
+
+		-
+			message: "#^Call to an undefined static method Fleetbase\\\\Models\\\\User\\:\\:whereIn\\(\\)\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiAdminController.php
+
+		-
+			message: "#^Call to an undefined static method Illuminate\\\\Support\\\\Facades\\\\Auth\\:\\:can\\(\\)\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiAdminController.php
+
+		-
+			message: "#^Call to method mapWithKeys\\(\\) on an unknown class IlluminateAgnostic\\\\StrAgnostic\\\\Str\\\\Support\\\\Collection\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiAdminController.php
+
+		-
+			message: "#^Cannot access property \\$day on mixed\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiAdminController.php
+
+		-
+			message: "#^Cannot access property \\$input_tokens on mixed\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiAdminController.php
+
+		-
+			message: "#^Cannot access property \\$output_tokens on mixed\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiAdminController.php
+
+		-
+			message: "#^Cannot access property \\$task_count on mixed\\.$#"
+			count: 2
+			path: server/src/Http/Controllers/Internal/AiAdminController.php
+
+		-
+			message: "#^Cannot access property \\$total_tokens on mixed\\.$#"
+			count: 2
+			path: server/src/Http/Controllers/Internal/AiAdminController.php
+
+		-
+			message: "#^Cannot access property \\$uuid on mixed\\.$#"
+			count: 2
+			path: server/src/Http/Controllers/Internal/AiAdminController.php
+
+		-
+			message: "#^Cannot call method isAdmin\\(\\) on mixed\\.$#"
+			count: 2
+			path: server/src/Http/Controllers/Internal/AiAdminController.php
+
+		-
+			message: "#^Cannot call method mapWithKeys\\(\\) on array\\<Illuminate\\\\Database\\\\Eloquent\\\\Builder\\>\\|Illuminate\\\\Database\\\\Eloquent\\\\Collection\\.$#"
+			count: 2
+			path: server/src/Http/Controllers/Internal/AiAdminController.php
+
+		-
+			message: "#^Cannot call method toISOString\\(\\) on mixed\\.$#"
+			count: 11
+			path: server/src/Http/Controllers/Internal/AiAdminController.php
+
+		-
+			message: "#^Cannot call method toIso8601String\\(\\) on mixed\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiAdminController.php
+
+		-
+			message: "#^Function abort_unless not found\\.$#"
+			count: 9
+			path: server/src/Http/Controllers/Internal/AiAdminController.php
+
+		-
+			message: "#^Function config not found\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiAdminController.php
+
+		-
+			message: "#^Function now not found\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiAdminController.php
+
+		-
+			message: "#^Function response not found\\.$#"
+			count: 10
+			path: server/src/Http/Controllers/Internal/AiAdminController.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Http\\\\Controllers\\\\Internal\\\\AiAdminController\\:\\:companies\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiAdminController.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Http\\\\Controllers\\\\Internal\\\\AiAdminController\\:\\:companiesForLabels\\(\\) has parameter \\$ids with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiAdminController.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Http\\\\Controllers\\\\Internal\\\\AiAdminController\\:\\:createAccessLog\\(\\) has parameter \\$attributes with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiAdminController.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Http\\\\Controllers\\\\Internal\\\\AiAdminController\\:\\:dateRaw\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiAdminController.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Http\\\\Controllers\\\\Internal\\\\AiAdminController\\:\\:download\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiAdminController.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Http\\\\Controllers\\\\Internal\\\\AiAdminController\\:\\:export\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiAdminController.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Http\\\\Controllers\\\\Internal\\\\AiAdminController\\:\\:findSession\\(\\) should return Fleetbase\\\\Ai\\\\Models\\\\AiSession but returns Illuminate\\\\Database\\\\Eloquent\\\\Builder\\|Illuminate\\\\Database\\\\Eloquent\\\\Model\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiAdminController.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Http\\\\Controllers\\\\Internal\\\\AiAdminController\\:\\:findTask\\(\\) should return Fleetbase\\\\Ai\\\\Models\\\\AiTask but returns Illuminate\\\\Database\\\\Eloquent\\\\Builder\\|Illuminate\\\\Database\\\\Eloquent\\\\Model\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiAdminController.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Http\\\\Controllers\\\\Internal\\\\AiAdminController\\:\\:knowledge\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiAdminController.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Http\\\\Controllers\\\\Internal\\\\AiAdminController\\:\\:knowledgeStats\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiAdminController.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Http\\\\Controllers\\\\Internal\\\\AiAdminController\\:\\:serializeCompany\\(\\) has parameter \\$company with no type specified\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiAdminController.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Http\\\\Controllers\\\\Internal\\\\AiAdminController\\:\\:serializeCompany\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiAdminController.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Http\\\\Controllers\\\\Internal\\\\AiAdminController\\:\\:serializeSession\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiAdminController.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Http\\\\Controllers\\\\Internal\\\\AiAdminController\\:\\:serializeStep\\(\\) has parameter \\$step with no type specified\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiAdminController.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Http\\\\Controllers\\\\Internal\\\\AiAdminController\\:\\:serializeStep\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiAdminController.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Http\\\\Controllers\\\\Internal\\\\AiAdminController\\:\\:serializeTask\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiAdminController.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Http\\\\Controllers\\\\Internal\\\\AiAdminController\\:\\:serializeUser\\(\\) has parameter \\$user with no type specified\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiAdminController.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Http\\\\Controllers\\\\Internal\\\\AiAdminController\\:\\:serializeUser\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiAdminController.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Http\\\\Controllers\\\\Internal\\\\AiAdminController\\:\\:serializeUserOption\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiAdminController.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Http\\\\Controllers\\\\Internal\\\\AiAdminController\\:\\:session\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiAdminController.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Http\\\\Controllers\\\\Internal\\\\AiAdminController\\:\\:sessions\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiAdminController.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Http\\\\Controllers\\\\Internal\\\\AiAdminController\\:\\:syncKnowledge\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiAdminController.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Http\\\\Controllers\\\\Internal\\\\AiAdminController\\:\\:task\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiAdminController.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Http\\\\Controllers\\\\Internal\\\\AiAdminController\\:\\:usage\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiAdminController.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Http\\\\Controllers\\\\Internal\\\\AiAdminController\\:\\:usageByDay\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiAdminController.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Http\\\\Controllers\\\\Internal\\\\AiAdminController\\:\\:usageGroup\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiAdminController.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Http\\\\Controllers\\\\Internal\\\\AiAdminController\\:\\:usageLabels\\(\\) has parameter \\$ids with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiAdminController.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Http\\\\Controllers\\\\Internal\\\\AiAdminController\\:\\:usageLabels\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiAdminController.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Http\\\\Controllers\\\\Internal\\\\AiAdminController\\:\\:users\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiAdminController.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Http\\\\Controllers\\\\Internal\\\\AiAdminController\\:\\:usersForLabels\\(\\) has parameter \\$ids with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiAdminController.php
+
+		-
+			message: "#^Parameter \\#1 \\$callback of method Illuminate\\\\Support\\\\Collection\\<\\(int\\|string\\),mixed\\>\\:\\:map\\(\\) expects callable\\(mixed, int\\|string\\)\\: array, Closure\\(Fleetbase\\\\Ai\\\\Models\\\\AiSession\\)\\: array given\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiAdminController.php
+
+		-
+			message: "#^Parameter \\#1 \\$callback of method Illuminate\\\\Support\\\\Collection\\<\\(int\\|string\\),mixed\\>\\:\\:map\\(\\) expects callable\\(mixed, int\\|string\\)\\: array, Closure\\(Fleetbase\\\\Models\\\\User\\)\\: array given\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiAdminController.php
+
+		-
+			message: "#^Parameter \\#1 \\$callback of method Illuminate\\\\Support\\\\Collection\\<\\(int\\|string\\),mixed\\>\\:\\:map\\(\\) expects callable\\(mixed, int\\|string\\)\\: array\\{id\\: mixed, uuid\\: mixed, public_id\\: mixed, name\\: mixed, status\\: mixed\\}, Closure\\(Fleetbase\\\\Models\\\\Company\\)\\: array\\{id\\: mixed, uuid\\: mixed, public_id\\: mixed, name\\: mixed, status\\: mixed\\} given\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiAdminController.php
+
+		-
+			message: "#^Parameter \\#1 \\$query of method Fleetbase\\\\Ai\\\\Http\\\\Controllers\\\\Internal\\\\AiAdminController\\:\\:applyUserSearch\\(\\) expects Illuminate\\\\Database\\\\Eloquent\\\\Builder, Illuminate\\\\Database\\\\Query\\\\Builder given\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiAdminController.php
+
+		-
+			message: "#^Parameter \\#1 \\$stream of function fclose expects resource, resource\\|false given\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiAdminController.php
+
+		-
+			message: "#^Parameter \\#1 \\$string of function trim expects string, string\\|null given\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiAdminController.php
+
+		-
+			message: "#^Return type of call to method Illuminate\\\\Support\\\\Collection\\<\\(int\\|string\\),mixed\\>\\:\\:map\\(\\) contains unresolvable type\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiAdminController.php
+
+		-
+			message: "#^Argument of an invalid type mixed supplied for foreach, only iterables are supported\\.$#"
+			count: 2
+			path: server/src/Http/Controllers/Internal/AiConfigController.php
+
+		-
+			message: "#^Call to an undefined method Fleetbase\\\\Http\\\\Requests\\\\AdminRequest\\:\\:input\\(\\)\\.$#"
+			count: 2
+			path: server/src/Http/Controllers/Internal/AiConfigController.php
+
+		-
+			message: "#^Cannot access offset 'api_key'\\|'secret'\\|'token' on mixed\\.$#"
+			count: 2
+			path: server/src/Http/Controllers/Internal/AiConfigController.php
+
+		-
+			message: "#^Function response not found\\.$#"
+			count: 5
+			path: server/src/Http/Controllers/Internal/AiConfigController.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Http\\\\Controllers\\\\Internal\\\\AiConfigController\\:\\:configureSystemAi\\(\\) has parameter \\$config with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiConfigController.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Http\\\\Controllers\\\\Internal\\\\AiConfigController\\:\\:maskSecrets\\(\\) has parameter \\$config with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiConfigController.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Http\\\\Controllers\\\\Internal\\\\AiConfigController\\:\\:maskSecrets\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiConfigController.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Http\\\\Controllers\\\\Internal\\\\AiConfigController\\:\\:preserveMaskedSecrets\\(\\) has parameter \\$config with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiConfigController.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Http\\\\Controllers\\\\Internal\\\\AiConfigController\\:\\:preserveMaskedSecrets\\(\\) has parameter \\$existing with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiConfigController.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Http\\\\Controllers\\\\Internal\\\\AiConfigController\\:\\:preserveMaskedSecrets\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiConfigController.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Http\\\\Controllers\\\\Internal\\\\AiConfigController\\:\\:show\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiConfigController.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Http\\\\Controllers\\\\Internal\\\\AiConfigController\\:\\:status\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiConfigController.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Http\\\\Controllers\\\\Internal\\\\AiConfigController\\:\\:store\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiConfigController.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Http\\\\Controllers\\\\Internal\\\\AiConfigController\\:\\:systemAiSetting\\(\\) has parameter \\$default with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiConfigController.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Http\\\\Controllers\\\\Internal\\\\AiConfigController\\:\\:systemAiSetting\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiConfigController.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Http\\\\Controllers\\\\Internal\\\\AiConfigController\\:\\:systemAiSetting\\(\\) should return array but returns mixed\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiConfigController.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Http\\\\Controllers\\\\Internal\\\\AiConfigController\\:\\:testProvider\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiConfigController.php
+
+		-
+			message: "#^Part \\$provider \\(mixed\\) of encapsed string cannot be cast to string\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiConfigController.php
+
+		-
+			message: "#^Call to an undefined static method Fleetbase\\\\Ai\\\\Models\\\\AiSession\\:\\:create\\(\\)\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiSessionController.php
+
+		-
+			message: "#^Call to an undefined static method Fleetbase\\\\Ai\\\\Models\\\\AiSession\\:\\:where\\(\\)\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiSessionController.php
+
+		-
+			message: "#^Cannot access property \\$uuid on mixed\\.$#"
+			count: 3
+			path: server/src/Http/Controllers/Internal/AiSessionController.php
+
+		-
+			message: "#^Cannot cast mixed to int\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiSessionController.php
+
+		-
+			message: "#^Cannot cast mixed to string\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiSessionController.php
+
+		-
+			message: "#^Function now not found\\.$#"
+			count: 2
+			path: server/src/Http/Controllers/Internal/AiSessionController.php
+
+		-
+			message: "#^Function request not found\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiSessionController.php
+
+		-
+			message: "#^Function response not found\\.$#"
+			count: 5
+			path: server/src/Http/Controllers/Internal/AiSessionController.php
+
+		-
+			message: "#^Function session not found\\.$#"
+			count: 2
+			path: server/src/Http/Controllers/Internal/AiSessionController.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Http\\\\Controllers\\\\Internal\\\\AiSessionController\\:\\:createSession\\(\\) has parameter \\$attributes with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiSessionController.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Http\\\\Controllers\\\\Internal\\\\AiSessionController\\:\\:destroy\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiSessionController.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Http\\\\Controllers\\\\Internal\\\\AiSessionController\\:\\:end\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiSessionController.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Http\\\\Controllers\\\\Internal\\\\AiSessionController\\:\\:findSession\\(\\) should return Fleetbase\\\\Ai\\\\Models\\\\AiSession but returns Illuminate\\\\Database\\\\Eloquent\\\\Builder\\|Illuminate\\\\Database\\\\Eloquent\\\\Model\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiSessionController.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Http\\\\Controllers\\\\Internal\\\\AiSessionController\\:\\:index\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiSessionController.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Http\\\\Controllers\\\\Internal\\\\AiSessionController\\:\\:show\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiSessionController.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Http\\\\Controllers\\\\Internal\\\\AiSessionController\\:\\:store\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiSessionController.php
+
+		-
+			message: "#^Access to an undefined property Fleetbase\\\\Ai\\\\Models\\\\AiTask\\:\\:\\$metadata\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiTaskController.php
+
+		-
+			message: "#^Call to an undefined static method Fleetbase\\\\Ai\\\\Models\\\\AiTask\\:\\:where\\(\\)\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiTaskController.php
+
+		-
+			message: "#^Call to method first\\(\\) on an unknown class IlluminateAgnostic\\\\StrAgnostic\\\\Str\\\\Support\\\\Collection\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiTaskController.php
+
+		-
+			message: "#^Cannot access property \\$uuid on mixed\\.$#"
+			count: 2
+			path: server/src/Http/Controllers/Internal/AiTaskController.php
+
+		-
+			message: "#^Cannot cast mixed to int\\.$#"
+			count: 2
+			path: server/src/Http/Controllers/Internal/AiTaskController.php
+
+		-
+			message: "#^Function abort_unless not found\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiTaskController.php
+
+		-
+			message: "#^Function now not found\\.$#"
+			count: 3
+			path: server/src/Http/Controllers/Internal/AiTaskController.php
+
+		-
+			message: "#^Function request not found\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiTaskController.php
+
+		-
+			message: "#^Function response not found\\.$#"
+			count: 8
+			path: server/src/Http/Controllers/Internal/AiTaskController.php
+
+		-
+			message: "#^Function session not found\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiTaskController.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Http\\\\Controllers\\\\Internal\\\\AiTaskController\\:\\:apply\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiTaskController.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Http\\\\Controllers\\\\Internal\\\\AiTaskController\\:\\:cancel\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiTaskController.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Http\\\\Controllers\\\\Internal\\\\AiTaskController\\:\\:confirmUiAction\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiTaskController.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Http\\\\Controllers\\\\Internal\\\\AiTaskController\\:\\:dismissUiAction\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiTaskController.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Http\\\\Controllers\\\\Internal\\\\AiTaskController\\:\\:failUiAction\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiTaskController.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Http\\\\Controllers\\\\Internal\\\\AiTaskController\\:\\:feedback\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiTaskController.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Http\\\\Controllers\\\\Internal\\\\AiTaskController\\:\\:findTask\\(\\) should return Fleetbase\\\\Ai\\\\Models\\\\AiTask but returns Illuminate\\\\Database\\\\Eloquent\\\\Builder\\|Illuminate\\\\Database\\\\Eloquent\\\\Model\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiTaskController.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Http\\\\Controllers\\\\Internal\\\\AiTaskController\\:\\:index\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiTaskController.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Http\\\\Controllers\\\\Internal\\\\AiTaskController\\:\\:preview\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiTaskController.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Http\\\\Controllers\\\\Internal\\\\AiTaskController\\:\\:show\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiTaskController.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Http\\\\Controllers\\\\Internal\\\\AiTaskController\\:\\:store\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiTaskController.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Http\\\\Controllers\\\\Internal\\\\AiTaskController\\:\\:systemAiConfig\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiTaskController.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Http\\\\Controllers\\\\Internal\\\\AiTaskController\\:\\:systemAiConfig\\(\\) should return array but returns mixed\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiTaskController.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Http\\\\Controllers\\\\Internal\\\\AiTaskController\\:\\:uiActionResponse\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiTaskController.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Http\\\\Controllers\\\\Internal\\\\AiTaskController\\:\\:uiActionResponse\\(\\) has parameter \\$result with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiTaskController.php
+
+		-
+			message: "#^Parameter \\#2 \\$actionKey of method Fleetbase\\\\Ai\\\\Services\\\\AiTaskService\\:\\:apply\\(\\) expects string\\|null, mixed given\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiTaskController.php
+
+		-
+			message: "#^Parameter \\#2 \\$actionKey of method Fleetbase\\\\Ai\\\\Services\\\\AiTaskService\\:\\:refreshPreview\\(\\) expects string\\|null, mixed given\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiTaskController.php
+
+		-
+			message: "#^Parameter \\#3 \\$error of method Fleetbase\\\\Ai\\\\Services\\\\AiUiActionService\\:\\:fail\\(\\) expects string\\|null, mixed given\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiTaskController.php
+
+		-
+			message: "#^Parameter \\#3 \\$input of method Fleetbase\\\\Ai\\\\Services\\\\AiTaskService\\:\\:apply\\(\\) expects array, mixed given\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiTaskController.php
+
+		-
+			message: "#^Parameter \\#3 \\$input of method Fleetbase\\\\Ai\\\\Services\\\\AiTaskService\\:\\:refreshPreview\\(\\) expects array, mixed given\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiTaskController.php
+
+		-
+			message: "#^Function response not found\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiToolController.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Http\\\\Controllers\\\\Internal\\\\AiToolController\\:\\:index\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: server/src/Http/Controllers/Internal/AiToolController.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Jobs\\\\SyncAiKnowledge\\:\\:handle\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Jobs/SyncAiKnowledge.php
+
+		-
+			message: "#^Property Fleetbase\\\\Ai\\\\Models\\\\AiAdminAccessLog\\:\\:\\$casts type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Models/AiAdminAccessLog.php
+
+		-
+			message: "#^Function config not found\\.$#"
+			count: 1
+			path: server/src/Models/AiKnowledgeChunk.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Models\\\\AiKnowledgeChunk\\:\\:document\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: server/src/Models/AiKnowledgeChunk.php
+
+		-
+			message: "#^Property Fleetbase\\\\Ai\\\\Models\\\\AiKnowledgeChunk\\:\\:\\$casts type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Models/AiKnowledgeChunk.php
+
+		-
+			message: "#^Call to an undefined method Illuminate\\\\Database\\\\Eloquent\\\\Relations\\\\HasMany\\:\\:orderBy\\(\\)\\.$#"
+			count: 1
+			path: server/src/Models/AiKnowledgeDocument.php
+
+		-
+			message: "#^Function config not found\\.$#"
+			count: 1
+			path: server/src/Models/AiKnowledgeDocument.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Models\\\\AiKnowledgeDocument\\:\\:chunks\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: server/src/Models/AiKnowledgeDocument.php
+
+		-
+			message: "#^Property Fleetbase\\\\Ai\\\\Models\\\\AiKnowledgeDocument\\:\\:\\$casts type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Models/AiKnowledgeDocument.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Models\\\\AiSession\\:\\:company\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: server/src/Models/AiSession.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Models\\\\AiSession\\:\\:createdBy\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: server/src/Models/AiSession.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Models\\\\AiSession\\:\\:tasks\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: server/src/Models/AiSession.php
+
+		-
+			message: "#^Property Fleetbase\\\\Ai\\\\Models\\\\AiSession\\:\\:\\$casts type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Models/AiSession.php
+
+		-
+			message: "#^Property Fleetbase\\\\Ai\\\\Models\\\\AiSession\\:\\:\\$searchableColumns has no type specified\\.$#"
+			count: 1
+			path: server/src/Models/AiSession.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Models\\\\AiTask\\:\\:company\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: server/src/Models/AiTask.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Models\\\\AiTask\\:\\:createdBy\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: server/src/Models/AiTask.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Models\\\\AiTask\\:\\:session\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: server/src/Models/AiTask.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Models\\\\AiTask\\:\\:steps\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: server/src/Models/AiTask.php
+
+		-
+			message: "#^Property Fleetbase\\\\Ai\\\\Models\\\\AiTask\\:\\:\\$casts type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Models/AiTask.php
+
+		-
+			message: "#^Property Fleetbase\\\\Ai\\\\Models\\\\AiTask\\:\\:\\$searchableColumns has no type specified\\.$#"
+			count: 1
+			path: server/src/Models/AiTask.php
+
+		-
+			message: "#^Property Fleetbase\\\\Ai\\\\Models\\\\AiTaskStep\\:\\:\\$casts type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Models/AiTaskStep.php
+
+		-
+			message: "#^Function config not found\\.$#"
+			count: 4
+			path: server/src/Providers/AiServiceProvider.php
+
+		-
+			message: "#^Parameter \\#1 \\$capability of method Fleetbase\\\\Ai\\\\Support\\\\AiCapabilityRegistry\\:\\:register\\(\\) expects Fleetbase\\\\Ai\\\\Contracts\\\\AICapabilityInterface, mixed given\\.$#"
+			count: 7
+			path: server/src/Providers/AiServiceProvider.php
+
+		-
+			message: "#^Property Fleetbase\\\\Ai\\\\Providers\\\\AiServiceProvider\\:\\:\\$commands type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Providers/AiServiceProvider.php
+
+		-
+			message: "#^Property Fleetbase\\\\Ai\\\\Providers\\\\AiServiceProvider\\:\\:\\$observers type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Providers/AiServiceProvider.php
+
+		-
+			message: "#^Access to an undefined property Fleetbase\\\\Ai\\\\Models\\\\AiTask\\:\\:\\$prompt\\.$#"
+			count: 1
+			path: server/src/Services/AiAgentRunner.php
+
+		-
+			message: "#^Cannot cast mixed to int\\.$#"
+			count: 1
+			path: server/src/Services/AiAgentRunner.php
+
+		-
+			message: "#^Function now not found\\.$#"
+			count: 3
+			path: server/src/Services/AiAgentRunner.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\AiAgentRunner\\:\\:addUsage\\(\\) has parameter \\$total with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/AiAgentRunner.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\AiAgentRunner\\:\\:addUsage\\(\\) has parameter \\$usage with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/AiAgentRunner.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\AiAgentRunner\\:\\:addUsage\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/AiAgentRunner.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\AiAgentRunner\\:\\:missingArguments\\(\\) has parameter \\$arguments with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/AiAgentRunner.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\AiAgentRunner\\:\\:missingArguments\\(\\) has parameter \\$schema with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/AiAgentRunner.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\AiAgentRunner\\:\\:missingArguments\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/AiAgentRunner.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\AiAgentRunner\\:\\:run\\(\\) has parameter \\$config with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/AiAgentRunner.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\AiAgentRunner\\:\\:run\\(\\) has parameter \\$history with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/AiAgentRunner.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\AiAgentRunner\\:\\:run\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/AiAgentRunner.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\AiAgentRunner\\:\\:runTool\\(\\) has parameter \\$call with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/AiAgentRunner.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\AiAgentRunner\\:\\:runTool\\(\\) has parameter \\$tools with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/AiAgentRunner.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\AiAgentRunner\\:\\:runTool\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/AiAgentRunner.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\AiAgentRunner\\:\\:serialize\\(\\) has parameter \\$output with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/AiAgentRunner.php
+
+		-
+			message: "#^Parameter \\#1 \\$callback of method Illuminate\\\\Support\\\\Collection\\<\\(int\\|string\\),mixed\\>\\:\\:map\\(\\) expects callable\\(mixed, int\\|string\\)\\: string, Closure\\(Fleetbase\\\\Ai\\\\Contracts\\\\AICapabilityInterface\\)\\: string given\\.$#"
+			count: 1
+			path: server/src/Services/AiAgentRunner.php
+
+		-
+			message: "#^Parameter \\#1 \\$callback of method Illuminate\\\\Support\\\\Collection\\<\\(int\\|string\\),mixed\\>\\:\\:mapWithKeys\\(\\) expects callable\\(mixed, int\\|string\\)\\: array\\<string, Fleetbase\\\\Ai\\\\Contracts\\\\AIToolCapabilityInterface\\>, Closure\\(Fleetbase\\\\Ai\\\\Contracts\\\\AIToolCapabilityInterface\\)\\: non\\-empty\\-array\\<string, Fleetbase\\\\Ai\\\\Contracts\\\\AIToolCapabilityInterface\\> given\\.$#"
+			count: 1
+			path: server/src/Services/AiAgentRunner.php
+
+		-
+			message: "#^Parameter \\#1 \\$value of static method Illuminate\\\\Support\\\\Str\\:\\:limit\\(\\) expects string, string\\|null given\\.$#"
+			count: 1
+			path: server/src/Services/AiAgentRunner.php
+
+		-
+			message: "#^Access to an undefined property Fleetbase\\\\Models\\\\File\\:\\:\\$content_type\\.$#"
+			count: 1
+			path: server/src/Services/AiAttachmentResolver.php
+
+		-
+			message: "#^Access to an undefined property Fleetbase\\\\Models\\\\File\\:\\:\\$file_size\\.$#"
+			count: 1
+			path: server/src/Services/AiAttachmentResolver.php
+
+		-
+			message: "#^Access to an undefined property Fleetbase\\\\Models\\\\File\\:\\:\\$id\\.$#"
+			count: 1
+			path: server/src/Services/AiAttachmentResolver.php
+
+		-
+			message: "#^Access to an undefined property Fleetbase\\\\Models\\\\File\\:\\:\\$original_filename\\.$#"
+			count: 2
+			path: server/src/Services/AiAttachmentResolver.php
+
+		-
+			message: "#^Access to an undefined property Fleetbase\\\\Models\\\\File\\:\\:\\$path\\.$#"
+			count: 1
+			path: server/src/Services/AiAttachmentResolver.php
+
+		-
+			message: "#^Access to an undefined property Fleetbase\\\\Models\\\\File\\:\\:\\$public_id\\.$#"
+			count: 1
+			path: server/src/Services/AiAttachmentResolver.php
+
+		-
+			message: "#^Access to an undefined property Fleetbase\\\\Models\\\\File\\:\\:\\$type\\.$#"
+			count: 1
+			path: server/src/Services/AiAttachmentResolver.php
+
+		-
+			message: "#^Access to an undefined property Fleetbase\\\\Models\\\\File\\:\\:\\$url\\.$#"
+			count: 1
+			path: server/src/Services/AiAttachmentResolver.php
+
+		-
+			message: "#^Access to an undefined property Fleetbase\\\\Models\\\\File\\:\\:\\$uuid\\.$#"
+			count: 1
+			path: server/src/Services/AiAttachmentResolver.php
+
+		-
+			message: "#^Call to an undefined static method Fleetbase\\\\Models\\\\File\\:\\:where\\(\\)\\.$#"
+			count: 1
+			path: server/src/Services/AiAttachmentResolver.php
+
+		-
+			message: "#^Call to method filter\\(\\) on an unknown class IlluminateAgnostic\\\\StrAgnostic\\\\Str\\\\Support\\\\Collection\\.$#"
+			count: 1
+			path: server/src/Services/AiAttachmentResolver.php
+
+		-
+			message: "#^Cannot access property \\$uuid on mixed\\.$#"
+			count: 1
+			path: server/src/Services/AiAttachmentResolver.php
+
+		-
+			message: "#^Cannot call method map\\(\\) on array\\<Illuminate\\\\Database\\\\Eloquent\\\\Builder\\>\\|Illuminate\\\\Database\\\\Eloquent\\\\Collection\\.$#"
+			count: 1
+			path: server/src/Services/AiAttachmentResolver.php
+
+		-
+			message: "#^Cannot cast mixed to string\\.$#"
+			count: 1
+			path: server/src/Services/AiAttachmentResolver.php
+
+		-
+			message: "#^Function session not found\\.$#"
+			count: 1
+			path: server/src/Services/AiAttachmentResolver.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\AiAttachmentResolver\\:\\:contextFor\\(\\) has parameter \\$attachments with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/AiAttachmentResolver.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\AiAttachmentResolver\\:\\:contextFor\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/AiAttachmentResolver.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\AiAttachmentResolver\\:\\:normalizeFile\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/AiAttachmentResolver.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\AiAttachmentResolver\\:\\:resolveFromRequest\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/AiAttachmentResolver.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\AiContextResolver\\:\\:forProvider\\(\\) has parameter \\$context with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/AiContextResolver.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\AiContextResolver\\:\\:forProvider\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/AiContextResolver.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\AiContextResolver\\:\\:hasFailures\\(\\) has parameter \\$context with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/AiContextResolver.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\AiContextResolver\\:\\:resolve\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/AiContextResolver.php
+
+		-
+			message: "#^Access to an undefined property Illuminate\\\\Database\\\\Eloquent\\\\Model\\:\\:\\$ai_session_uuid\\.$#"
+			count: 1
+			path: server/src/Services/AiLogExporter.php
+
+		-
+			message: "#^Access to an undefined property Illuminate\\\\Database\\\\Eloquent\\\\Model\\:\\:\\$company_uuid\\.$#"
+			count: 1
+			path: server/src/Services/AiLogExporter.php
+
+		-
+			message: "#^Access to an undefined property Illuminate\\\\Database\\\\Eloquent\\\\Model\\:\\:\\$completed_at\\.$#"
+			count: 1
+			path: server/src/Services/AiLogExporter.php
+
+		-
+			message: "#^Access to an undefined property Illuminate\\\\Database\\\\Eloquent\\\\Model\\:\\:\\$created_at\\.$#"
+			count: 1
+			path: server/src/Services/AiLogExporter.php
+
+		-
+			message: "#^Access to an undefined property Illuminate\\\\Database\\\\Eloquent\\\\Model\\:\\:\\$created_by_uuid\\.$#"
+			count: 1
+			path: server/src/Services/AiLogExporter.php
+
+		-
+			message: "#^Access to an undefined property Illuminate\\\\Database\\\\Eloquent\\\\Model\\:\\:\\$feedback_comment\\.$#"
+			count: 1
+			path: server/src/Services/AiLogExporter.php
+
+		-
+			message: "#^Access to an undefined property Illuminate\\\\Database\\\\Eloquent\\\\Model\\:\\:\\$feedback_rating\\.$#"
+			count: 1
+			path: server/src/Services/AiLogExporter.php
+
+		-
+			message: "#^Access to an undefined property Illuminate\\\\Database\\\\Eloquent\\\\Model\\:\\:\\$input_tokens\\.$#"
+			count: 1
+			path: server/src/Services/AiLogExporter.php
+
+		-
+			message: "#^Access to an undefined property Illuminate\\\\Database\\\\Eloquent\\\\Model\\:\\:\\$metadata\\.$#"
+			count: 1
+			path: server/src/Services/AiLogExporter.php
+
+		-
+			message: "#^Access to an undefined property Illuminate\\\\Database\\\\Eloquent\\\\Model\\:\\:\\$model\\.$#"
+			count: 1
+			path: server/src/Services/AiLogExporter.php
+
+		-
+			message: "#^Access to an undefined property Illuminate\\\\Database\\\\Eloquent\\\\Model\\:\\:\\$output_tokens\\.$#"
+			count: 1
+			path: server/src/Services/AiLogExporter.php
+
+		-
+			message: "#^Access to an undefined property Illuminate\\\\Database\\\\Eloquent\\\\Model\\:\\:\\$prompt\\.$#"
+			count: 1
+			path: server/src/Services/AiLogExporter.php
+
+		-
+			message: "#^Access to an undefined property Illuminate\\\\Database\\\\Eloquent\\\\Model\\:\\:\\$provider\\.$#"
+			count: 1
+			path: server/src/Services/AiLogExporter.php
+
+		-
+			message: "#^Access to an undefined property Illuminate\\\\Database\\\\Eloquent\\\\Model\\:\\:\\$response\\.$#"
+			count: 1
+			path: server/src/Services/AiLogExporter.php
+
+		-
+			message: "#^Access to an undefined property Illuminate\\\\Database\\\\Eloquent\\\\Model\\:\\:\\$session\\.$#"
+			count: 1
+			path: server/src/Services/AiLogExporter.php
+
+		-
+			message: "#^Access to an undefined property Illuminate\\\\Database\\\\Eloquent\\\\Model\\:\\:\\$status\\.$#"
+			count: 1
+			path: server/src/Services/AiLogExporter.php
+
+		-
+			message: "#^Access to an undefined property Illuminate\\\\Database\\\\Eloquent\\\\Model\\:\\:\\$steps\\.$#"
+			count: 1
+			path: server/src/Services/AiLogExporter.php
+
+		-
+			message: "#^Access to an undefined property Illuminate\\\\Database\\\\Eloquent\\\\Model\\:\\:\\$total_tokens\\.$#"
+			count: 1
+			path: server/src/Services/AiLogExporter.php
+
+		-
+			message: "#^Access to an undefined property Illuminate\\\\Database\\\\Eloquent\\\\Model\\:\\:\\$uuid\\.$#"
+			count: 1
+			path: server/src/Services/AiLogExporter.php
+
+		-
+			message: "#^Cannot call method toIso8601String\\(\\) on mixed\\.$#"
+			count: 2
+			path: server/src/Services/AiLogExporter.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\AiLogExporter\\:\\:csvRow\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/AiLogExporter.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\AiLogExporter\\:\\:record\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/AiLogExporter.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\AiLogExporter\\:\\:write\\(\\) has parameter \\$handle with no type specified\\.$#"
+			count: 1
+			path: server/src/Services/AiLogExporter.php
+
+		-
+			message: "#^Call to method keyBy\\(\\) on an unknown class IlluminateAgnostic\\\\StrAgnostic\\\\Str\\\\Support\\\\Collection\\.$#"
+			count: 1
+			path: server/src/Services/AiProviderManager.php
+
+		-
+			message: "#^Call to method pluck\\(\\) on an unknown class IlluminateAgnostic\\\\StrAgnostic\\\\Str\\\\Support\\\\Collection\\.$#"
+			count: 1
+			path: server/src/Services/AiProviderManager.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\AiProviderManager\\:\\:complete\\(\\) has parameter \\$messages with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/AiProviderManager.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\AiProviderManager\\:\\:complete\\(\\) has parameter \\$options with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/AiProviderManager.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\AiProviderManager\\:\\:complete\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/AiProviderManager.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\AiProviderManager\\:\\:converse\\(\\) has parameter \\$messages with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/AiProviderManager.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\AiProviderManager\\:\\:converse\\(\\) has parameter \\$options with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/AiProviderManager.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\AiProviderManager\\:\\:converse\\(\\) has parameter \\$tools with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/AiProviderManager.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\AiProviderManager\\:\\:defaultConfig\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/AiProviderManager.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\AiProviderManager\\:\\:metadata\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/AiProviderManager.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\AiProviderManager\\:\\:modelFor\\(\\) has parameter \\$config with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/AiProviderManager.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\AiProviderManager\\:\\:modelFor\\(\\) should return string but returns mixed\\.$#"
+			count: 1
+			path: server/src/Services/AiProviderManager.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\AiProviderManager\\:\\:normalizeConfig\\(\\) has parameter \\$config with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/AiProviderManager.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\AiProviderManager\\:\\:normalizeConfig\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/AiProviderManager.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\AiProviderManager\\:\\:providerFor\\(\\) has parameter \\$config with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/AiProviderManager.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\AiProviderManager\\:\\:providerNameFor\\(\\) has parameter \\$config with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/AiProviderManager.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\AiProviderManager\\:\\:providerNameFor\\(\\) should return string but returns mixed\\.$#"
+			count: 1
+			path: server/src/Services/AiProviderManager.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\AiProviderManager\\:\\:supportsTools\\(\\) has parameter \\$config with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/AiProviderManager.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\AiProviderManager\\:\\:test\\(\\) has parameter \\$config with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/AiProviderManager.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\AiProviderManager\\:\\:test\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/AiProviderManager.php
+
+		-
+			message: "#^Parameter \\#1 \\$array of static method Illuminate\\\\Support\\\\Arr\\:\\:get\\(\\) expects array\\|ArrayAccess, mixed given\\.$#"
+			count: 3
+			path: server/src/Services/AiProviderManager.php
+
+		-
+			message: "#^Parameter \\#1 \\$config of method Fleetbase\\\\Ai\\\\Services\\\\AiProviderManager\\:\\:providerFor\\(\\) expects array, mixed given\\.$#"
+			count: 2
+			path: server/src/Services/AiProviderManager.php
+
+		-
+			message: "#^Parameter \\#1 \\$key of method Illuminate\\\\Support\\\\Collection\\<\\(int\\|string\\),mixed\\>\\:\\:get\\(\\) expects \\(int\\|string\\), mixed given\\.$#"
+			count: 1
+			path: server/src/Services/AiProviderManager.php
+
+		-
+			message: "#^Parameter \\#1 \\$key of method Illuminate\\\\Support\\\\Collection\\<\\(int\\|string\\),mixed\\>\\:\\:has\\(\\) expects array\\<\\(int\\|string\\)\\>\\|int\\|string, mixed given\\.$#"
+			count: 1
+			path: server/src/Services/AiProviderManager.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\AiQueryExecutor\\:\\:applyFilters\\(\\) has parameter \\$filters with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/AiQueryExecutor.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\AiQueryExecutor\\:\\:count\\(\\) has parameter \\$filters with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/AiQueryExecutor.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\AiQueryExecutor\\:\\:count\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/AiQueryExecutor.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\AiQueryExecutor\\:\\:countsBy\\(\\) has parameter \\$filters with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/AiQueryExecutor.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\AiQueryExecutor\\:\\:countsBy\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/AiQueryExecutor.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\AiQueryExecutor\\:\\:listRecords\\(\\) has parameter \\$filters with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/AiQueryExecutor.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\AiQueryExecutor\\:\\:listRecords\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/AiQueryExecutor.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\AiQueryExecutor\\:\\:locationSummary\\(\\) has parameter \\$filters with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/AiQueryExecutor.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\AiQueryExecutor\\:\\:locationSummary\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/AiQueryExecutor.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\AiQueryExecutor\\:\\:samples\\(\\) has parameter \\$filters with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/AiQueryExecutor.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\AiQueryExecutor\\:\\:samples\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/AiQueryExecutor.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\AiQueryExecutor\\:\\:sanitizeRecord\\(\\) has parameter \\$record with no type specified\\.$#"
+			count: 1
+			path: server/src/Services/AiQueryExecutor.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\AiQueryExecutor\\:\\:sanitizeRecord\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/AiQueryExecutor.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\AiQueryExecutor\\:\\:userFromSession\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: server/src/Services/AiQueryExecutor.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\AiQueryExecutor\\:\\:whereValidLocation\\(\\) should return Illuminate\\\\Database\\\\Eloquent\\\\Builder but returns Illuminate\\\\Database\\\\Query\\\\Builder\\.$#"
+			count: 1
+			path: server/src/Services/AiQueryExecutor.php
+
+		-
+			message: "#^Parameter \\#1 \\$column of method Illuminate\\\\Database\\\\Eloquent\\\\Builder\\:\\:where\\(\\) expects array\\|Closure\\|Illuminate\\\\Contracts\\\\Database\\\\Query\\\\Expression\\|string, string\\|null given\\.$#"
+			count: 2
+			path: server/src/Services/AiQueryExecutor.php
+
+		-
+			message: "#^Parameter \\#1 \\$column of method Illuminate\\\\Database\\\\Query\\\\Builder\\:\\:orWhereNull\\(\\) expects array\\|Illuminate\\\\Contracts\\\\Database\\\\Query\\\\Expression\\|string, string\\|null given\\.$#"
+			count: 1
+			path: server/src/Services/AiQueryExecutor.php
+
+		-
+			message: "#^Parameter \\#1 \\$column of method Illuminate\\\\Database\\\\Query\\\\Builder\\:\\:whereIn\\(\\) expects Illuminate\\\\Contracts\\\\Database\\\\Query\\\\Expression\\|string, string\\|null given\\.$#"
+			count: 1
+			path: server/src/Services/AiQueryExecutor.php
+
+		-
+			message: "#^Parameter \\#1 \\$column of method Illuminate\\\\Database\\\\Query\\\\Builder\\:\\:whereNotIn\\(\\) expects Illuminate\\\\Contracts\\\\Database\\\\Query\\\\Expression\\|string, string\\|null given\\.$#"
+			count: 1
+			path: server/src/Services/AiQueryExecutor.php
+
+		-
+			message: "#^Parameter \\#1 \\$columns of method Illuminate\\\\Database\\\\Query\\\\Builder\\:\\:whereNotNull\\(\\) expects array\\|Illuminate\\\\Contracts\\\\Database\\\\Query\\\\Expression\\|string, string\\|null given\\.$#"
+			count: 1
+			path: server/src/Services/AiQueryExecutor.php
+
+		-
+			message: "#^Parameter \\#1 \\$columns of method Illuminate\\\\Database\\\\Query\\\\Builder\\:\\:whereNull\\(\\) expects array\\|Illuminate\\\\Contracts\\\\Database\\\\Query\\\\Expression\\|string, string\\|null given\\.$#"
+			count: 1
+			path: server/src/Services/AiQueryExecutor.php
+
+		-
+			message: "#^Parameter \\#1 \\$field of method Fleetbase\\\\Ai\\\\Support\\\\AiQueryableResource\\:\\:columnFor\\(\\) expects string, mixed given\\.$#"
+			count: 1
+			path: server/src/Services/AiQueryExecutor.php
+
+		-
+			message: "#^Parameter \\#1 \\$field of method Fleetbase\\\\Ai\\\\Support\\\\AiQueryableResource\\:\\:hasField\\(\\) expects string, mixed given\\.$#"
+			count: 1
+			path: server/src/Services/AiQueryExecutor.php
+
+		-
+			message: "#^Parameter \\#1 \\.\\.\\.\\$groups of method Illuminate\\\\Database\\\\Query\\\\Builder\\:\\:groupBy\\(\\) expects array\\|Illuminate\\\\Contracts\\\\Database\\\\Query\\\\Expression\\|string, string\\|null given\\.$#"
+			count: 1
+			path: server/src/Services/AiQueryExecutor.php
+
+		-
+			message: "#^Access to an undefined property Fleetbase\\\\Ai\\\\Models\\\\AiSession\\:\\:\\$status\\.$#"
+			count: 1
+			path: server/src/Services/AiTaskService.php
+
+		-
+			message: "#^Access to an undefined property Fleetbase\\\\Ai\\\\Models\\\\AiSession\\:\\:\\$title\\.$#"
+			count: 1
+			path: server/src/Services/AiTaskService.php
+
+		-
+			message: "#^Access to an undefined property Fleetbase\\\\Ai\\\\Models\\\\AiSession\\:\\:\\$uuid\\.$#"
+			count: 1
+			path: server/src/Services/AiTaskService.php
+
+		-
+			message: "#^Access to an undefined property Fleetbase\\\\Ai\\\\Models\\\\AiTask\\:\\:\\$ai_session_uuid\\.$#"
+			count: 3
+			path: server/src/Services/AiTaskService.php
+
+		-
+			message: "#^Access to an undefined property Fleetbase\\\\Ai\\\\Models\\\\AiTask\\:\\:\\$company_uuid\\.$#"
+			count: 2
+			path: server/src/Services/AiTaskService.php
+
+		-
+			message: "#^Access to an undefined property Fleetbase\\\\Ai\\\\Models\\\\AiTask\\:\\:\\$context\\.$#"
+			count: 6
+			path: server/src/Services/AiTaskService.php
+
+		-
+			message: "#^Access to an undefined property Fleetbase\\\\Ai\\\\Models\\\\AiTask\\:\\:\\$created_by_uuid\\.$#"
+			count: 1
+			path: server/src/Services/AiTaskService.php
+
+		-
+			message: "#^Access to an undefined property Fleetbase\\\\Ai\\\\Models\\\\AiTask\\:\\:\\$metadata\\.$#"
+			count: 7
+			path: server/src/Services/AiTaskService.php
+
+		-
+			message: "#^Access to an undefined property Fleetbase\\\\Ai\\\\Models\\\\AiTask\\:\\:\\$model\\.$#"
+			count: 4
+			path: server/src/Services/AiTaskService.php
+
+		-
+			message: "#^Access to an undefined property Fleetbase\\\\Ai\\\\Models\\\\AiTask\\:\\:\\$prompt\\.$#"
+			count: 7
+			path: server/src/Services/AiTaskService.php
+
+		-
+			message: "#^Access to an undefined property Fleetbase\\\\Ai\\\\Models\\\\AiTask\\:\\:\\$provider\\.$#"
+			count: 4
+			path: server/src/Services/AiTaskService.php
+
+		-
+			message: "#^Access to an undefined property Fleetbase\\\\Ai\\\\Models\\\\AiTask\\:\\:\\$response\\.$#"
+			count: 2
+			path: server/src/Services/AiTaskService.php
+
+		-
+			message: "#^Access to an undefined property Fleetbase\\\\Ai\\\\Models\\\\AiTask\\:\\:\\$response_summary\\.$#"
+			count: 3
+			path: server/src/Services/AiTaskService.php
+
+		-
+			message: "#^Access to an undefined property Fleetbase\\\\Ai\\\\Models\\\\AiTask\\:\\:\\$status\\.$#"
+			count: 2
+			path: server/src/Services/AiTaskService.php
+
+		-
+			message: "#^Access to an undefined property Fleetbase\\\\Ai\\\\Models\\\\AiTask\\:\\:\\$uuid\\.$#"
+			count: 2
+			path: server/src/Services/AiTaskService.php
+
+		-
+			message: "#^Access to an undefined property object\\:\\:\\$status\\.$#"
+			count: 1
+			path: server/src/Services/AiTaskService.php
+
+		-
+			message: "#^Call to an undefined static method Fleetbase\\\\Ai\\\\Models\\\\AiSession\\:\\:create\\(\\)\\.$#"
+			count: 1
+			path: server/src/Services/AiTaskService.php
+
+		-
+			message: "#^Call to an undefined static method Fleetbase\\\\Ai\\\\Models\\\\AiSession\\:\\:where\\(\\)\\.$#"
+			count: 1
+			path: server/src/Services/AiTaskService.php
+
+		-
+			message: "#^Call to an undefined static method Fleetbase\\\\Ai\\\\Models\\\\AiTask\\:\\:create\\(\\)\\.$#"
+			count: 1
+			path: server/src/Services/AiTaskService.php
+
+		-
+			message: "#^Call to an undefined static method Fleetbase\\\\Ai\\\\Models\\\\AiTask\\:\\:where\\(\\)\\.$#"
+			count: 1
+			path: server/src/Services/AiTaskService.php
+
+		-
+			message: "#^Call to an undefined static method Fleetbase\\\\Ai\\\\Models\\\\AiTaskStep\\:\\:create\\(\\)\\.$#"
+			count: 1
+			path: server/src/Services/AiTaskService.php
+
+		-
+			message: "#^Call to method map\\(\\) on an unknown class IlluminateAgnostic\\\\StrAgnostic\\\\Str\\\\Support\\\\Collection\\.$#"
+			count: 1
+			path: server/src/Services/AiTaskService.php
+
+		-
+			message: "#^Cannot access property \\$uuid on mixed\\.$#"
+			count: 3
+			path: server/src/Services/AiTaskService.php
+
+		-
+			message: "#^Cannot cast mixed to int\\.$#"
+			count: 1
+			path: server/src/Services/AiTaskService.php
+
+		-
+			message: "#^Cannot cast mixed to string\\.$#"
+			count: 1
+			path: server/src/Services/AiTaskService.php
+
+		-
+			message: "#^Function now not found\\.$#"
+			count: 25
+			path: server/src/Services/AiTaskService.php
+
+		-
+			message: "#^Function session not found\\.$#"
+			count: 3
+			path: server/src/Services/AiTaskService.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\AiTaskService\\:\\:answerWithTools\\(\\) has parameter \\$attachments with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/AiTaskService.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\AiTaskService\\:\\:answerWithTools\\(\\) has parameter \\$config with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/AiTaskService.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\AiTaskService\\:\\:answerWithTools\\(\\) should return Fleetbase\\\\Ai\\\\Models\\\\AiTask but returns Fleetbase\\\\Ai\\\\Models\\\\AiTask\\|null\\.$#"
+			count: 1
+			path: server/src/Services/AiTaskService.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\AiTaskService\\:\\:apply\\(\\) has parameter \\$input with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/AiTaskService.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\AiTaskService\\:\\:apply\\(\\) should return Fleetbase\\\\Ai\\\\Models\\\\AiTask but returns Fleetbase\\\\Ai\\\\Models\\\\AiTask\\|null\\.$#"
+			count: 2
+			path: server/src/Services/AiTaskService.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\AiTaskService\\:\\:conversationHistory\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/AiTaskService.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\AiTaskService\\:\\:createFromRequest\\(\\) should return Fleetbase\\\\Ai\\\\Models\\\\AiTask but returns Fleetbase\\\\Ai\\\\Models\\\\AiTask\\|null\\.$#"
+			count: 1
+			path: server/src/Services/AiTaskService.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\AiTaskService\\:\\:createSession\\(\\) has parameter \\$attributes with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/AiTaskService.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\AiTaskService\\:\\:createTask\\(\\) has parameter \\$attributes with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/AiTaskService.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\AiTaskService\\:\\:normalizeActionPreview\\(\\) has parameter \\$preview with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/AiTaskService.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\AiTaskService\\:\\:normalizeActionPreview\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/AiTaskService.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\AiTaskService\\:\\:recordStep\\(\\) has parameter \\$attributes with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/AiTaskService.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\AiTaskService\\:\\:refreshPreview\\(\\) has parameter \\$input with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/AiTaskService.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\AiTaskService\\:\\:refreshPreview\\(\\) should return Fleetbase\\\\Ai\\\\Models\\\\AiTask but returns Fleetbase\\\\Ai\\\\Models\\\\AiTask\\|null\\.$#"
+			count: 2
+			path: server/src/Services/AiTaskService.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\AiTaskService\\:\\:resolveActionPreviews\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/AiTaskService.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\AiTaskService\\:\\:resolveSessionForRequest\\(\\) should return Fleetbase\\\\Ai\\\\Models\\\\AiSession but returns object\\.$#"
+			count: 2
+			path: server/src/Services/AiTaskService.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\AiTaskService\\:\\:sessionContext\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/AiTaskService.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\AiTaskService\\:\\:systemAiConfig\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/AiTaskService.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\AiTaskService\\:\\:systemAiConfig\\(\\) should return array but returns mixed\\.$#"
+			count: 1
+			path: server/src/Services/AiTaskService.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\AiTaskService\\:\\:usesTools\\(\\) has parameter \\$config with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/AiTaskService.php
+
+		-
+			message: "#^Parameter \\#1 \\$array of static method Illuminate\\\\Support\\\\Arr\\:\\:get\\(\\) expects array\\|ArrayAccess, mixed given\\.$#"
+			count: 6
+			path: server/src/Services/AiTaskService.php
+
+		-
+			message: "#^Parameter \\#1 \\$callback of method Illuminate\\\\Support\\\\Collection\\<\\(int\\|string\\),mixed\\>\\:\\:flatMap\\(\\) expects callable\\(mixed, int\\|string\\)\\: \\(array\\<int, array\\{role\\: string, content\\: string\\}\\>\\|Illuminate\\\\Support\\\\Collection\\<int, array\\{role\\: string, content\\: string\\}\\>\\), Closure\\(Fleetbase\\\\Ai\\\\Models\\\\AiTask\\)\\: array\\{0\\: array\\{role\\: 'user', content\\: string\\}, 1\\?\\: array\\{role\\: 'assistant', content\\: string\\}\\} given\\.$#"
+			count: 1
+			path: server/src/Services/AiTaskService.php
+
+		-
+			message: "#^Parameter \\#1 \\$callback of method Illuminate\\\\Support\\\\Collection\\<\\(int\\|string\\),mixed\\>\\:\\:map\\(\\) expects callable\\(mixed, int\\|string\\)\\: array, Closure\\(Fleetbase\\\\Ai\\\\Contracts\\\\AIActionCapabilityInterface\\)\\: array given\\.$#"
+			count: 1
+			path: server/src/Services/AiTaskService.php
+
+		-
+			message: "#^Parameter \\#1 \\$callback of method Illuminate\\\\Support\\\\Collection\\<\\(int\\|string\\),mixed\\>\\:\\:map\\(\\) expects callable\\(mixed, int\\|string\\)\\: array\\{prompt\\: mixed, response\\: string, status\\: mixed\\}, Closure\\(Fleetbase\\\\Ai\\\\Models\\\\AiTask\\)\\: array\\{prompt\\: mixed, response\\: string, status\\: mixed\\} given\\.$#"
+			count: 1
+			path: server/src/Services/AiTaskService.php
+
+		-
+			message: "#^Parameter \\#1 \\$provider of class Fleetbase\\\\Ai\\\\Services\\\\AiAgentRunner constructor expects Fleetbase\\\\Ai\\\\Contracts\\\\AIConversationalProviderInterface, Fleetbase\\\\Ai\\\\Contracts\\\\AIProviderInterface given\\.$#"
+			count: 1
+			path: server/src/Services/AiTaskService.php
+
+		-
+			message: "#^Parameter \\#1 \\$route of static method Fleetbase\\\\Ai\\\\Support\\\\AiSystemPrompt\\:\\:pageName\\(\\) expects string\\|null, mixed given\\.$#"
+			count: 2
+			path: server/src/Services/AiTaskService.php
+
+		-
+			message: "#^Parameter \\#1 \\$string of function trim expects string, string\\|null given\\.$#"
+			count: 1
+			path: server/src/Services/AiTaskService.php
+
+		-
+			message: "#^Return type of call to method Illuminate\\\\Support\\\\Collection\\<\\(int\\|string\\),array\\<string, mixed\\>\\>\\:\\:values\\(\\) contains unresolvable type\\.$#"
+			count: 1
+			path: server/src/Services/AiTaskService.php
+
+		-
+			message: "#^Return type of call to method Illuminate\\\\Support\\\\Collection\\<\\(int\\|string\\),mixed\\>\\:\\:map\\(\\) contains unresolvable type\\.$#"
+			count: 1
+			path: server/src/Services/AiTaskService.php
+
+		-
+			message: "#^Return type of call to method Illuminate\\\\Support\\\\Collection\\<int,array\\<string, mixed\\>\\>\\:\\:all\\(\\) contains unresolvable type\\.$#"
+			count: 1
+			path: server/src/Services/AiTaskService.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\AiTemporalContext\\:\\:context\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/AiTemporalContext.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\AiTemporalContext\\:\\:dayWindow\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/AiTemporalContext.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\AiTemporalContext\\:\\:rangeWindow\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/AiTemporalContext.php
+
+		-
+			message: "#^Access to an undefined property Fleetbase\\\\Ai\\\\Models\\\\AiTask\\:\\:\\$company_uuid\\.$#"
+			count: 1
+			path: server/src/Services/AiUiActionService.php
+
+		-
+			message: "#^Access to an undefined property Fleetbase\\\\Ai\\\\Models\\\\AiTask\\:\\:\\$created_by_uuid\\.$#"
+			count: 1
+			path: server/src/Services/AiUiActionService.php
+
+		-
+			message: "#^Access to an undefined property Fleetbase\\\\Ai\\\\Models\\\\AiTask\\:\\:\\$metadata\\.$#"
+			count: 2
+			path: server/src/Services/AiUiActionService.php
+
+		-
+			message: "#^Access to an undefined property Fleetbase\\\\Ai\\\\Models\\\\AiTask\\:\\:\\$uuid\\.$#"
+			count: 1
+			path: server/src/Services/AiUiActionService.php
+
+		-
+			message: "#^Call to an undefined static method Fleetbase\\\\Ai\\\\Models\\\\AiTaskStep\\:\\:create\\(\\)\\.$#"
+			count: 1
+			path: server/src/Services/AiUiActionService.php
+
+		-
+			message: "#^Function now not found\\.$#"
+			count: 5
+			path: server/src/Services/AiUiActionService.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\AiUiActionService\\:\\:close\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/AiUiActionService.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\AiUiActionService\\:\\:confirm\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/AiUiActionService.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\AiUiActionService\\:\\:dismiss\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/AiUiActionService.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\AiUiActionService\\:\\:fail\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/AiUiActionService.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\AiUiActionService\\:\\:find\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/AiUiActionService.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\AiUiActionService\\:\\:recordStep\\(\\) has parameter \\$attributes with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/AiUiActionService.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\AiUiActionService\\:\\:update\\(\\) has parameter \\$action with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/AiUiActionService.php
+
+		-
+			message: "#^Parameter \\#2 \\$index of method Fleetbase\\\\Ai\\\\Services\\\\AiUiActionService\\:\\:update\\(\\) expects int, int\\|null given\\.$#"
+			count: 4
+			path: server/src/Services/AiUiActionService.php
+
+		-
+			message: "#^Access to an undefined property Fleetbase\\\\Ai\\\\Models\\\\AiTask\\:\\:\\$prompt\\.$#"
+			count: 1
+			path: server/src/Services/AnthropicProvider.php
+
+		-
+			message: "#^Argument of an invalid type mixed supplied for foreach, only iterables are supported\\.$#"
+			count: 1
+			path: server/src/Services/AnthropicProvider.php
+
+		-
+			message: "#^Cannot access offset 'text' on mixed\\.$#"
+			count: 1
+			path: server/src/Services/AnthropicProvider.php
+
+		-
+			message: "#^Cannot cast mixed to int\\.$#"
+			count: 3
+			path: server/src/Services/AnthropicProvider.php
+
+		-
+			message: "#^Cannot cast mixed to string\\.$#"
+			count: 12
+			path: server/src/Services/AnthropicProvider.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\AnthropicProvider\\:\\:complete\\(\\) has parameter \\$messages with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/AnthropicProvider.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\AnthropicProvider\\:\\:complete\\(\\) has parameter \\$options with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/AnthropicProvider.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\AnthropicProvider\\:\\:complete\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/AnthropicProvider.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\AnthropicProvider\\:\\:conversationPayload\\(\\) has parameter \\$messages with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/AnthropicProvider.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\AnthropicProvider\\:\\:conversationPayload\\(\\) has parameter \\$options with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/AnthropicProvider.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\AnthropicProvider\\:\\:conversationPayload\\(\\) has parameter \\$tools with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/AnthropicProvider.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\AnthropicProvider\\:\\:conversationPayload\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/AnthropicProvider.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\AnthropicProvider\\:\\:converse\\(\\) has parameter \\$messages with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/AnthropicProvider.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\AnthropicProvider\\:\\:converse\\(\\) has parameter \\$options with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/AnthropicProvider.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\AnthropicProvider\\:\\:converse\\(\\) has parameter \\$tools with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/AnthropicProvider.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\AnthropicProvider\\:\\:errorMessage\\(\\) has parameter \\$body with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/AnthropicProvider.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\AnthropicProvider\\:\\:errorMessage\\(\\) should return string but returns mixed\\.$#"
+			count: 1
+			path: server/src/Services/AnthropicProvider.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\AnthropicProvider\\:\\:extractText\\(\\) has parameter \\$body with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/AnthropicProvider.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\AnthropicProvider\\:\\:headers\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/AnthropicProvider.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\AnthropicProvider\\:\\:messagesUrl\\(\\) has parameter \\$providerConfig with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/AnthropicProvider.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\AnthropicProvider\\:\\:normalizeUsage\\(\\) has parameter \\$usage with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/AnthropicProvider.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\AnthropicProvider\\:\\:normalizeUsage\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/AnthropicProvider.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\AnthropicProvider\\:\\:supportsTools\\(\\) has parameter \\$config with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/AnthropicProvider.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\AnthropicProvider\\:\\:systemInstruction\\(\\) has parameter \\$options with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/AnthropicProvider.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\AnthropicProvider\\:\\:test\\(\\) has parameter \\$config with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/AnthropicProvider.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\AnthropicProvider\\:\\:test\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/AnthropicProvider.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\AnthropicProvider\\:\\:toAnthropicMessages\\(\\) has parameter \\$messages with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/AnthropicProvider.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\AnthropicProvider\\:\\:toAnthropicMessages\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/AnthropicProvider.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\AnthropicProvider\\:\\:turnFromResponse\\(\\) has parameter \\$body with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/AnthropicProvider.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\AnthropicProvider\\:\\:userInstruction\\(\\) has parameter \\$capabilityContext with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/AnthropicProvider.php
+
+		-
+			message: "#^Parameter \\#1 \\$array of static method Illuminate\\\\Support\\\\Arr\\:\\:get\\(\\) expects array\\|ArrayAccess, mixed given\\.$#"
+			count: 20
+			path: server/src/Services/AnthropicProvider.php
+
+		-
+			message: "#^Parameter \\#1 \\$providerConfig of method Fleetbase\\\\Ai\\\\Services\\\\AnthropicProvider\\:\\:messagesUrl\\(\\) expects array, mixed given\\.$#"
+			count: 3
+			path: server/src/Services/AnthropicProvider.php
+
+		-
+			message: "#^Parameter \\#1 \\$usage of method Fleetbase\\\\Ai\\\\Services\\\\AnthropicProvider\\:\\:normalizeUsage\\(\\) expects array, mixed given\\.$#"
+			count: 1
+			path: server/src/Services/AnthropicProvider.php
+
+		-
+			message: "#^Parameter \\#1 \\$value of static method Illuminate\\\\Support\\\\Str\\:\\:limit\\(\\) expects string, string\\|null given\\.$#"
+			count: 1
+			path: server/src/Services/AnthropicProvider.php
+
+		-
+			message: "#^Call to method map\\(\\) on an unknown class IlluminateAgnostic\\\\StrAgnostic\\\\Str\\\\Support\\\\Collection\\.$#"
+			count: 2
+			path: server/src/Services/Knowledge/DocsSiteSource.php
+
+		-
+			message: "#^Cannot call method parse\\(\\) on Fleetbase\\\\Ai\\\\Support\\\\Knowledge\\\\DocsHtmlParser\\|null\\.$#"
+			count: 1
+			path: server/src/Services/Knowledge/DocsSiteSource.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\Knowledge\\\\DocsSiteSource\\:\\:__construct\\(\\) has parameter \\$config with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/Knowledge/DocsSiteSource.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\Knowledge\\\\DocsSiteSource\\:\\:documents\\(\\) return type has no value type specified in iterable type iterable\\.$#"
+			count: 1
+			path: server/src/Services/Knowledge/DocsSiteSource.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\Knowledge\\\\DocsSiteSource\\:\\:pageUrls\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/Knowledge/DocsSiteSource.php
+
+		-
+			message: "#^Offset 1 on array\\{array\\<int, string\\>, array\\<int, non\\-empty\\-string\\>\\} on left side of \\?\\? always exists and is not nullable\\.$#"
+			count: 1
+			path: server/src/Services/Knowledge/DocsSiteSource.php
+
+		-
+			message: "#^Parameter \\#1 \\$string of function trim expects string, mixed given\\.$#"
+			count: 1
+			path: server/src/Services/Knowledge/DocsSiteSource.php
+
+		-
+			message: "#^Parameter \\#3 \\$subject of function str_replace expects array\\|string, mixed given\\.$#"
+			count: 1
+			path: server/src/Services/Knowledge/DocsSiteSource.php
+
+		-
+			message: "#^Property Fleetbase\\\\Ai\\\\Services\\\\Knowledge\\\\DocsSiteSource\\:\\:\\$failures type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/Knowledge/DocsSiteSource.php
+
+		-
+			message: "#^Function report not found\\.$#"
+			count: 1
+			path: server/src/Services/Knowledge/KnowledgeBootstrapper.php
+
+		-
+			message: "#^Negated boolean expression is always false\\.$#"
+			count: 1
+			path: server/src/Services/Knowledge/KnowledgeBootstrapper.php
+
+		-
+			message: "#^Access to an undefined property Fleetbase\\\\Ai\\\\Models\\\\AiKnowledgeDocument\\:\\:\\$content_hash\\.$#"
+			count: 1
+			path: server/src/Services/Knowledge/KnowledgeIndexer.php
+
+		-
+			message: "#^Access to an undefined property Fleetbase\\\\Ai\\\\Models\\\\AiKnowledgeDocument\\:\\:\\$uuid\\.$#"
+			count: 3
+			path: server/src/Services/Knowledge/KnowledgeIndexer.php
+
+		-
+			message: "#^Call to an undefined static method Fleetbase\\\\Ai\\\\Models\\\\AiKnowledgeChunk\\:\\:create\\(\\)\\.$#"
+			count: 1
+			path: server/src/Services/Knowledge/KnowledgeIndexer.php
+
+		-
+			message: "#^Call to an undefined static method Fleetbase\\\\Ai\\\\Models\\\\AiKnowledgeChunk\\:\\:where\\(\\)\\.$#"
+			count: 1
+			path: server/src/Services/Knowledge/KnowledgeIndexer.php
+
+		-
+			message: "#^Call to an undefined static method Fleetbase\\\\Ai\\\\Models\\\\AiKnowledgeChunk\\:\\:whereIn\\(\\)\\.$#"
+			count: 1
+			path: server/src/Services/Knowledge/KnowledgeIndexer.php
+
+		-
+			message: "#^Call to an undefined static method Fleetbase\\\\Ai\\\\Models\\\\AiKnowledgeDocument\\:\\:where\\(\\)\\.$#"
+			count: 2
+			path: server/src/Services/Knowledge/KnowledgeIndexer.php
+
+		-
+			message: "#^Call to an undefined static method Fleetbase\\\\Ai\\\\Models\\\\AiKnowledgeDocument\\:\\:whereIn\\(\\)\\.$#"
+			count: 1
+			path: server/src/Services/Knowledge/KnowledgeIndexer.php
+
+		-
+			message: "#^Function now not found\\.$#"
+			count: 2
+			path: server/src/Services/Knowledge/KnowledgeIndexer.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\Knowledge\\\\KnowledgeIndexer\\:\\:chunksFor\\(\\) has parameter \\$document with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/Knowledge/KnowledgeIndexer.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\Knowledge\\\\KnowledgeIndexer\\:\\:chunksFor\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/Knowledge/KnowledgeIndexer.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\Knowledge\\\\KnowledgeIndexer\\:\\:hash\\(\\) has parameter \\$document with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/Knowledge/KnowledgeIndexer.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\Knowledge\\\\KnowledgeIndexer\\:\\:persist\\(\\) has parameter \\$chunks with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/Knowledge/KnowledgeIndexer.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\Knowledge\\\\KnowledgeIndexer\\:\\:prune\\(\\) has parameter \\$keepUrls with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/Knowledge/KnowledgeIndexer.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\Knowledge\\\\KnowledgeIndexer\\:\\:split\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/Knowledge/KnowledgeIndexer.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\Knowledge\\\\KnowledgeIndexer\\:\\:store\\(\\) has parameter \\$document with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/Knowledge/KnowledgeIndexer.php
+
+		-
+			message: "#^Parameter \\#1 \\$data of function gzdecode expects string, string\\|false given\\.$#"
+			count: 1
+			path: server/src/Services/Knowledge/KnowledgeIndexer.php
+
+		-
+			message: "#^Parameter \\#1 \\$data of function gzencode expects string, string\\|false given\\.$#"
+			count: 1
+			path: server/src/Services/Knowledge/KnowledgeIndexer.php
+
+		-
+			message: "#^Parameter \\#2 \\$data of function hash expects string, string\\|false given\\.$#"
+			count: 1
+			path: server/src/Services/Knowledge/KnowledgeIndexer.php
+
+		-
+			message: "#^Access to an undefined property Fleetbase\\\\Ai\\\\Models\\\\AiKnowledgeChunk\\:\\:\\$anchor\\.$#"
+			count: 1
+			path: server/src/Services/Knowledge/KnowledgeSearch.php
+
+		-
+			message: "#^Access to an undefined property Fleetbase\\\\Ai\\\\Models\\\\AiKnowledgeChunk\\:\\:\\$audience\\.$#"
+			count: 2
+			path: server/src/Services/Knowledge/KnowledgeSearch.php
+
+		-
+			message: "#^Access to an undefined property Fleetbase\\\\Ai\\\\Models\\\\AiKnowledgeChunk\\:\\:\\$content\\.$#"
+			count: 2
+			path: server/src/Services/Knowledge/KnowledgeSearch.php
+
+		-
+			message: "#^Access to an undefined property Fleetbase\\\\Ai\\\\Models\\\\AiKnowledgeChunk\\:\\:\\$document\\.$#"
+			count: 2
+			path: server/src/Services/Knowledge/KnowledgeSearch.php
+
+		-
+			message: "#^Access to an undefined property Fleetbase\\\\Ai\\\\Models\\\\AiKnowledgeChunk\\:\\:\\$heading\\.$#"
+			count: 1
+			path: server/src/Services/Knowledge/KnowledgeSearch.php
+
+		-
+			message: "#^Access to an undefined property Fleetbase\\\\Ai\\\\Models\\\\AiKnowledgeChunk\\:\\:\\$heading_path\\.$#"
+			count: 1
+			path: server/src/Services/Knowledge/KnowledgeSearch.php
+
+		-
+			message: "#^Access to an undefined property Fleetbase\\\\Ai\\\\Models\\\\AiKnowledgeChunk\\:\\:\\$uuid\\.$#"
+			count: 1
+			path: server/src/Services/Knowledge/KnowledgeSearch.php
+
+		-
+			message: "#^Access to an undefined property Fleetbase\\\\Ai\\\\Models\\\\AiKnowledgeDocument\\:\\:\\$description\\.$#"
+			count: 1
+			path: server/src/Services/Knowledge/KnowledgeSearch.php
+
+		-
+			message: "#^Access to an undefined property Fleetbase\\\\Ai\\\\Models\\\\AiKnowledgeDocument\\:\\:\\$module\\.$#"
+			count: 1
+			path: server/src/Services/Knowledge/KnowledgeSearch.php
+
+		-
+			message: "#^Access to an undefined property Fleetbase\\\\Ai\\\\Models\\\\AiKnowledgeDocument\\:\\:\\$section\\.$#"
+			count: 1
+			path: server/src/Services/Knowledge/KnowledgeSearch.php
+
+		-
+			message: "#^Access to an undefined property Fleetbase\\\\Ai\\\\Models\\\\AiKnowledgeDocument\\:\\:\\$title\\.$#"
+			count: 2
+			path: server/src/Services/Knowledge/KnowledgeSearch.php
+
+		-
+			message: "#^Access to an undefined property Fleetbase\\\\Ai\\\\Models\\\\AiKnowledgeDocument\\:\\:\\$url\\.$#"
+			count: 1
+			path: server/src/Services/Knowledge/KnowledgeSearch.php
+
+		-
+			message: "#^Call to an undefined method Illuminate\\\\Database\\\\Query\\\\Builder\\:\\:whereHas\\(\\)\\.$#"
+			count: 2
+			path: server/src/Services/Knowledge/KnowledgeSearch.php
+
+		-
+			message: "#^Call to an undefined static method Fleetbase\\\\Ai\\\\Models\\\\AiKnowledgeDocument\\:\\:whereIn\\(\\)\\.$#"
+			count: 1
+			path: server/src/Services/Knowledge/KnowledgeSearch.php
+
+		-
+			message: "#^Call to method reject\\(\\) on an unknown class IlluminateAgnostic\\\\StrAgnostic\\\\Str\\\\Support\\\\Collection\\.$#"
+			count: 1
+			path: server/src/Services/Knowledge/KnowledgeSearch.php
+
+		-
+			message: "#^Cannot access property \\$ai_knowledge_document_uuid on mixed\\.$#"
+			count: 1
+			path: server/src/Services/Knowledge/KnowledgeSearch.php
+
+		-
+			message: "#^Cannot cast mixed to string\\.$#"
+			count: 1
+			path: server/src/Services/Knowledge/KnowledgeSearch.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\Knowledge\\\\KnowledgeSearch\\:\\:allowedAudiences\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/Knowledge/KnowledgeSearch.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\Knowledge\\\\KnowledgeSearch\\:\\:allowedChunks\\(\\) has parameter \\$allowed with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/Knowledge/KnowledgeSearch.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\Knowledge\\\\KnowledgeSearch\\:\\:candidates\\(\\) has parameter \\$allowedAudiences with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/Knowledge/KnowledgeSearch.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\Knowledge\\\\KnowledgeSearch\\:\\:candidates\\(\\) has parameter \\$terms with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/Knowledge/KnowledgeSearch.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\Knowledge\\\\KnowledgeSearch\\:\\:chunkByUuid\\(\\) has parameter \\$allowed with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/Knowledge/KnowledgeSearch.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\Knowledge\\\\KnowledgeSearch\\:\\:documentByUrl\\(\\) has parameter \\$allowed with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/Knowledge/KnowledgeSearch.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\Knowledge\\\\KnowledgeSearch\\:\\:pageSections\\(\\) has parameter \\$allowed with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/Knowledge/KnowledgeSearch.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\Knowledge\\\\KnowledgeSearch\\:\\:pageSections\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/Knowledge/KnowledgeSearch.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\Knowledge\\\\KnowledgeSearch\\:\\:present\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/Knowledge/KnowledgeSearch.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\Knowledge\\\\KnowledgeSearch\\:\\:read\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/Knowledge/KnowledgeSearch.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\Knowledge\\\\KnowledgeSearch\\:\\:score\\(\\) has parameter \\$chunk with no type specified\\.$#"
+			count: 1
+			path: server/src/Services/Knowledge/KnowledgeSearch.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\Knowledge\\\\KnowledgeSearch\\:\\:score\\(\\) has parameter \\$terms with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/Knowledge/KnowledgeSearch.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\Knowledge\\\\KnowledgeSearch\\:\\:search\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/Knowledge/KnowledgeSearch.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\Knowledge\\\\KnowledgeSearch\\:\\:terms\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/Knowledge/KnowledgeSearch.php
+
+		-
+			message: "#^Offset 0 on array\\{array\\<int, string\\>\\} on left side of \\?\\? always exists and is not nullable\\.$#"
+			count: 1
+			path: server/src/Services/Knowledge/KnowledgeSearch.php
+
+		-
+			message: "#^Parameter \\#1 \\$callback of method Illuminate\\\\Support\\\\Collection\\<\\(int\\|string\\),mixed\\>\\:\\:map\\(\\) expects callable\\(mixed, int\\|string\\)\\: string, Closure\\(Fleetbase\\\\Ai\\\\Models\\\\AiKnowledgeChunk\\)\\: string given\\.$#"
+			count: 1
+			path: server/src/Services/Knowledge/KnowledgeSearch.php
+
+		-
+			message: "#^Parameter \\#1 \\$chunk of method Fleetbase\\\\Ai\\\\Services\\\\Knowledge\\\\KnowledgeSearch\\:\\:present\\(\\) expects Fleetbase\\\\Ai\\\\Models\\\\AiKnowledgeChunk, mixed given\\.$#"
+			count: 2
+			path: server/src/Services/Knowledge/KnowledgeSearch.php
+
+		-
+			message: "#^Access to an undefined property Fleetbase\\\\Ai\\\\Models\\\\AiTask\\:\\:\\$prompt\\.$#"
+			count: 1
+			path: server/src/Services/LocalAIProvider.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\LocalAIProvider\\:\\:complete\\(\\) has parameter \\$messages with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/LocalAIProvider.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\LocalAIProvider\\:\\:complete\\(\\) has parameter \\$options with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/LocalAIProvider.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\LocalAIProvider\\:\\:complete\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/LocalAIProvider.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\LocalAIProvider\\:\\:test\\(\\) has parameter \\$config with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/LocalAIProvider.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\LocalAIProvider\\:\\:test\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/LocalAIProvider.php
+
+		-
+			message: "#^Access to an undefined property Fleetbase\\\\Ai\\\\Models\\\\AiTask\\:\\:\\$prompt\\.$#"
+			count: 1
+			path: server/src/Services/OpenAIProvider.php
+
+		-
+			message: "#^Argument of an invalid type mixed supplied for foreach, only iterables are supported\\.$#"
+			count: 2
+			path: server/src/Services/OpenAIProvider.php
+
+		-
+			message: "#^Cannot access offset 'text' on mixed\\.$#"
+			count: 1
+			path: server/src/Services/OpenAIProvider.php
+
+		-
+			message: "#^Cannot cast mixed to int\\.$#"
+			count: 2
+			path: server/src/Services/OpenAIProvider.php
+
+		-
+			message: "#^Cannot cast mixed to string\\.$#"
+			count: 12
+			path: server/src/Services/OpenAIProvider.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\OpenAIProvider\\:\\:complete\\(\\) has parameter \\$messages with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/OpenAIProvider.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\OpenAIProvider\\:\\:complete\\(\\) has parameter \\$options with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/OpenAIProvider.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\OpenAIProvider\\:\\:complete\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/OpenAIProvider.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\OpenAIProvider\\:\\:conversationPayload\\(\\) has parameter \\$messages with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/OpenAIProvider.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\OpenAIProvider\\:\\:conversationPayload\\(\\) has parameter \\$options with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/OpenAIProvider.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\OpenAIProvider\\:\\:conversationPayload\\(\\) has parameter \\$tools with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/OpenAIProvider.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\OpenAIProvider\\:\\:conversationPayload\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/OpenAIProvider.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\OpenAIProvider\\:\\:converse\\(\\) has parameter \\$messages with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/OpenAIProvider.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\OpenAIProvider\\:\\:converse\\(\\) has parameter \\$options with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/OpenAIProvider.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\OpenAIProvider\\:\\:converse\\(\\) has parameter \\$tools with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/OpenAIProvider.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\OpenAIProvider\\:\\:errorMessage\\(\\) has parameter \\$body with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/OpenAIProvider.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\OpenAIProvider\\:\\:errorMessage\\(\\) should return string but returns mixed\\.$#"
+			count: 1
+			path: server/src/Services/OpenAIProvider.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\OpenAIProvider\\:\\:extractText\\(\\) has parameter \\$body with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/OpenAIProvider.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\OpenAIProvider\\:\\:normalizeUsage\\(\\) has parameter \\$usage with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/OpenAIProvider.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\OpenAIProvider\\:\\:normalizeUsage\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/OpenAIProvider.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\OpenAIProvider\\:\\:responsesUrl\\(\\) has parameter \\$providerConfig with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/OpenAIProvider.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\OpenAIProvider\\:\\:supportsTools\\(\\) has parameter \\$config with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/OpenAIProvider.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\OpenAIProvider\\:\\:systemInstruction\\(\\) has parameter \\$options with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/OpenAIProvider.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\OpenAIProvider\\:\\:test\\(\\) has parameter \\$config with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/OpenAIProvider.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\OpenAIProvider\\:\\:test\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/OpenAIProvider.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\OpenAIProvider\\:\\:toResponsesInput\\(\\) has parameter \\$messages with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/OpenAIProvider.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\OpenAIProvider\\:\\:toResponsesInput\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/OpenAIProvider.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\OpenAIProvider\\:\\:turnFromResponse\\(\\) has parameter \\$body with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/OpenAIProvider.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Services\\\\OpenAIProvider\\:\\:userInstruction\\(\\) has parameter \\$capabilityContext with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Services/OpenAIProvider.php
+
+		-
+			message: "#^Parameter \\#1 \\$array of static method Illuminate\\\\Support\\\\Arr\\:\\:get\\(\\) expects array\\|ArrayAccess, mixed given\\.$#"
+			count: 21
+			path: server/src/Services/OpenAIProvider.php
+
+		-
+			message: "#^Parameter \\#1 \\$providerConfig of method Fleetbase\\\\Ai\\\\Services\\\\OpenAIProvider\\:\\:responsesUrl\\(\\) expects array, mixed given\\.$#"
+			count: 3
+			path: server/src/Services/OpenAIProvider.php
+
+		-
+			message: "#^Parameter \\#1 \\$usage of method Fleetbase\\\\Ai\\\\Services\\\\OpenAIProvider\\:\\:normalizeUsage\\(\\) expects array, mixed given\\.$#"
+			count: 1
+			path: server/src/Services/OpenAIProvider.php
+
+		-
+			message: "#^Parameter \\#1 \\$value of static method Illuminate\\\\Support\\\\Str\\:\\:limit\\(\\) expects string, string\\|null given\\.$#"
+			count: 1
+			path: server/src/Services/OpenAIProvider.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Support\\\\AiActionPreview\\:\\:find\\(\\) has parameter \\$previews with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Support/AiActionPreview.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Support\\\\AiActionPreview\\:\\:find\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Support/AiActionPreview.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Support\\\\AiActionPreview\\:\\:normalize\\(\\) has parameter \\$preview with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Support/AiActionPreview.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Support\\\\AiActionPreview\\:\\:normalize\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Support/AiActionPreview.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Support\\\\AiActionPreview\\:\\:same\\(\\) has parameter \\$a with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Support/AiActionPreview.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Support\\\\AiActionPreview\\:\\:same\\(\\) has parameter \\$b with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Support/AiActionPreview.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Support\\\\AiAudience\\:\\:canAll\\(\\) has parameter \\$permissions with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Support/AiAudience.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Support\\\\AiAudience\\:\\:forUser\\(\\) has parameter \\$user with no type specified\\.$#"
+			count: 1
+			path: server/src/Support/AiAudience.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Support\\\\AiAudience\\:\\:toArray\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Support/AiAudience.php
+
+		-
+			message: "#^Unsafe usage of new static\\(\\)\\.$#"
+			count: 2
+			path: server/src/Support/AiAudience.php
+
+		-
+			message: "#^Call to method values\\(\\) on an unknown class IlluminateAgnostic\\\\StrAgnostic\\\\Str\\\\Support\\\\Collection\\.$#"
+			count: 1
+			path: server/src/Support/AiCapabilityRegistry.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Support\\\\AiCapabilityRegistry\\:\\:list\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Support/AiCapabilityRegistry.php
+
+		-
+			message: "#^Parameter \\#1 \\$callback of method Illuminate\\\\Support\\\\Collection\\<\\(int\\|string\\),mixed\\>\\:\\:map\\(\\) expects callable\\(mixed, int\\|string\\)\\: array, Closure\\(Fleetbase\\\\Ai\\\\Contracts\\\\AICapabilityInterface\\)\\: array given\\.$#"
+			count: 1
+			path: server/src/Support/AiCapabilityRegistry.php
+
+		-
+			message: "#^Property Fleetbase\\\\Ai\\\\Support\\\\AiCapabilityRegistry\\:\\:\\$capabilities type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Support/AiCapabilityRegistry.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Support\\\\AiProviderTurn\\:\\:__construct\\(\\) has parameter \\$metadata with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Support/AiProviderTurn.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Support\\\\AiProviderTurn\\:\\:__construct\\(\\) has parameter \\$toolCalls with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Support/AiProviderTurn.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Support\\\\AiProviderTurn\\:\\:__construct\\(\\) has parameter \\$usage with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Support/AiProviderTurn.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Support\\\\AiProviderTurn\\:\\:toAssistantMessage\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Support/AiProviderTurn.php
+
+		-
+			message: "#^Call to method values\\(\\) on an unknown class IlluminateAgnostic\\\\StrAgnostic\\\\Str\\\\Support\\\\Collection\\.$#"
+			count: 1
+			path: server/src/Support/AiQueryRegistry.php
+
+		-
+			message: "#^Property Fleetbase\\\\Ai\\\\Support\\\\AiQueryRegistry\\:\\:\\$resources type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Support/AiQueryRegistry.php
+
+		-
+			message: "#^Function session not found\\.$#"
+			count: 1
+			path: server/src/Support/AiQueryableResource.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Support\\\\AiQueryableResource\\:\\:__construct\\(\\) has parameter \\$aliases with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Support/AiQueryableResource.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Support\\\\AiQueryableResource\\:\\:__construct\\(\\) has parameter \\$fields with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Support/AiQueryableResource.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Support\\\\AiQueryableResource\\:\\:__construct\\(\\) has parameter \\$sampleFields with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Support/AiQueryableResource.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Support\\\\AiQueryableResource\\:\\:enumFor\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Support/AiQueryableResource.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Support\\\\AiQueryableResource\\:\\:field\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Support/AiQueryableResource.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Support\\\\AiRelativeDateResolver\\:\\:normalize\\(\\) should return string but returns string\\|null\\.$#"
+			count: 1
+			path: server/src/Support/AiRelativeDateResolver.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Support\\\\AiRelativeDateResolver\\:\\:resolveWindow\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Support/AiRelativeDateResolver.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Support\\\\AiRelativeDateResolver\\:\\:window\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Support/AiRelativeDateResolver.php
+
+		-
+			message: "#^Access to an undefined property Fleetbase\\\\Ai\\\\Models\\\\AiTask\\:\\:\\$prompt\\.$#"
+			count: 1
+			path: server/src/Support/AiSystemPrompt.php
+
+		-
+			message: "#^Call to method reject\\(\\) on an unknown class IlluminateAgnostic\\\\StrAgnostic\\\\Str\\\\Support\\\\Collection\\.$#"
+			count: 1
+			path: server/src/Support/AiSystemPrompt.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Support\\\\AiSystemPrompt\\:\\:build\\(\\) has parameter \\$options with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Support/AiSystemPrompt.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Support\\\\AiSystemPrompt\\:\\:userMessage\\(\\) has parameter \\$context with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Support/AiSystemPrompt.php
+
+		-
+			message: "#^Parameter \\#3 \\$subject of function str_replace expects array\\|string, mixed given\\.$#"
+			count: 1
+			path: server/src/Support/AiSystemPrompt.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Support\\\\AiToolContext\\:\\:addActionPreview\\(\\) has parameter \\$preview with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Support/AiToolContext.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Support\\\\AiToolContext\\:\\:addActionPreview\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Support/AiToolContext.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Support\\\\AiToolContext\\:\\:addUiAction\\(\\) has parameter \\$action with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Support/AiToolContext.php
+
+		-
+			message: "#^Property Fleetbase\\\\Ai\\\\Support\\\\AiToolContext\\:\\:\\$actionPreviews type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Support/AiToolContext.php
+
+		-
+			message: "#^Property Fleetbase\\\\Ai\\\\Support\\\\AiToolContext\\:\\:\\$uiActions type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Support/AiToolContext.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Support\\\\Capabilities\\\\AbstractAICapability\\:\\:permissions\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Support/Capabilities/AbstractAICapability.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Support\\\\Capabilities\\\\AbstractAICapability\\:\\:toArray\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Support/Capabilities/AbstractAICapability.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Support\\\\Capabilities\\\\AbstractAIToolCapability\\:\\:toArray\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Support/Capabilities/AbstractAIToolCapability.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Support\\\\Capabilities\\\\CurrentPageContextCapability\\:\\:permissions\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Support/Capabilities/CurrentPageContextCapability.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Support\\\\Capabilities\\\\CurrentPageContextCapability\\:\\:toArray\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Support/Capabilities/CurrentPageContextCapability.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Support\\\\Capabilities\\\\FindConsoleCommandsTool\\:\\:invoke\\(\\) has parameter \\$arguments with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Support/Capabilities/FindConsoleCommandsTool.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Support\\\\Capabilities\\\\FindConsoleCommandsTool\\:\\:invoke\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Support/Capabilities/FindConsoleCommandsTool.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Support\\\\Capabilities\\\\FindConsoleCommandsTool\\:\\:toolParameters\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Support/Capabilities/FindConsoleCommandsTool.php
+
+		-
+			message: "#^Parameter \\#1 \\$callback of method Illuminate\\\\Support\\\\Collection\\<\\(int\\|string\\),mixed\\>\\:\\:map\\(\\) expects callable\\(mixed, int\\|string\\)\\: array, Closure\\(Fleetbase\\\\Ai\\\\Support\\\\Commands\\\\AiConsoleCommand\\)\\: array given\\.$#"
+			count: 1
+			path: server/src/Support/Capabilities/FindConsoleCommandsTool.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Support\\\\Capabilities\\\\ProposeConsoleCommandTool\\:\\:invoke\\(\\) has parameter \\$arguments with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Support/Capabilities/ProposeConsoleCommandTool.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Support\\\\Capabilities\\\\ProposeConsoleCommandTool\\:\\:invoke\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Support/Capabilities/ProposeConsoleCommandTool.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Support\\\\Capabilities\\\\ProposeConsoleCommandTool\\:\\:toolParameters\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Support/Capabilities/ProposeConsoleCommandTool.php
+
+		-
+			message: "#^Call to method map\\(\\) on an unknown class IlluminateAgnostic\\\\StrAgnostic\\\\Str\\\\Support\\\\Collection\\.$#"
+			count: 1
+			path: server/src/Support/Capabilities/Query/AbstractQueryTool.php
+
+		-
+			message: "#^Cannot cast mixed to string\\.$#"
+			count: 3
+			path: server/src/Support/Capabilities/Query/AbstractQueryTool.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Support\\\\Capabilities\\\\Query\\\\AbstractQueryTool\\:\\:describeFilters\\(\\) has parameter \\$filters with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Support/Capabilities/Query/AbstractQueryTool.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Support\\\\Capabilities\\\\Query\\\\AbstractQueryTool\\:\\:describeFilters\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Support/Capabilities/Query/AbstractQueryTool.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Support\\\\Capabilities\\\\Query\\\\AbstractQueryTool\\:\\:filterSchema\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Support/Capabilities/Query/AbstractQueryTool.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Support\\\\Capabilities\\\\Query\\\\AbstractQueryTool\\:\\:normalizeDateTime\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Support/Capabilities/Query/AbstractQueryTool.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Support\\\\Capabilities\\\\Query\\\\AbstractQueryTool\\:\\:normalizeValue\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Support/Capabilities/Query/AbstractQueryTool.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Support\\\\Capabilities\\\\Query\\\\AbstractQueryTool\\:\\:prepareFilters\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 2
+			path: server/src/Support/Capabilities/Query/AbstractQueryTool.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Support\\\\Capabilities\\\\Query\\\\AbstractQueryTool\\:\\:resolveResource\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Support/Capabilities/Query/AbstractQueryTool.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Support\\\\Capabilities\\\\Query\\\\AbstractQueryTool\\:\\:resourceSchema\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Support/Capabilities/Query/AbstractQueryTool.php
+
+		-
+			message: "#^Parameter \\#1 \\$callback of method Illuminate\\\\Support\\\\Collection\\<\\(int\\|string\\),mixed\\>\\:\\:map\\(\\) expects callable\\(mixed, int\\|string\\)\\: string, Closure\\(Fleetbase\\\\Ai\\\\Support\\\\AiQueryableResource\\)\\: non\\-falsy\\-string given\\.$#"
+			count: 1
+			path: server/src/Support/Capabilities/Query/AbstractQueryTool.php
+
+		-
+			message: "#^Part \\$value \\(mixed\\) of encapsed string cannot be cast to string\\.$#"
+			count: 1
+			path: server/src/Support/Capabilities/Query/AbstractQueryTool.php
+
+		-
+			message: "#^Cannot access property \\$key on Fleetbase\\\\Ai\\\\Support\\\\AiQueryableResource\\|null\\.$#"
+			count: 1
+			path: server/src/Support/Capabilities/Query/CountRecordsTool.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Support\\\\Capabilities\\\\Query\\\\CountRecordsTool\\:\\:invoke\\(\\) has parameter \\$arguments with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Support/Capabilities/Query/CountRecordsTool.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Support\\\\Capabilities\\\\Query\\\\CountRecordsTool\\:\\:invoke\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Support/Capabilities/Query/CountRecordsTool.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Support\\\\Capabilities\\\\Query\\\\CountRecordsTool\\:\\:toolParameters\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Support/Capabilities/Query/CountRecordsTool.php
+
+		-
+			message: "#^Parameter \\#1 \\$resource of method Fleetbase\\\\Ai\\\\Support\\\\Capabilities\\\\Query\\\\AbstractQueryTool\\:\\:prepareFilters\\(\\) expects Fleetbase\\\\Ai\\\\Support\\\\AiQueryableResource, Fleetbase\\\\Ai\\\\Support\\\\AiQueryableResource\\|null given\\.$#"
+			count: 1
+			path: server/src/Support/Capabilities/Query/CountRecordsTool.php
+
+		-
+			message: "#^Cannot access property \\$key on Fleetbase\\\\Ai\\\\Support\\\\AiQueryableResource\\|null\\.$#"
+			count: 2
+			path: server/src/Support/Capabilities/Query/GroupCountTool.php
+
+		-
+			message: "#^Cannot call method hasField\\(\\) on Fleetbase\\\\Ai\\\\Support\\\\AiQueryableResource\\|null\\.$#"
+			count: 1
+			path: server/src/Support/Capabilities/Query/GroupCountTool.php
+
+		-
+			message: "#^Cannot call method typeFor\\(\\) on Fleetbase\\\\Ai\\\\Support\\\\AiQueryableResource\\|null\\.$#"
+			count: 1
+			path: server/src/Support/Capabilities/Query/GroupCountTool.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Support\\\\Capabilities\\\\Query\\\\GroupCountTool\\:\\:invoke\\(\\) has parameter \\$arguments with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Support/Capabilities/Query/GroupCountTool.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Support\\\\Capabilities\\\\Query\\\\GroupCountTool\\:\\:invoke\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Support/Capabilities/Query/GroupCountTool.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Support\\\\Capabilities\\\\Query\\\\GroupCountTool\\:\\:toolParameters\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Support/Capabilities/Query/GroupCountTool.php
+
+		-
+			message: "#^Parameter \\#1 \\$resource of method Fleetbase\\\\Ai\\\\Support\\\\Capabilities\\\\Query\\\\AbstractQueryTool\\:\\:prepareFilters\\(\\) expects Fleetbase\\\\Ai\\\\Support\\\\AiQueryableResource, Fleetbase\\\\Ai\\\\Support\\\\AiQueryableResource\\|null given\\.$#"
+			count: 1
+			path: server/src/Support/Capabilities/Query/GroupCountTool.php
+
+		-
+			message: "#^Cannot access property \\$key on Fleetbase\\\\Ai\\\\Support\\\\AiQueryableResource\\|null\\.$#"
+			count: 1
+			path: server/src/Support/Capabilities/Query/ListRecordsTool.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Support\\\\Capabilities\\\\Query\\\\ListRecordsTool\\:\\:invoke\\(\\) has parameter \\$arguments with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Support/Capabilities/Query/ListRecordsTool.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Support\\\\Capabilities\\\\Query\\\\ListRecordsTool\\:\\:invoke\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Support/Capabilities/Query/ListRecordsTool.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Support\\\\Capabilities\\\\Query\\\\ListRecordsTool\\:\\:toolParameters\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Support/Capabilities/Query/ListRecordsTool.php
+
+		-
+			message: "#^Parameter \\#1 \\$resource of method Fleetbase\\\\Ai\\\\Support\\\\Capabilities\\\\Query\\\\AbstractQueryTool\\:\\:prepareFilters\\(\\) expects Fleetbase\\\\Ai\\\\Support\\\\AiQueryableResource, Fleetbase\\\\Ai\\\\Support\\\\AiQueryableResource\\|null given\\.$#"
+			count: 1
+			path: server/src/Support/Capabilities/Query/ListRecordsTool.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Support\\\\Capabilities\\\\ReadDocTool\\:\\:invoke\\(\\) has parameter \\$arguments with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Support/Capabilities/ReadDocTool.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Support\\\\Capabilities\\\\ReadDocTool\\:\\:invoke\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Support/Capabilities/ReadDocTool.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Support\\\\Capabilities\\\\ReadDocTool\\:\\:toolParameters\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Support/Capabilities/ReadDocTool.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Support\\\\Capabilities\\\\SearchDocsTool\\:\\:invoke\\(\\) has parameter \\$arguments with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Support/Capabilities/SearchDocsTool.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Support\\\\Capabilities\\\\SearchDocsTool\\:\\:invoke\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Support/Capabilities/SearchDocsTool.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Support\\\\Capabilities\\\\SearchDocsTool\\:\\:toolParameters\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Support/Capabilities/SearchDocsTool.php
+
+		-
+			message: "#^Call to method filter\\(\\) on an unknown class IlluminateAgnostic\\\\StrAgnostic\\\\Str\\\\Support\\\\Collection\\.$#"
+			count: 1
+			path: server/src/Support/Commands/AiCommandRegistry.php
+
+		-
+			message: "#^Call to method values\\(\\) on an unknown class IlluminateAgnostic\\\\StrAgnostic\\\\Str\\\\Support\\\\Collection\\.$#"
+			count: 1
+			path: server/src/Support/Commands/AiCommandRegistry.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Support\\\\Commands\\\\AiCommandRegistry\\:\\:registerMany\\(\\) has parameter \\$commands with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Support/Commands/AiCommandRegistry.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Support\\\\Commands\\\\AiCommandRegistry\\:\\:search\\(\\) should return Illuminate\\\\Support\\\\Collection but returns Illuminate\\\\Support\\\\Collection\\|IlluminateAgnostic\\\\StrAgnostic\\\\Str\\\\Support\\\\Collection\\.$#"
+			count: 1
+			path: server/src/Support/Commands/AiCommandRegistry.php
+
+		-
+			message: "#^Parameter \\#1 \\$callback of method Illuminate\\\\Support\\\\Collection\\<\\(int\\|string\\),mixed\\>\\:\\:filter\\(\\) expects \\(callable\\(mixed, int\\|string\\)\\: bool\\)\\|null, Closure\\(Fleetbase\\\\Ai\\\\Support\\\\Commands\\\\AiConsoleCommand\\)\\: bool given\\.$#"
+			count: 1
+			path: server/src/Support/Commands/AiCommandRegistry.php
+
+		-
+			message: "#^Parameter \\#1 \\$callback of method Illuminate\\\\Support\\\\Collection\\<\\(int\\|string\\),mixed\\>\\:\\:map\\(\\) expects callable\\(mixed, int\\|string\\)\\: array\\{command\\: Fleetbase\\\\Ai\\\\Support\\\\Commands\\\\AiConsoleCommand, score\\: int\\}, Closure\\(Fleetbase\\\\Ai\\\\Support\\\\Commands\\\\AiConsoleCommand\\)\\: array\\{command\\: Fleetbase\\\\Ai\\\\Support\\\\Commands\\\\AiConsoleCommand, score\\: int\\<0, max\\>\\} given\\.$#"
+			count: 1
+			path: server/src/Support/Commands/AiCommandRegistry.php
+
+		-
+			message: "#^Parameter \\#1 \\$string of function mb_strlen expects string, mixed given\\.$#"
+			count: 1
+			path: server/src/Support/Commands/AiCommandRegistry.php
+
+		-
+			message: "#^Parameter \\#1 \\$value of static method Illuminate\\\\Support\\\\Str\\:\\:lower\\(\\) expects string, string\\|null given\\.$#"
+			count: 1
+			path: server/src/Support/Commands/AiCommandRegistry.php
+
+		-
+			message: "#^Parameter \\#1 \\$value of static method Illuminate\\\\Support\\\\Str\\:\\:singular\\(\\) expects string, mixed given\\.$#"
+			count: 1
+			path: server/src/Support/Commands/AiCommandRegistry.php
+
+		-
+			message: "#^Property Fleetbase\\\\Ai\\\\Support\\\\Commands\\\\AiCommandRegistry\\:\\:\\$commands type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Support/Commands/AiCommandRegistry.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Support\\\\Commands\\\\AiConsoleCommand\\:\\:__construct\\(\\) has parameter \\$keywords with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Support/Commands/AiConsoleCommand.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Support\\\\Commands\\\\AiConsoleCommand\\:\\:__construct\\(\\) has parameter \\$params with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Support/Commands/AiConsoleCommand.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Support\\\\Commands\\\\AiConsoleCommand\\:\\:__construct\\(\\) has parameter \\$permissions with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Support/Commands/AiConsoleCommand.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Support\\\\Commands\\\\AiConsoleCommand\\:\\:__construct\\(\\) has parameter \\$steps with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Support/Commands/AiConsoleCommand.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Support\\\\Commands\\\\AiConsoleCommand\\:\\:dialog\\(\\) has parameter \\$options with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Support/Commands/AiConsoleCommand.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Support\\\\Commands\\\\AiConsoleCommand\\:\\:fromArray\\(\\) has parameter \\$definition with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Support/Commands/AiConsoleCommand.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Support\\\\Commands\\\\AiConsoleCommand\\:\\:navigate\\(\\) has parameter \\$options with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Support/Commands/AiConsoleCommand.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Support\\\\Commands\\\\AiConsoleCommand\\:\\:resolvedSteps\\(\\) has parameter \\$params with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Support/Commands/AiConsoleCommand.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Support\\\\Commands\\\\AiConsoleCommand\\:\\:resolvedSteps\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Support/Commands/AiConsoleCommand.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Support\\\\Commands\\\\AiConsoleCommand\\:\\:summary\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Support/Commands/AiConsoleCommand.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Support\\\\Commands\\\\AiConsoleCommand\\:\\:validateParams\\(\\) has parameter \\$params with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Support/Commands/AiConsoleCommand.php
+
+		-
+			message: "#^Unsafe usage of new static\\(\\)\\.$#"
+			count: 3
+			path: server/src/Support/Commands/AiConsoleCommand.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Support\\\\Commands\\\\CoreConsoleCommands\\:\\:admin\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Support/Commands/CoreConsoleCommands.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Support\\\\Commands\\\\CoreConsoleCommands\\:\\:console\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Support/Commands/CoreConsoleCommands.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Support\\\\Commands\\\\CoreConsoleCommands\\:\\:developers\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Support/Commands/CoreConsoleCommands.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Support\\\\Commands\\\\CoreConsoleCommands\\:\\:iam\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Support/Commands/CoreConsoleCommands.php
+
+		-
+			message: "#^Call to method contains\\(\\) on an unknown class IlluminateAgnostic\\\\StrAgnostic\\\\Str\\\\Support\\\\Collection\\.$#"
+			count: 1
+			path: server/src/Support/Eval/AiEvalGrader.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Support\\\\Eval\\\\AiEvalGrader\\:\\:grade\\(\\) has parameter \\$expect with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Support/Eval/AiEvalGrader.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Support\\\\Eval\\\\AiEvalGrader\\:\\:grade\\(\\) has parameter \\$outcome with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Support/Eval/AiEvalGrader.php
+
+		-
+			message: "#^Cannot access offset 'cases' on mixed\\.$#"
+			count: 1
+			path: server/src/Support/Eval/AiEvalRunner.php
+
+		-
+			message: "#^Cannot access offset 'id' on mixed\\.$#"
+			count: 2
+			path: server/src/Support/Eval/AiEvalRunner.php
+
+		-
+			message: "#^Cannot access offset 'prompt' on mixed\\.$#"
+			count: 1
+			path: server/src/Support/Eval/AiEvalRunner.php
+
+		-
+			message: "#^Cannot cast mixed to string\\.$#"
+			count: 1
+			path: server/src/Support/Eval/AiEvalRunner.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Support\\\\Eval\\\\AiEvalRunner\\:\\:audienceFor\\(\\) has parameter \\$case with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Support/Eval/AiEvalRunner.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Support\\\\Eval\\\\AiEvalRunner\\:\\:loadCases\\(\\) has parameter \\$only with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Support/Eval/AiEvalRunner.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Support\\\\Eval\\\\AiEvalRunner\\:\\:loadCases\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Support/Eval/AiEvalRunner.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Support\\\\Eval\\\\AiEvalRunner\\:\\:loadCases\\(\\) should return array\\<int, array\\> but returns array\\<int, mixed\\>\\.$#"
+			count: 1
+			path: server/src/Support/Eval/AiEvalRunner.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Support\\\\Eval\\\\AiEvalRunner\\:\\:run\\(\\) has parameter \\$case with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Support/Eval/AiEvalRunner.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Support\\\\Eval\\\\AiEvalRunner\\:\\:run\\(\\) has parameter \\$config with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Support/Eval/AiEvalRunner.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Support\\\\Eval\\\\AiEvalRunner\\:\\:run\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Support/Eval/AiEvalRunner.php
+
+		-
+			message: "#^Method class@anonymous/Support/Eval/AiEvalRunner\\.php\\:70\\:\\:__construct\\(\\) has parameter \\$granted with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Support/Eval/AiEvalRunner.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Support\\\\Knowledge\\\\DocsHtmlParser\\:\\:appendLine\\(\\) has parameter \\$sections with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Support/Knowledge/DocsHtmlParser.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Support\\\\Knowledge\\\\DocsHtmlParser\\:\\:inline\\(\\) has parameter \\$nestedLists with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Support/Knowledge/DocsHtmlParser.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Support\\\\Knowledge\\\\DocsHtmlParser\\:\\:renderBlock\\(\\) has parameter \\$sections with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Support/Knowledge/DocsHtmlParser.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Support\\\\Knowledge\\\\DocsHtmlParser\\:\\:renderList\\(\\) has parameter \\$sections with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Support/Knowledge/DocsHtmlParser.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Support\\\\Knowledge\\\\DocsHtmlParser\\:\\:renderTable\\(\\) has parameter \\$sections with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Support/Knowledge/DocsHtmlParser.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Support\\\\Knowledge\\\\KnowledgeAudienceClassifier\\:\\:__construct\\(\\) has parameter \\$developerPaths with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Support/Knowledge/KnowledgeAudienceClassifier.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Support\\\\Knowledge\\\\KnowledgeAudienceClassifier\\:\\:__construct\\(\\) has parameter \\$systemAdminPaths with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Support/Knowledge/KnowledgeAudienceClassifier.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Support\\\\Knowledge\\\\KnowledgeAudienceClassifier\\:\\:fromConfig\\(\\) has parameter \\$config with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Support/Knowledge/KnowledgeAudienceClassifier.php
+
+		-
+			message: "#^Method Fleetbase\\\\Ai\\\\Support\\\\Knowledge\\\\KnowledgeAudienceClassifier\\:\\:matchesPrefix\\(\\) has parameter \\$prefixes with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: server/src/Support/Knowledge/KnowledgeAudienceClassifier.php
+
+		-
+			message: "#^Unsafe usage of new static\\(\\)\\.$#"
+			count: 1
+			path: server/src/Support/Knowledge/KnowledgeAudienceClassifier.php
+
+		-
+			message: "#^Function config not found\\.$#"
+			count: 2
+			path: server/src/routes.php

@@ -1,6 +1,6 @@
 {
     "name": "fleetbase/ai",
-    "version": "0.0.4",
+    "version": "0.0.5",
     "description": "Fleetbase AI operations copilot and task automation module",
     "keywords": [
         "fleetbase",
@@ -71,7 +71,7 @@
         "test:coverage": "php scripts/coverage-runner.php --coverage --coverage-text --colors=always",
         "test:coverage:clover": "mkdir -p coverage && php scripts/coverage-runner.php --coverage-clover=coverage/clover.xml --colors=always",
         "test:coverage:phpdbg": "mkdir -p coverage && phpdbg -qrr scripts/coverage-runner.php --coverage-clover=coverage/clover.xml --colors=always",
-        "test:types": "phpstan analyse --ansi --memory-limit=0",
+        "test:types": "phpstan analyse --ansi --memory-limit=-1",
         "test:unit": "php scripts/pest-runner.php --colors=always",
         "test": [
             "@test:lint",

@@ -28,125 +28,6 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 
-if (!function_exists('aiAdminRequestDouble')) {
-    function aiAdminRequestDouble(array $input = [], bool $admin = false): Fleetbase\Http\Requests\AdminRequest
-    {
-        return new class($input, $admin) extends Fleetbase\Http\Requests\AdminRequest {
-            public function __construct(private array $values, private bool $admin)
-            {
-            }
-
-            public function input($key = null, $default = null)
-            {
-                if ($key === null) {
-                    return $this->values;
-                }
-
-                return data_get($this->values, $key, $default);
-            }
-
-            public function filled($key)
-            {
-                $value = $this->input($key);
-
-                return $value !== null && $value !== '';
-            }
-
-            public function searchQuery()
-            {
-                return $this->input('search');
-            }
-
-            public function user($guard = null)
-            {
-                return new class($this->admin) {
-                    public string $uuid = 'admin-user-uuid';
-
-                    public function __construct(private bool $admin)
-                    {
-                    }
-
-                    public function isAdmin(): bool
-                    {
-                        return $this->admin;
-                    }
-                };
-            }
-
-            public function ip()
-            {
-                return $this->input('ip', '127.0.0.1');
-            }
-
-            public function userAgent()
-            {
-                return $this->input('user_agent', 'Fleetbase AI test browser');
-            }
-        };
-    }
-}
-
-if (!function_exists('aiAdminFilterBuilder')) {
-    function aiAdminFilterBuilder(): Builder
-    {
-        return new class extends Builder {
-            public array $calls = [];
-
-            public function __construct()
-            {
-            }
-
-            public function where($column, $operator = null, $value = null, $boolean = 'and')
-            {
-                if (is_callable($column)) {
-                    $nested = aiAdminFilterBuilder();
-                    $column($nested);
-                    $this->calls[] = ['where_nested', $nested->calls];
-
-                    return $this;
-                }
-
-                $this->calls[] = ['where', $column, $operator, $value, $boolean];
-
-                return $this;
-            }
-
-            public function orWhere($column, $operator = null, $value = null)
-            {
-                $this->calls[] = ['orWhere', $column, $operator, $value];
-
-                return $this;
-            }
-
-            public function whereHas($relation, $callback = null, $operator = '>=', $count = 1)
-            {
-                $nested = aiAdminFilterBuilder();
-
-                if (is_callable($callback)) {
-                    $callback($nested);
-                }
-
-                $this->calls[] = ['whereHas', $relation, $nested->calls, $operator, $count];
-
-                return $this;
-            }
-
-            public function orWhereHas($relation, $callback = null, $operator = '>=', $count = 1)
-            {
-                $nested = aiAdminFilterBuilder();
-
-                if (is_callable($callback)) {
-                    $callback($nested);
-                }
-
-                $this->calls[] = ['orWhereHas', $relation, $nested->calls, $operator, $count];
-
-                return $this;
-            }
-        };
-    }
-}
-
 if (!function_exists('aiAdminUsageBuilder')) {
     function aiAdminUsageBuilder(array $rows): Builder
     {
@@ -319,13 +200,23 @@ if (!function_exists('aiAdminAnalyticsBuilder')) {
                 $this->calls[] = ['first', $columns];
 
                 return (object) [
-                    'task_count'      => '5',
-                    'input_tokens'    => '100',
-                    'output_tokens'   => '75',
-                    'total_tokens'    => '175',
-                    'failed_count'    => '1',
-                    'completed_count' => '4',
+                    'task_count'              => '5',
+                    'input_tokens'            => '100',
+                    'output_tokens'           => '75',
+                    'total_tokens'            => '175',
+                    'failed_count'            => '1',
+                    'completed_count'         => '4',
+                    'session_count'           => '3',
+                    'negative_feedback_count' => '2',
+                    'positive_feedback_count' => '1',
                 ];
+            }
+
+            public function count($columns = '*')
+            {
+                $flag = collect($this->calls)->last(fn ($call) => $call[0] === 'where' && str_starts_with((string) $call[1], 'metadata->'));
+
+                return ['metadata->degraded' => 2, 'metadata->truncated' => 1][$flag[1] ?? ''] ?? 0;
             }
 
             public function groupBy(...$groups)
@@ -475,6 +366,13 @@ if (!function_exists('aiAdminEndpointBuilder')) {
                 return $this;
             }
 
+            public function offset($value)
+            {
+                $this->calls[] = ['offset', $value];
+
+                return $this;
+            }
+
             public function limit($value)
             {
                 $this->calls[] = ['limit', $value];
@@ -598,9 +496,31 @@ test('ai service provider registers bindings and boots package resources', funct
             $this->registered[] = $provider;
         }
 
-        public function singleton(string $abstract, ?string $concrete = null): void
+        public function singleton(string $abstract, $concrete = null): void
         {
             $this->singletons[$abstract] = $concrete ?? $abstract;
+        }
+
+        public function make(string $abstract)
+        {
+            $concrete = $this->singletons[$abstract] ?? $abstract;
+
+            if ($concrete instanceof Closure) {
+                return $concrete($this);
+            }
+
+            return match ($concrete) {
+                Fleetbase\Ai\Support\Capabilities\SearchDocsTool::class   => new Fleetbase\Ai\Support\Capabilities\SearchDocsTool($this->make(Fleetbase\Ai\Services\Knowledge\KnowledgeSearch::class)),
+                Fleetbase\Ai\Support\Capabilities\ReadDocTool::class      => new Fleetbase\Ai\Support\Capabilities\ReadDocTool($this->make(Fleetbase\Ai\Services\Knowledge\KnowledgeSearch::class)),
+                Fleetbase\Ai\Services\Knowledge\KnowledgeSearch::class    => new Fleetbase\Ai\Services\Knowledge\KnowledgeSearch($this->make(Fleetbase\Ai\Support\Knowledge\KnowledgeAudienceClassifier::class)),
+                Fleetbase\Ai\Services\Knowledge\KnowledgeIndexer::class   => new Fleetbase\Ai\Services\Knowledge\KnowledgeIndexer($this->make(Fleetbase\Ai\Support\Knowledge\KnowledgeAudienceClassifier::class)),
+                Fleetbase\Ai\Support\Capabilities\Query\CountRecordsTool::class,
+                Fleetbase\Ai\Support\Capabilities\Query\GroupCountTool::class,
+                Fleetbase\Ai\Support\Capabilities\Query\ListRecordsTool::class => new $concrete(new AiQueryRegistry(), new AiQueryExecutor(new AiQueryRegistry())),
+                Fleetbase\Ai\Support\Capabilities\FindConsoleCommandsTool::class,
+                Fleetbase\Ai\Support\Capabilities\ProposeConsoleCommandTool::class => new $concrete(new Fleetbase\Ai\Support\Commands\AiCommandRegistry()),
+                default                                                            => new $concrete(),
+            };
         }
     };
 
@@ -613,10 +533,49 @@ test('ai service provider registers bindings and boots package resources', funct
             $this->booted[] = 'observers';
         }
 
+        protected function mergeConfigFrom($path, $key)
+        {
+            $this->booted[] = ['config', $key];
+        }
+
+        public function registerCommands(): void
+        {
+            $this->booted[] = ['commands', $this->commands];
+        }
+
+        public function scheduleCommands(?callable $callback = null): void
+        {
+            $schedule = new class {
+                public array $commands = [];
+
+                public function command(string $command): self
+                {
+                    $this->commands[] = $command;
+
+                    return $this;
+                }
+
+                public function __call($method, $arguments): self
+                {
+                    return $this;
+                }
+            };
+
+            $callback($schedule);
+            $this->booted[] = ['schedule', $schedule->commands];
+        }
+
+        public ?Fleetbase\Ai\Support\Commands\AiCommandRegistry $commandRegistry = null;
+
         public function callAfterResolving($name, $callback)
         {
-            $this->registry = new AiCapabilityRegistry();
-            $callback($this->registry);
+            if ($name === Fleetbase\Ai\Support\Commands\AiCommandRegistry::class) {
+                $this->commandRegistry = new Fleetbase\Ai\Support\Commands\AiCommandRegistry();
+                $callback($this->commandRegistry);
+            } else {
+                $this->registry = new AiCapabilityRegistry();
+                $callback($this->registry);
+            }
             $this->booted[] = ['after_resolving', $name];
         }
 
@@ -641,18 +600,39 @@ test('ai service provider registers bindings and boots package resources', funct
 
     expect($app->registered)->toBe([CoreServiceProvider::class])
         ->and($app->singletons)->toMatchArray([
-            Fleetbase\Ai\Contracts\AIProviderInterface::class   => AiProviderManager::class,
-            AiCapabilityRegistry::class                         => AiCapabilityRegistry::class,
-            AiQueryRegistry::class                              => AiQueryRegistry::class,
-            AiQueryExecutor::class                              => AiQueryExecutor::class,
-            AiTemporalContext::class                            => AiTemporalContext::class,
+            Fleetbase\Ai\Contracts\AIProviderInterface::class      => AiProviderManager::class,
+            AiCapabilityRegistry::class                            => AiCapabilityRegistry::class,
+            AiQueryRegistry::class                                 => AiQueryRegistry::class,
+            AiQueryExecutor::class                                 => AiQueryExecutor::class,
+            AiTemporalContext::class                               => AiTemporalContext::class,
+            Fleetbase\Ai\Support\Commands\AiCommandRegistry::class => Fleetbase\Ai\Support\Commands\AiCommandRegistry::class,
         ])
+        ->and($app->singletons)->toHaveKeys([
+            Fleetbase\Ai\Support\Knowledge\KnowledgeAudienceClassifier::class,
+            Fleetbase\Ai\Services\Knowledge\DocsSiteSource::class,
+            Fleetbase\Ai\Services\Knowledge\KnowledgeIndexer::class,
+            Fleetbase\Ai\Services\Knowledge\KnowledgeSearch::class,
+            Fleetbase\Ai\Services\Knowledge\KnowledgeBootstrapper::class,
+        ])
+        ->and($app->make(Fleetbase\Ai\Services\Knowledge\DocsSiteSource::class))->toBeInstanceOf(Fleetbase\Ai\Services\Knowledge\DocsSiteSource::class)
+        ->and($app->make(Fleetbase\Ai\Services\Knowledge\KnowledgeBootstrapper::class))->toBeInstanceOf(Fleetbase\Ai\Services\Knowledge\KnowledgeBootstrapper::class)
         ->and($provider->registry->get('core.current_page_context'))->toBeInstanceOf(CurrentPageContextCapability::class)
-        ->and($provider->booted[0])->toBe('observers')
-        ->and($provider->booted[1])->toBe(['after_resolving', AiCapabilityRegistry::class])
-        ->and($provider->booted[2][0])->toBe('expansions')
-        ->and($provider->booted[3][0])->toBe('routes')
-        ->and($provider->booted[4][0])->toBe('migrations');
+        ->and($provider->registry->get('core.search_docs'))->toBeInstanceOf(Fleetbase\Ai\Support\Capabilities\SearchDocsTool::class)
+        ->and($provider->registry->get('core.read_doc'))->toBeInstanceOf(Fleetbase\Ai\Support\Capabilities\ReadDocTool::class)
+        ->and($provider->registry->get('core.count_records'))->toBeInstanceOf(Fleetbase\Ai\Support\Capabilities\Query\CountRecordsTool::class)
+        ->and($provider->registry->get('core.group_count'))->toBeInstanceOf(Fleetbase\Ai\Support\Capabilities\Query\GroupCountTool::class)
+        ->and($provider->registry->get('core.list_records'))->toBeInstanceOf(Fleetbase\Ai\Support\Capabilities\Query\ListRecordsTool::class)
+        ->and($provider->booted[0])->toBe(['config', 'ai'])
+        ->and($provider->booted[1])->toBe('observers')
+        ->and($provider->booted[2])->toBe(['after_resolving', AiCapabilityRegistry::class])
+        ->and($provider->registry->get('core.propose_console_command'))->toBeInstanceOf(Fleetbase\Ai\Support\Capabilities\ProposeConsoleCommandTool::class)
+        ->and($provider->booted[3])->toBe(['after_resolving', Fleetbase\Ai\Support\Commands\AiCommandRegistry::class])
+        ->and($provider->commandRegistry->get('iam.users.create'))->not->toBeNull()
+        ->and($provider->booted[4])->toBe(['commands', [Fleetbase\Ai\Console\Commands\SyncAiDocs::class, Fleetbase\Ai\Console\Commands\ExportAiLogs::class, Fleetbase\Ai\Console\Commands\EvaluateAi::class, Fleetbase\Ai\Console\Commands\ReplayAiTask::class]])
+        ->and($provider->booted[5])->toBe(['schedule', ['ai:sync-docs']])
+        ->and($provider->booted[6][0])->toBe('expansions')
+        ->and($provider->booted[7][0])->toBe('routes')
+        ->and($provider->booted[8][0])->toBe('migrations');
 });
 
 test('config controller masks and preserves provider secrets', function () {
@@ -749,7 +729,7 @@ test('config controller status show and store use normalized masked settings', f
         ->and($store['config']['providers']['openai']['api_key'])->toBe('********');
 });
 
-test('admin controller serializes redacted steps and metadata summaries', function () {
+test('admin controller serializes steps with their full content', function () {
     $controller = new AiAdminController();
     $timestamp  = Carbon::parse('2026-07-19 10:00:00', 'UTC');
 
@@ -761,8 +741,8 @@ test('admin controller serializes redacted steps and metadata summaries', functi
         'provider'     => 'local',
         'model'        => 'fleetbase-local-preview',
         'tool'         => null,
-        'input'        => ['prompt' => 'secret input'],
-        'output'       => ['answer' => 'secret output'],
+        'input'        => ['prompt' => 'full input'],
+        'output'       => ['answer' => 'full output'],
         'usage'        => ['total_tokens' => 7],
         'metadata'     => ['source' => 'test'],
         'error'        => null,
@@ -771,30 +751,13 @@ test('admin controller serializes redacted steps and metadata summaries', functi
         'created_at'   => $timestamp,
     ];
 
-    $redactedStep = aiInvokeProtected($controller, 'serializeStep', $step, false);
-    $revealedStep = aiInvokeProtected($controller, 'serializeStep', $step, true);
-    $summary      = aiInvokeProtected($controller, 'metadataSummary', [
-        'action_previews' => [['key' => 'demo']],
-        'action_results'  => [['status' => 'ok']],
-        'action_errors'   => [['message' => 'cancelled']],
-        'attachments'     => [['id' => 'file-1']],
-    ]);
+    $serialized = aiInvokeProtected($controller, 'serializeStep', $step);
 
-    expect($redactedStep['input'])->toBeNull()
-        ->and($redactedStep['output'])->toBeNull()
-        ->and($redactedStep['metadata']['keys'])->toBe(['source'])
-        ->and($redactedStep['content_redacted'])->toBeTrue()
-        ->and($revealedStep['input'])->toBe(['prompt' => 'secret input'])
-        ->and($revealedStep['output'])->toBe(['answer' => 'secret output'])
-        ->and($revealedStep['metadata'])->toBe(['source' => 'test'])
-        ->and($revealedStep['content_redacted'])->toBeFalse()
-        ->and($summary)->toBe([
-            'keys'                  => ['action_previews', 'action_results', 'action_errors', 'attachments'],
-            'action_previews_count' => 1,
-            'action_results_count'  => 1,
-            'action_errors_count'   => 1,
-            'attachments_count'     => 1,
-        ]);
+    expect($serialized['input'])->toBe(['prompt' => 'full input'])
+        ->and($serialized['output'])->toBe(['answer' => 'full output'])
+        ->and($serialized['metadata'])->toBe(['source' => 'test'])
+        ->and($serialized['usage'])->toBe(['total_tokens' => 7])
+        ->and($serialized)->not->toHaveKey('content_redacted');
 });
 
 test('session controller shows ends and deletes found sessions', function () {
@@ -889,7 +852,6 @@ test('session controller protected lookup and default query helper build scoped 
         ->and($query->calls[0])->toBe(['where', 'created_by_uuid', null, null, 'and'])
         ->and($query->calls[1])->toBe(['where_nested', [
             ['where', 'uuid', 'session-uuid', null, 'and'],
-            ['orWhere', 'id', 'session-uuid', null],
         ]]);
 });
 
@@ -1249,28 +1211,50 @@ test('task controller find task builds scoped lookup query', function () {
 
     $found = aiInvokeProtected($controller, 'findTask', 'task-uuid');
 
+    // A UUID must never be compared against the numeric key: MySQL casts `4dcd1b1f-...` to 4 and
+    // would match an unrelated task.
     expect($found->uuid)->toBe('task-uuid')
         ->and($query->calls)->toBe([
             ['where', 'created_by_uuid', null, null, 'and'],
             ['where_nested', [
                 ['where', 'uuid', 'task-uuid', null, 'and'],
-                ['orWhere', 'id', 'task-uuid', null],
             ]],
             ['firstOrFail', ['*']],
         ]);
 });
 
-test('admin controller summarizes metadata and nullable related records', function () {
+test('task controller find task still accepts a numeric id', function () {
+    $task = new AiTask();
+    $task->setRawAttributes(['uuid' => 'task-uuid'], true);
+    $query = aiSessionControllerBuilder([$task]);
+
+    $controller = new class($query) extends AiTaskController {
+        public function __construct(private Builder $query)
+        {
+        }
+
+        protected function tasksForCurrentCompany(): Builder
+        {
+            return $this->query;
+        }
+    };
+
+    aiInvokeProtected($controller, 'findTask', '51');
+
+    expect($query->calls)->toBe([
+        ['where', 'created_by_uuid', null, null, 'and'],
+        ['where_nested', [
+            ['where', 'uuid', '51', null, 'and'],
+            ['orWhere', 'id', 51, null],
+        ]],
+        ['firstOrFail', ['*']],
+    ]);
+});
+
+test('admin controller serializes nullable related records', function () {
     $controller = new AiAdminController();
 
-    expect(aiInvokeProtected($controller, 'metadataSummary', null))->toBe([
-        'keys'                  => [],
-        'action_previews_count' => 0,
-        'action_results_count'  => 0,
-        'action_errors_count'   => 0,
-        'attachments_count'     => 0,
-    ])
-        ->and(aiInvokeProtected($controller, 'serializeCompany', null))->toBeNull()
+    expect(aiInvokeProtected($controller, 'serializeCompany', null))->toBeNull()
         ->and(aiInvokeProtected($controller, 'serializeUser', null))->toBeNull()
         ->and(aiInvokeProtected($controller, 'excerpt', null))->toBeNull()
         ->and(aiInvokeProtected($controller, 'excerpt', "  Multi\n line\tvalue  ", 20))->toBe('Multi line value');
@@ -1282,17 +1266,19 @@ test('admin controller serializes sessions tasks relations and user options', fu
 
     $session = new AiSession();
     $session->setRawAttributes([
-        'id'               => 10,
-        'uuid'             => 'session-uuid',
-        'company_uuid'     => 'company-uuid',
-        'created_by_uuid'  => 'user-uuid',
-        'title'            => 'Dispatch planning',
-        'status'           => 'active',
-        'tasks_count'      => 2,
-        'total_tokens_sum' => 44,
-        'last_message_at'  => $timestamp,
-        'created_at'       => $timestamp,
-        'updated_at'       => $timestamp,
+        'id'                      => 10,
+        'uuid'                    => 'session-uuid',
+        'company_uuid'            => 'company-uuid',
+        'created_by_uuid'         => 'user-uuid',
+        'title'                   => 'Dispatch planning',
+        'status'                  => 'active',
+        'tasks_count'             => 2,
+        'total_tokens_sum'        => 44,
+        'negative_feedback_count' => 1,
+        'flagged_count'           => 3,
+        'last_message_at'         => $timestamp,
+        'created_at'              => $timestamp,
+        'updated_at'              => $timestamp,
     ], true);
     $session->setRelation('company', (object) [
         'uuid'      => 'company-uuid',
@@ -1352,24 +1338,33 @@ test('admin controller serializes sessions tasks relations and user options', fu
     $task->setRelation('company', $session->company);
     $task->setRelation('createdBy', $session->createdBy);
 
-    $redactedSession = aiInvokeProtected($controller, 'serializeSession', $session);
-    $redactedTask    = aiInvokeProtected($controller, 'serializeTask', $task, false);
-    $revealedTask    = aiInvokeProtected($controller, 'serializeTask', $task, true);
+    $serializedSession = aiInvokeProtected($controller, 'serializeSession', $session);
+    $serializedTask    = aiInvokeProtected($controller, 'serializeTask', $task);
 
-    expect($redactedSession['tasks_count'])->toBe(2)
-        ->and($redactedSession['total_tokens'])->toBe(44)
-        ->and($redactedSession['company']['name'])->toBe('Fleetbase')
-        ->and($redactedSession['created_by']['email'])->toBe('ops@example.test')
-        ->and($redactedTask['prompt'])->toBeNull()
-        ->and($redactedTask['response'])->toBeNull()
-        ->and($redactedTask['metadata']['attachments_count'])->toBe(1)
-        ->and($redactedTask['steps'])->toHaveCount(1)
-        ->and($redactedTask['steps'][0]['input'])->toBeNull()
-        ->and($redactedTask['session']['uuid'])->toBe('session-uuid')
-        ->and($revealedTask['prompt'])->toBe("  Plan\n dispatch for delayed orders  ")
-        ->and($revealedTask['response'])->toBe('Dispatch plan response body')
-        ->and($revealedTask['context'])->toBe(['route' => 'fleet-ops.operations'])
-        ->and($revealedTask['metadata'])->toBe(['attachments' => [['id' => 'file-1']]]);
+    // A task counted with withCount('steps') carries steps_count without loading the steps.
+    $counted = new AiTask();
+    $counted->setRawAttributes(['uuid' => 'counted-task', 'steps_count' => 4], true);
+    $countedTask = aiInvokeProtected($controller, 'serializeTask', $counted);
+
+    expect($serializedSession['tasks_count'])->toBe(2)
+        ->and($serializedSession['total_tokens'])->toBe(44)
+        ->and($serializedSession['negative_feedback_count'])->toBe(1)
+        ->and($serializedSession['failed_count'])->toBe(0)
+        ->and($serializedSession['flagged_count'])->toBe(3)
+        ->and($serializedSession['company']['name'])->toBe('Fleetbase')
+        ->and($serializedSession['created_by']['email'])->toBe('ops@example.test')
+        ->and($serializedTask['prompt'])->toBe("  Plan\n dispatch for delayed orders  ")
+        ->and($serializedTask['response'])->toBe('Dispatch plan response body')
+        ->and($serializedTask['context'])->toBe(['route' => 'fleet-ops.operations'])
+        ->and($serializedTask['metadata'])->toBe(['attachments' => [['id' => 'file-1']]])
+        ->and($serializedTask['prompt_excerpt'])->toBe('Plan dispatch for delayed orders')
+        ->and($serializedTask['steps_count'])->toBe(1)
+        ->and($serializedTask['steps'])->toHaveCount(1)
+        ->and($serializedTask['steps'][0]['input'])->toBe(['prompt' => 'Plan dispatch'])
+        ->and($serializedTask['session']['uuid'])->toBe('session-uuid')
+        ->and($serializedTask)->not->toHaveKey('content_redacted')
+        ->and($countedTask['steps_count'])->toBe(4)
+        ->and($countedTask['steps'])->toBe([]);
 });
 
 test('admin controller lists company and user filter options through query helpers', function () {
@@ -1570,19 +1565,48 @@ test('admin controller lists sessions and returns session and task detail payloa
     $detail       = aiJsonPayload($controller->session('session-uuid', aiAdminRequestDouble([], true)));
     $taskResponse = aiJsonPayload($controller->task('task-uuid', aiAdminRequestDouble([], true)));
 
+    $counts  = collect($sessionsQuery->calls)->firstWhere(0, 'withCount')[1];
+    $applied = collect($counts)->except(0)->map(function (Closure $scope) {
+        $query = aiAdminFilterBuilder();
+        $scope($query);
+
+        return $query->calls;
+    });
+    $taskScope = $session->loaded[0][1]['tasks'];
+    $taskQuery = new class {
+        public array $calls = [];
+
+        public function __call($method, $arguments)
+        {
+            $this->calls[] = [$method, $arguments];
+
+            return $this;
+        }
+    };
+    $taskScope($taskQuery);
+
     expect($list['sessions'][0]['uuid'])->toBe('session-uuid')
-        ->and($list['meta']['can_reveal_content'])->toBeTrue()
-        ->and($sessionsQuery->calls)->toContain(['withCount', 'tasks'])
+        ->and($list['meta'])->not->toHaveKey('can_reveal_content')
+        ->and($counts[0])->toBe('tasks')
+        ->and($applied->keys()->all())->toBe(['tasks as negative_feedback_count', 'tasks as failed_count', 'tasks as flagged_count'])
+        ->and($applied['tasks as negative_feedback_count'])->toBe([['where', 'feedback_rating', '<', 0, 'and']])
+        ->and($applied['tasks as failed_count'])->toBe([['whereIn', 'status', ['failed', 'apply_failed']]])
+        ->and($applied['tasks as flagged_count'][0][1])->toBe([['where', 'metadata->degraded', true, null, 'and'], ['orWhere', 'metadata->truncated', true, null]])
         ->and($sessionsQuery->calls)->toContain(['withSum', 'tasks as total_tokens_sum', 'total_tokens'])
-        ->and($sessionsQuery->calls)->toContain(['limit', 100])
+        ->and($sessionsQuery->calls)->toContain(['offset', 0], ['limit', 101])
+        ->and($list['meta'])->toMatchArray(['page' => 1, 'limit' => 100, 'has_more' => false])
         ->and($detail['session']['tasks'][0]['uuid'])->toBe('task-uuid')
-        ->and($detail['meta']['can_reveal_content'])->toBeTrue()
+        ->and($detail)->not->toHaveKey('meta')
+        // Steps are counted, not loaded, for the transcript; they load per turn on demand.
+        ->and($taskQuery->calls[0])->toBe(['withCount', ['steps']])
+        ->and($taskQuery->calls[1][0])->toBe('with')
+        ->and($taskQuery->calls[1][1][0])->not->toContain('steps')
         ->and($session->loaded[0][0])->toBe('load')
         ->and($session->loaded[1])->toBe(['loadCount', 'tasks'])
         ->and($session->loaded[2])->toBe(['loadSum', 'tasks as total_tokens_sum', 'total_tokens'])
         ->and($taskResponse['task']['uuid'])->toBe('task-uuid')
-        ->and($taskResponse['task']['content_redacted'])->toBeTrue()
-        ->and($taskResponse['meta']['can_reveal_content'])->toBeTrue()
+        ->and($taskResponse['task'])->not->toHaveKey('content_redacted')
+        ->and($taskResponse)->not->toHaveKey('meta')
         ->and($task->loaded[0])->toBe(['steps', 'session', 'company:uuid,public_id,name', 'createdBy:uuid,public_id,name,email']);
 });
 
@@ -1615,92 +1639,11 @@ test('admin controller protected lookup and query helpers build expected queries
     expect(aiInvokeProtected($controller, 'findSession', 'session-uuid'))->toBe($session)
         ->and($sessionQuery->calls[0])->toBe(['where_nested', [
             ['where', 'uuid', 'session-uuid', null, 'and'],
-            ['orWhere', 'id', 'session-uuid', null],
         ]])
         ->and(aiInvokeProtected($controller, 'findTask', 'task-uuid'))->toBe($task)
         ->and($taskQuery->calls[0])->toBe(['where_nested', [
             ['where', 'uuid', 'task-uuid', null, 'and'],
-            ['orWhere', 'id', 'task-uuid', null],
         ]]);
-});
-
-test('admin controller reveals task content and records access log metadata', function () {
-    $task = new class extends AiTask {
-        public array $loaded = [];
-
-        public function __construct()
-        {
-            $this->setRawAttributes([
-                'id'               => 30,
-                'uuid'             => 'task-uuid',
-                'ai_session_uuid'  => 'session-uuid',
-                'company_uuid'     => 'company-uuid',
-                'created_by_uuid'  => 'user-uuid',
-                'task_type'        => 'chat',
-                'status'           => 'answered',
-                'provider'         => 'openai',
-                'model'            => 'gpt-5-mini',
-                'prompt'           => 'Plan the route',
-                'response'         => 'Route planned',
-                'metadata'         => ['attachments' => []],
-            ], true);
-            $this->setRelation('steps', collect());
-            $this->setRelation('company', (object) ['uuid' => 'company-uuid', 'public_id' => 'COMP-1', 'name' => 'Fleetbase']);
-            $this->setRelation('createdBy', (object) ['uuid' => 'user-uuid', 'public_id' => 'USR-1', 'name' => 'Ops', 'email' => 'ops@example.test']);
-        }
-
-        public function load($relations)
-        {
-            $this->loaded[] = $relations;
-
-            return $this;
-        }
-    };
-
-    $controller = new class($task) extends AiAdminController {
-        public array $logs = [];
-
-        public function __construct(private AiTask $task)
-        {
-        }
-
-        protected function findTask(string $id): AiTask
-        {
-            return $this->task;
-        }
-
-        protected function createAccessLog(array $attributes): AiAdminAccessLog
-        {
-            $this->logs[] = $attributes;
-
-            $log = new AiAdminAccessLog();
-            $log->setRawAttributes($attributes, true);
-
-            return $log;
-        }
-    };
-
-    $response = aiJsonPayload($controller->revealTaskContent('task-uuid', aiAdminRequestDouble([
-        'ip'         => '203.0.113.10',
-        'user_agent' => str_repeat('A', 1200),
-    ], true)));
-
-    expect($response['task']['prompt'])->toBe('Plan the route')
-        ->and($response['task']['response'])->toBe('Route planned')
-        ->and($response['task']['content_redacted'])->toBeFalse()
-        ->and($controller->logs)->toHaveCount(1)
-        ->and($controller->logs[0]['company_uuid'])->toBe('company-uuid')
-        ->and($controller->logs[0]['ai_session_uuid'])->toBe('session-uuid')
-        ->and($controller->logs[0]['ai_task_uuid'])->toBe('task-uuid')
-        ->and($controller->logs[0]['viewed_by_uuid'])->toBe('admin-user-uuid')
-        ->and($controller->logs[0]['action'])->toBe('view_task_content')
-        ->and($controller->logs[0]['ip_address'])->toBe('203.0.113.10')
-        ->and(strlen($controller->logs[0]['user_agent']))->toBe(1000)
-        ->and($controller->logs[0]['metadata'])->toBe([
-            'task_status' => 'answered',
-            'provider'    => 'openai',
-            'model'       => 'gpt-5-mini',
-        ]);
 });
 
 test('admin controller usage endpoint summarizes filtered analytics', function () {
@@ -1739,24 +1682,56 @@ test('admin controller usage endpoint summarizes filtered analytics', function (
         ->and($base->calls[5][3]->toDateTimeString())->toBe('2026-07-01 00:00:00')
         ->and($base->calls[6][2])->toBe('<=')
         ->and($response['summary'])->toBe([
-            'task_count'      => 5,
-            'input_tokens'    => 100,
-            'output_tokens'   => 75,
-            'total_tokens'    => 175,
-            'failed_count'    => 1,
-            'completed_count' => 4,
+            'task_count'              => 5,
+            'input_tokens'            => 100,
+            'output_tokens'           => 75,
+            'total_tokens'            => 175,
+            'failed_count'            => 1,
+            'completed_count'         => 4,
+            'session_count'           => 3,
+            'negative_feedback_count' => 2,
+            'positive_feedback_count' => 1,
+            'degraded_count'          => 2,
+            'truncated_count'         => 1,
         ])
+        ->and($response['from'])->toBe('2026-07-01')
+        ->and($response['to'])->toBe('2026-07-19')
         ->and($response['by_provider'][0])->toMatchArray([
             'key'          => 'openai',
             'label'        => 'openai',
             'task_count'   => 3,
             'total_tokens' => 30,
         ])
-        ->and($response['by_day'][0])->toBe([
+        // Every day of the requested range is present, so the chart has no gaps.
+        ->and($response['by_day'])->toHaveCount(19)
+        ->and($response['by_day'][0])->toBe(['day' => '2026-07-01', 'task_count' => 0, 'total_tokens' => 0])
+        ->and($response['by_day'][18])->toBe([
             'day'          => '2026-07-19',
             'task_count'   => 2,
             'total_tokens' => 70,
         ]);
+});
+
+test('admin controller zero fills usage days only for a sensible range', function () {
+    $controller = new AiAdminController();
+    $rows       = collect([
+        ['day' => '2026-07-10', 'task_count' => 1, 'total_tokens' => 10],
+        ['day' => '2026-07-13 00:00:00', 'task_count' => 2, 'total_tokens' => 20],
+    ]);
+    $fill = fn ($rows, $from = null, $to = null) => aiInvokeProtected($controller, 'zeroFillDays', $rows, $from, $to)->all();
+
+    $unbounded = $fill($rows);
+
+    expect($fill(collect()))->toBe([])
+        ->and($fill(collect(), '2026-07-01', '2026-07-02'))->toBe([
+            ['day' => '2026-07-01', 'task_count' => 0, 'total_tokens' => 0],
+            ['day' => '2026-07-02', 'task_count' => 0, 'total_tokens' => 0],
+        ])
+        // Without a range the span runs from the first to the last active day.
+        ->and(array_column($unbounded, 'day'))->toBe(['2026-07-10', '2026-07-11', '2026-07-12', '2026-07-13'])
+        ->and($unbounded[3])->toBe(['day' => '2026-07-13', 'task_count' => 2, 'total_tokens' => 20])
+        ->and($fill($rows, '2026-07-20', '2026-07-01'))->toBe($rows->all())
+        ->and($fill($rows, '2025-01-01', '2026-07-13'))->toBe($rows->all());
 });
 
 test('admin controller applies session task and user filters', function () {

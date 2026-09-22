@@ -42,6 +42,10 @@ Route::prefix(config('ai.api.routing.prefix', 'ai'))->namespace('Fleetbase\Ai\Ht
                         $router->post('tasks/{id}/preview', 'Internal\AiTaskController@preview');
                         $router->post('tasks/{id}/apply', 'Internal\AiTaskController@apply');
                         $router->post('tasks/{id}/cancel', 'Internal\AiTaskController@cancel');
+                        $router->post('tasks/{id}/feedback', 'Internal\AiTaskController@feedback');
+                        $router->post('tasks/{id}/ui-actions/{actionId}/confirm', 'Internal\AiTaskController@confirmUiAction');
+                        $router->post('tasks/{id}/ui-actions/{actionId}/dismiss', 'Internal\AiTaskController@dismissUiAction');
+                        $router->post('tasks/{id}/ui-actions/{actionId}/failed', 'Internal\AiTaskController@failUiAction');
                         $router->get('tools', 'Internal\AiToolController@index');
 
                         $router->prefix('admin')->group(function ($router) {
@@ -50,8 +54,10 @@ Route::prefix(config('ai.api.routing.prefix', 'ai'))->namespace('Fleetbase\Ai\Ht
                             $router->get('sessions', 'Internal\AiAdminController@sessions');
                             $router->get('sessions/{id}', 'Internal\AiAdminController@session');
                             $router->get('tasks/{id}', 'Internal\AiAdminController@task');
-                            $router->post('tasks/{id}/reveal-content', 'Internal\AiAdminController@revealTaskContent');
                             $router->get('usage', 'Internal\AiAdminController@usage');
+                            $router->get('export', 'Internal\AiAdminController@export');
+                            $router->get('knowledge', 'Internal\AiAdminController@knowledge');
+                            $router->post('knowledge/sync', 'Internal\AiAdminController@syncKnowledge');
                         });
                     }
                 );

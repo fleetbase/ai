@@ -1,6 +1,6 @@
 {
     "name": "@fleetbase/ai-engine",
-    "version": "0.0.4",
+    "version": "0.0.5",
     "description": "Fleetbase AI operations copilot and task automation module",
     "keywords": [
         "fleetbase-extension",
@@ -36,7 +36,7 @@
         "lint:js:fix": "eslint . --fix",
         "start": "ember serve",
         "test": "concurrently \"npm:lint\" \"npm:test:*\" --names \"lint,test:\"",
-        "test:ember": "ember test",
+        "test:ember": "EMBER_ENV=test ember test",
         "test:ember-compatibility": "ember try:each",
         "publish:npm": "npm config set registry https://registry.npmjs.org/ && npm publish",
         "publish:github": "npm config set '@fleetbase:registry' https://npm.pkg.github.com/ && npm publish"
@@ -44,12 +44,13 @@
     "dependencies": {
         "@babel/core": "^7.23.2",
         "@fleetbase/ember-core": "^0.3.24",
-        "@fleetbase/ember-ui": "^0.3.41",
+        "@fleetbase/ember-ui": "^0.4.2",
         "@fortawesome/ember-fontawesome": "^2.0.0",
         "@fortawesome/fontawesome-svg-core": "6.4.0",
         "@fortawesome/free-brands-svg-icons": "6.4.0",
         "@fortawesome/free-solid-svg-icons": "6.4.0",
         "broccoli-funnel": "^3.0.8",
+        "date-fns": "^2.30.0",
         "ember-auto-import": "^2.7.4",
         "ember-cli-babel": "^8.2.0",
         "ember-cli-htmlbars": "^6.3.0",
@@ -61,6 +62,7 @@
     "devDependencies": {
         "@babel/eslint-parser": "^7.22.15",
         "@babel/plugin-proposal-decorators": "^7.23.2",
+        "@ember/legacy-built-in-components": "^0.4.2",
         "@ember/optional-features": "^2.0.0",
         "@ember/test-helpers": "^3.2.0",
         "@embroider/test-setup": "^3.0.2",
@@ -101,6 +103,7 @@
         "stylelint": "^15.11.0",
         "stylelint-config-standard": "^34.0.0",
         "stylelint-prettier": "^4.0.2",
+        "tracked-built-ins": "^3.3.0",
         "webpack": "^5.89.0"
     },
     "peerDependencies": {

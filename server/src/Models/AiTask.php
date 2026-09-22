@@ -36,6 +36,9 @@ class AiTask extends Model
         'input_tokens',
         'output_tokens',
         'total_tokens',
+        'feedback_rating',
+        'feedback_comment',
+        'feedback_at',
         'context',
         'usage',
         'metadata',
@@ -51,6 +54,7 @@ class AiTask extends Model
         'error'        => Json::class,
         'started_at'   => 'datetime',
         'completed_at' => 'datetime',
+        'feedback_at'  => 'datetime',
     ];
 
     protected $searchableColumns = ['prompt', 'response_summary', 'task_type', 'status'];

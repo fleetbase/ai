@@ -170,6 +170,10 @@ test('query executor denies permissioned resources before running queries', func
         ->and($executor->samples('secure-orders'))->toBe([
             'authorized' => false,
             'resource'   => 'secure-orders',
+        ])
+        ->and($executor->listRecords('secure-orders'))->toBe([
+            'authorized' => false,
+            'resource'   => 'secure-orders',
         ]);
 });
 

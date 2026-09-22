@@ -1,0 +1,50 @@
+<div class="fleetbase-ai-logs-list" ...attributes>
+    {{#if this.rows.length}}
+        <ul class="fleetbase-ai-logs-rows" role="listbox" aria-label="Conversations" tabindex="0" {{on "keydown" this.navigate}}>
+            {{#each this.rows as |row|}}
+                <li
+                    class="fleetbase-ai-logs-row {{if row.isSelected 'is-selected'}}"
+                    role="option"
+                    aria-selected={{if row.isSelected "true" "false"}}
+                    data-test-session-row={{row.id}}
+                    {{on "click" (fn this.select row.session)}}
+                >
+                    <div class="fleetbase-ai-logs-row-line">
+                        <span class="fleetbase-ai-logs-row-dot {{if row.isActive 'is-active'}}" title={{if row.isActive "Active" "Ended"}}></span>
+                        <span class="fleetbase-ai-logs-row-title">{{row.title}}</span>
+                        <time class="fleetbase-ai-logs-row-time" datetime={{row.whenTitle}} title={{row.whenTitle}}>{{row.when}}</time>
+                    </div>
+                    <div class="fleetbase-ai-logs-row-line fleetbase-ai-logs-row-meta">
+                        <span class="fleetbase-ai-logs-row-owner">{{or row.owner "Unknown user"}}</span>
+                        <span class="fleetbase-ai-logs-row-signals">
+                            {{#if row.negative}}
+                                <span class="fleetbase-ai-logs-signal is-danger" title="{{row.negative}} not helpful"><FaIcon @icon="thumbs-down" /> {{row.negative}}</span>
+                            {{/if}}
+                            {{#if row.failed}}
+                                <span class="fleetbase-ai-logs-signal is-danger" title="{{row.failed}} failed"><FaIcon @icon="circle-xmark" /> {{row.failed}}</span>
+                            {{/if}}
+                            {{#if row.flagged}}
+                                <span class="fleetbase-ai-logs-signal is-warning" title="{{row.flagged}} degraded or cut off"><FaIcon @icon="triangle-exclamation" /> {{row.flagged}}</span>
+                            {{/if}}
+                            <span class="fleetbase-ai-logs-signal" title="{{row.turns}} turns"><FaIcon @icon="comment" /> {{row.turns}}</span>
+                            <span class="fleetbase-ai-logs-signal" title={{row.tokensTitle}}><FaIcon @icon="coins" /> {{row.tokens}}</span>
+                        </span>
+                    </div>
+                </li>
+            {{/each}}
+        </ul>
+        {{#if @hasMore}}
+            <div class="fleetbase-ai-logs-list-footer">
+                <Button @size="xs" @text="Load more" @isLoading={{@isLoadingMore}} @onClick={{@onLoadMore}} />
+            </div>
+        {{/if}}
+    {{else if @isLoading}}
+        <div class="fleetbase-ai-logs-empty"><Spinner @loadingMessage="Loading conversations..." /></div>
+    {{else}}
+        <div class="fleetbase-ai-logs-empty">
+            <FaIcon @icon="comments" @size="2x" />
+            <strong>No conversations found</strong>
+            <span>{{if @isFiltered "Try removing a filter." "AI chats appear here once people start using Fleetbase AI."}}</span>
+        </div>
+    {{/if}}
+</div>

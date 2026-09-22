@@ -1,0 +1,81 @@
+{{#if (eq @field "search")}}
+    <div class="fleetbase-ai-admin-toolbar-search">
+        <FaIcon @icon="magnifying-glass" class="fleetbase-ai-admin-toolbar-search-icon" />
+        <input
+            type="search"
+            class="form-input form-input-sm w-full"
+            value={{@filters.search}}
+            placeholder={{or @searchPlaceholder "Search"}}
+            aria-label={{or @searchPlaceholder "Search"}}
+            {{on "input" (fn this.setFromInput "search")}}
+        />
+    </div>
+{{else if (eq @field "session_status")}}
+    <Select class="fleetbase-ai-admin-toolbar-select form-input-sm" aria-label="Session status" @value={{@filters.status}} @options={{this.sessionStatusOptions}} @optionLabel="label" @optionValue="value" @onSelect={{fn this.set "status"}} />
+{{else if (eq @field "task_status")}}
+    <Select class="fleetbase-ai-admin-toolbar-select form-input-sm" aria-label="Answer status" @value={{@filters.task_status}} @options={{this.taskStatusOptions}} @optionLabel="label" @optionValue="value" @onSelect={{fn this.set "task_status"}} />
+{{else if (eq @field "feedback")}}
+    <Select class="fleetbase-ai-admin-toolbar-select form-input-sm" aria-label="Feedback" @value={{@filters.feedback}} @options={{this.feedbackOptions}} @optionLabel="label" @optionValue="value" @onSelect={{fn this.set "feedback"}} />
+{{else if (eq @field "review")}}
+    <div class="fleetbase-ai-admin-toolbar-group" role="group" aria-label="Needs review">
+        <Button
+            @type={{if @filters.degraded "primary" "default"}}
+            @icon="triangle-exclamation"
+            @text="Degraded"
+            @helpText="Answers given while a capability had failed"
+            aria-pressed={{if @filters.degraded "true" "false"}}
+            data-test-filter-degraded
+            @onClick={{fn this.toggle "degraded"}}
+        />
+        <Button
+            @type={{if @filters.truncated "primary" "default"}}
+            @icon="scissors"
+            @text="Cut off"
+            @helpText="Answers cut off at the output limit"
+            aria-pressed={{if @filters.truncated "true" "false"}}
+            data-test-filter-truncated
+            @onClick={{fn this.toggle "truncated"}}
+        />
+    </div>
+{{else if (eq @field "provider")}}
+    <Select class="fleetbase-ai-admin-toolbar-select form-input-sm" aria-label="Provider" @value={{@filters.provider}} @options={{this.providerOptions}} @optionLabel="label" @optionValue="value" @onSelect={{this.setProvider}} />
+{{else if (eq @field "model")}}
+    <Select class="fleetbase-ai-admin-toolbar-select form-input-sm" aria-label="Model" @value={{@filters.model}} @options={{this.modelOptions}} @optionLabel="label" @optionValue="value" @onSelect={{fn this.set "model"}} />
+{{else if (eq @field "company")}}
+    <div class="fleetbase-ai-admin-toolbar-model">
+        <ModelSelect
+            @modelName="company"
+            @source={{@companySource}}
+            @selectedModel={{@filters.selectedCompany}}
+            @placeholder="Any organization"
+            @triggerClass="form-select form-input form-input-sm"
+            @allowClear={{true}}
+            @renderInPlace={{true}}
+            @onChange={{this.setCompany}}
+            as |company|
+        >
+            {{or company.name company.public_id company.uuid}}
+        </ModelSelect>
+    </div>
+{{else if (eq @field "user")}}
+    <div class="fleetbase-ai-admin-toolbar-model">
+        <ModelSelect
+            @modelName="user"
+            @source={{@userSource}}
+            @query={{@filters.userQuery}}
+            @selectedModel={{@filters.selectedUser}}
+            @placeholder="Any user"
+            @triggerClass="form-select form-input form-input-sm"
+            @allowClear={{true}}
+            @renderInPlace={{true}}
+            @onChange={{this.setUser}}
+            as |user|
+        >
+            {{or user.name user.email user.public_id user.uuid}}
+        </ModelSelect>
+    </div>
+{{else if (eq @field "date")}}
+    <div class="fleetbase-ai-admin-toolbar-date">
+        <DatePicker @value={{@filters.dateRange}} @range={{true}} @onSelect={{this.setDateRange}} @autoClose={{true}} @buttons={{array "clear"}} @placeholder="Any date" class="form-input form-input-sm w-full" />
+    </div>
+{{/if}}

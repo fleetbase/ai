@@ -20,11 +20,21 @@ export default {
                     title: 'Task & Chat Logs',
                     icon: 'list-check',
                     component: new ExtensionComponent('@fleetbase/ai-engine', 'admin/ai-audit-logs'),
+                    // Full-width, full-height page instead of the boxed admin panel.
+                    overwriteWrapperClass: true,
+                    wrapperClass: 'fleetbase-ai-admin-fullbleed',
+                }),
+                new MenuItem({
+                    title: 'Knowledge Base',
+                    icon: 'book-open',
+                    component: new ExtensionComponent('@fleetbase/ai-engine', 'admin/ai-knowledge'),
                 }),
                 new MenuItem({
                     title: 'Usage Analytics',
                     icon: 'chart-column',
                     component: new ExtensionComponent('@fleetbase/ai-engine', 'admin/ai-usage-analytics'),
+                    overwriteWrapperClass: true,
+                    wrapperClass: 'fleetbase-ai-admin-fullbleed',
                 }),
             ],
             { icon: 'brain', priority: 30 }
