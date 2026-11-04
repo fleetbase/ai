@@ -199,6 +199,27 @@ test('list records returns the newest matches with the total and a truncation fl
         ->and($tool->toolDescription())->toContain('total_matching');
 });
 
+test('query tools cast integer filters and reject values that are not numbers', function () {
+    $registry = aiQueryToolRegistry()->register(new AiQueryableResource(
+        key: 'fleet-ops.order-flags',
+        label: 'Fleet-Ops order flags',
+        module: 'fleet-ops',
+        modelClass: AiQueryToolOrder::class,
+        aliases: ['order-flags'],
+        fields: ['dispatched' => ['column' => 'dispatched', 'type' => 'integer']],
+        sampleFields: ['public_id'],
+        description: 'Orders by dispatched flag',
+    ));
+    $tool    = new CountRecordsTool($registry, new AiQueryExecutor($registry));
+    $context = aiQueryToolContext();
+
+    $counted = $tool->invoke(new AiTask(), ['resource' => 'fleet-ops.order-flags', 'filters' => [['field' => 'dispatched', 'operator' => '=', 'value' => '1']]], $context);
+    $invalid = $tool->invoke(new AiTask(), ['resource' => 'fleet-ops.order-flags', 'filters' => [['field' => 'dispatched', 'operator' => '=', 'value' => 'many']]], $context);
+
+    expect($counted['count'])->toBe(2)
+        ->and($invalid['details'][0])->toContain("'dispatched' must be a number.");
+});
+
 test('query tools fall back to UTC when the timezone cannot be resolved', function () {
     $registry = aiQueryToolRegistry();
     $failing  = new class extends AiTemporalContext {
