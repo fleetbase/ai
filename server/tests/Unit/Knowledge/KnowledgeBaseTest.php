@@ -288,6 +288,20 @@ HTML;
         ->and(json_encode($result))->not->toContain('Not an item');
 });
 
+test('docs parser flattens line breaks and block elements inside list items', function () {
+    $html = <<<'HTML'
+<html><body><article>
+<h1>Map</h1>
+<h2 id="providers">Providers</h2>
+<ul><li>Leaflet<br>default</li><li>Google<p>needs a key</p></li><li>Mapbox<div>beta</div></li></ul>
+</article></body></html>
+HTML;
+
+    $result = (new DocsHtmlParser())->parse($html);
+
+    expect($result['sections'][0]['content'])->toBe("- Leaflet default\n- Google needs a key\n- Mapbox beta");
+});
+
 test('audience classifier tags pages by path and never loosens a section', function () {
     $classifier = aiKnowledgeClassifier();
 
@@ -488,7 +502,8 @@ test('docs site source discovers docs pages from the sitemap and parses them', f
         ->and($source->key())->toBe('fleetbase-docs')
         ->and($source->moduleFor(''))->toBe('overview')
         ->and($source->sectionFor('fleet-ops'))->toBeNull()
-        ->and($source->sectionFor('cli/account/login'))->toBe('CLI › Account');
+        ->and($source->sectionFor('cli/account/login'))->toBe('CLI › Account')
+        ->and($source->sectionFor('fleet-ops/orders/create'))->toBe('Fleet-Ops › Orders');
 });
 
 test('docs site source fails clearly when the sitemap is unavailable', function () {
