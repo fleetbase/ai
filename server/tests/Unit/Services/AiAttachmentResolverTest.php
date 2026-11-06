@@ -56,6 +56,21 @@ function aiAttachmentFile(array $attributes = [], string|Throwable|null $content
                     return true;
                 }
 
+                public function path($path)
+                {
+                    return $path;
+                }
+
+                public function putFile($path, $file = null, $options = [])
+                {
+                    return false;
+                }
+
+                public function putFileAs($path, $file, $name = null, $options = [])
+                {
+                    return false;
+                }
+
                 public function writeStream($path, $resource, array $options = [])
                 {
                     return true;

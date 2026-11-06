@@ -710,7 +710,7 @@ class AiAdminController extends Controller
         $start = Carbon::parse($from ?: (string) reset($days))->startOfDay();
         $end   = Carbon::parse($to ?: (string) end($days))->startOfDay();
 
-        if ($end->lt($start) || $start->diffInDays($end) > 366) {
+        if ($end->lt($start) || (int) $start->diffInDays($end, true) > 366) {
             return $rows->values();
         }
 
